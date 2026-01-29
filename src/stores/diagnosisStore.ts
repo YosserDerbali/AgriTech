@@ -46,6 +46,10 @@ interface DiagnosisStore {
   isLoading: boolean;
   addDiagnosis: (diagnosis: Omit<Diagnosis, 'id' | 'createdAt' | 'updatedAt'>) => void;
   getDiagnosis: (id: string) => Diagnosis | undefined;
+  getPendingDiagnoses: () => Diagnosis[];
+  approveDiagnosis: (id: string, treatment: string, notes?: string) => void;
+  rejectDiagnosis: (id: string, notes: string) => void;
+  updateDiagnosis: (id: string, updates: Partial<Diagnosis>) => void;
   setLoading: (loading: boolean) => void;
 }
 
@@ -64,5 +68,42 @@ export const useDiagnosisStore = create<DiagnosisStore>((set, get) => ({
     }));
   },
   getDiagnosis: (id) => get().diagnoses.find((d) => d.id === id),
+  getPendingDiagnoses: () => get().diagnoses.filter((d) => d.status === 'PENDING'),
+  approveDiagnosis: (id, treatment, notes) => {
+    set((state) => ({
+      diagnoses: state.diagnoses.map((d) =>
+        d.id === id
+          ? {
+              ...d,
+              status: 'APPROVED' as const,
+              treatment,
+              agronomistNotes: notes || d.agronomistNotes,
+              updatedAt: new Date(),
+            }
+          : d
+      ),
+    }));
+  },
+  rejectDiagnosis: (id, notes) => {
+    set((state) => ({
+      diagnoses: state.diagnoses.map((d) =>
+        d.id === id
+          ? {
+              ...d,
+              status: 'REJECTED' as const,
+              agronomistNotes: notes,
+              updatedAt: new Date(),
+            }
+          : d
+      ),
+    }));
+  },
+  updateDiagnosis: (id, updates) => {
+    set((state) => ({
+      diagnoses: state.diagnoses.map((d) =>
+        d.id === id ? { ...d, ...updates, updatedAt: new Date() } : d
+      ),
+    }));
+  },
   setLoading: (loading) => set({ isLoading: loading }),
 }));
