@@ -11,6 +11,8 @@ import DiagnosePage from "./pages/DiagnosePage";
 import HistoryPage from "./pages/HistoryPage";
 import DiagnosisDetailPage from "./pages/DiagnosisDetailPage";
 import ProfilePage from "./pages/ProfilePage";
+import FarmerArticlesPage from "./pages/FarmerArticlesPage";
+import ArticleDetailPage from "./pages/ArticleDetailPage";
 import NotFound from "./pages/NotFound";
 // Agronomist pages
 import AgronomistDashboardPage from "./pages/agronomist/AgronomistDashboardPage";
@@ -19,12 +21,18 @@ import DiagnosisReviewPage from "./pages/agronomist/DiagnosisReviewPage";
 import ArticlesPage from "./pages/agronomist/ArticlesPage";
 import ArticleEditorPage from "./pages/agronomist/ArticleEditorPage";
 import AgronomistProfilePage from "./pages/agronomist/AgronomistProfilePage";
+// Admin pages
+import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
+import UserManagementPage from "./pages/admin/UserManagementPage";
+import AIModelsPage from "./pages/admin/AIModelsPage";
+import SettingsPage from "./pages/admin/SettingsPage";
 
 const queryClient = new QueryClient();
 
 function AppContent() {
   const location = useLocation();
   const isAgronomistRoute = location.pathname.startsWith('/agronomist');
+  const isAdminRoute = location.pathname.startsWith('/admin');
 
   return (
     <div className="min-h-screen bg-background">
@@ -36,6 +44,8 @@ function AppContent() {
         <Route path="/history" element={<HistoryPage />} />
         <Route path="/diagnosis/:id" element={<DiagnosisDetailPage />} />
         <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/articles" element={<FarmerArticlesPage />} />
+        <Route path="/articles/:id" element={<ArticleDetailPage />} />
         
         {/* Agronomist routes */}
         <Route path="/agronomist" element={<AgronomistDashboardPage />} />
@@ -46,9 +56,15 @@ function AppContent() {
         <Route path="/agronomist/articles/edit/:id" element={<ArticleEditorPage />} />
         <Route path="/agronomist/profile" element={<AgronomistProfilePage />} />
         
+        {/* Admin routes */}
+        <Route path="/admin" element={<AdminDashboardPage />} />
+        <Route path="/admin/users" element={<UserManagementPage />} />
+        <Route path="/admin/ai-models" element={<AIModelsPage />} />
+        <Route path="/admin/settings" element={<SettingsPage />} />
+        
         <Route path="*" element={<NotFound />} />
       </Routes>
-      {isAgronomistRoute ? <AgronomistBottomNav /> : <BottomNav />}
+      {!isAdminRoute && (isAgronomistRoute ? <AgronomistBottomNav /> : <BottomNav />)}
     </div>
   );
 }

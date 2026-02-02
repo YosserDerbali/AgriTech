@@ -1,15 +1,26 @@
 import { useAppStore, UserRole } from '@/stores/appStore';
-import { Sprout, Stethoscope } from 'lucide-react';
+import { Sprout, Stethoscope, Shield } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 export function RoleSwitcher() {
   const { currentRole, setRole } = useAppStore();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Hide role switcher on admin pages
+  const isAdminRoute = location.pathname.startsWith('/admin');
+  if (isAdminRoute) return null;
 
   const handleRoleChange = (role: UserRole) => {
     setRole(role);
-    navigate(role === 'farmer' ? '/' : '/agronomist');
+    if (role === 'farmer') {
+      navigate('/');
+    } else if (role === 'agronomist') {
+      navigate('/agronomist');
+    } else {
+      navigate('/admin');
+    }
   };
 
   return (
@@ -37,6 +48,18 @@ export function RoleSwitcher() {
       >
         <Stethoscope className="w-3.5 h-3.5" />
         Agronomist
+      </button>
+      <button
+        onClick={() => handleRoleChange('admin')}
+        className={cn(
+          'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all',
+          currentRole === 'admin'
+            ? 'bg-destructive text-destructive-foreground'
+            : 'text-muted-foreground hover:text-foreground'
+        )}
+      >
+        <Shield className="w-3.5 h-3.5" />
+        Admin
       </button>
     </div>
   );

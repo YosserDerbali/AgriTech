@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { Article, ArticleFormData } from '@/types/article';
 
-// Mock data for demonstration
+// Mock data for demonstration - includes both agronomist and external articles
 const mockArticles: Article[] = [
   {
     id: '1',
@@ -60,6 +60,68 @@ Apply copper-based fungicides at the first sign of infection. Remove and destroy
     source: 'AGRONOMIST',
     tags: ['corn', 'pest management', 'IPM', 'sustainable farming'],
     createdAt: new Date(Date.now() - 86400000 * 7),
+    updatedAt: new Date(Date.now() - 86400000 * 5),
+    published: true,
+  },
+  {
+    id: '3',
+    authorId: 'external',
+    authorName: 'FAO Plant Production',
+    title: 'Climate-Smart Agriculture: Adapting to Changing Weather Patterns',
+    content: `Climate change poses significant challenges to agricultural productivity worldwide. This article explores practical strategies for adapting farming practices to changing weather patterns.
+
+## Key Challenges
+
+- Unpredictable rainfall patterns
+- Increased frequency of droughts
+- Rising temperatures affecting crop cycles
+- New pest and disease pressures
+
+## Adaptation Strategies
+
+1. **Drought-resistant varieties**: Selecting crops bred for water efficiency
+2. **Water harvesting**: Collecting and storing rainwater
+3. **Conservation tillage**: Reducing soil disturbance to retain moisture
+4. **Diversification**: Growing multiple crops to spread risk
+
+## Looking Forward
+
+Farmers who embrace climate-smart practices today will be better positioned for the challenges ahead.`,
+    excerpt: 'Practical strategies for adapting your farm to climate change.',
+    coverImageUrl: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800',
+    source: 'EXTERNAL',
+    externalUrl: 'https://www.fao.org/agriculture',
+    tags: ['climate change', 'adaptation', 'sustainable farming'],
+    createdAt: new Date(Date.now() - 86400000 * 2),
+    updatedAt: new Date(Date.now() - 86400000 * 2),
+    published: true,
+  },
+  {
+    id: '4',
+    authorId: 'external',
+    authorName: 'Agricultural Research Institute',
+    title: 'Soil Health: The Foundation of Productive Farming',
+    content: `Healthy soil is the cornerstone of sustainable agriculture. Understanding and maintaining soil health can dramatically improve crop yields while reducing input costs.
+
+## Indicators of Healthy Soil
+
+- Good structure and aggregation
+- Active biological community
+- Balanced nutrient levels
+- Adequate organic matter content
+
+## Improving Soil Health
+
+1. **Cover crops**: Protect and enrich soil between main crops
+2. **Composting**: Add organic matter to improve structure
+3. **Reduced tillage**: Preserve soil structure and biology
+4. **Crop rotation**: Break pest cycles and balance nutrients`,
+    excerpt: 'Understanding soil health for better crop yields.',
+    coverImageUrl: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=800',
+    source: 'EXTERNAL',
+    externalUrl: 'https://www.agriculture.org/soil-health',
+    tags: ['soil health', 'organic farming', 'composting'],
+    createdAt: new Date(Date.now() - 86400000 * 5),
     updatedAt: new Date(Date.now() - 86400000 * 5),
     published: true,
   },
