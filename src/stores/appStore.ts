@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-export type UserRole = 'farmer' | 'agronomist';
+export type UserRole = 'farmer' | 'agronomist' | 'admin';
 
 interface AppStore {
   currentRole: UserRole;
