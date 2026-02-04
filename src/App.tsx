@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { AgronomistBottomNav } from "@/components/layout/AgronomistBottomNav";
-import { RoleSwitcher } from "@/components/layout/RoleSwitcher";
+
 import { useAppStore } from "@/stores/appStore";
 import HomePage from "./pages/HomePage";
 import DiagnosePage from "./pages/DiagnosePage";
@@ -77,7 +77,7 @@ function AppContent() {
 
   return (
     <div className="min-h-screen bg-background">
-      {showNav && !isAdminRoute && <RoleSwitcher />}
+      
       <Routes>
         {/* Auth routes */}
         <Route path="/auth/farmer" element={<FarmerAuthPage />} />
