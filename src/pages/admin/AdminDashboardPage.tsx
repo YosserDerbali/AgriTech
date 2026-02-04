@@ -39,10 +39,11 @@ const statusData = [
 ];
 
 export default function AdminDashboardPage() {
-  const stats = useAdminStore((state) => state.getSystemStats());
+  const getSystemStats = useAdminStore((state) => state.getSystemStats);
   const diagnoses = useDiagnosisStore((state) => state.diagnoses);
   const articles = useArticleStore((state) => state.articles);
 
+  const stats = getSystemStats();
   const pendingCount = diagnoses.filter((d) => d.status === 'PENDING').length;
   const approvedCount = diagnoses.filter((d) => d.status === 'APPROVED').length;
 
