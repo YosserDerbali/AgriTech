@@ -1,7 +1,9 @@
+import { useNavigate } from 'react-router-dom';
 import { User, Settings, Bell, HelpCircle, LogOut, ChevronRight, Shield } from 'lucide-react';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { useAppStore } from '@/stores/appStore';
 import { toast } from 'sonner';
 
 const menuItems = [
@@ -12,12 +14,17 @@ const menuItems = [
 ];
 
 export default function ProfilePage() {
+  const navigate = useNavigate();
+  const { user, logout } = useAppStore();
+
   const handleMenuClick = (label: string) => {
     toast.info(`${label} - Ready for backend integration`);
   };
 
   const handleLogout = () => {
-    toast.info('Logout - Ready for auth integration');
+    logout();
+    toast.success('Logged out successfully');
+    navigate('/auth/farmer');
   };
 
   return (
@@ -33,8 +40,8 @@ export default function ProfilePage() {
                 <User className="w-8 h-8 text-primary" />
               </div>
               <div className="flex-1">
-                <h2 className="font-semibold text-lg">Farmer User</h2>
-                <p className="text-sm text-muted-foreground">farmer@example.com</p>
+                <h2 className="font-semibold text-lg">{user?.name || 'Farmer User'}</h2>
+                <p className="text-sm text-muted-foreground">{user?.email || 'farmer@example.com'}</p>
               </div>
               <Button variant="outline" size="sm">
                 Edit

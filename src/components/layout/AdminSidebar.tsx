@@ -1,4 +1,4 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   Users, 
@@ -11,6 +11,8 @@ import {
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { useAppStore } from '@/stores/appStore';
+import { toast } from 'sonner';
 
 const navItems = [
   { path: '/admin', icon: LayoutDashboard, label: 'Dashboard' },
@@ -21,7 +23,15 @@ const navItems = [
 
 export function AdminSidebar() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
+  const { logout } = useAppStore();
+
+  const handleLogout = () => {
+    logout();
+    toast.success('Logged out successfully');
+    navigate('/auth/admin');
+  };
 
   const SidebarContent = () => (
     <>
@@ -63,13 +73,13 @@ export function AdminSidebar() {
       </nav>
       
       <div className="p-4 border-t border-border">
-        <Link
-          to="/"
-          className="flex items-center gap-3 px-4 py-3 rounded-lg text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
         >
           <LogOut className="w-5 h-5" />
-          <span className="font-medium">Exit Admin</span>
-        </Link>
+          <span className="font-medium">Sign Out</span>
+        </button>
       </div>
     </>
   );

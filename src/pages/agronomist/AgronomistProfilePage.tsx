@@ -1,8 +1,11 @@
+import { useNavigate } from 'react-router-dom';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useDiagnosisStore } from '@/stores/diagnosisStore';
 import { useArticleStore } from '@/stores/articleStore';
+import { useAppStore } from '@/stores/appStore';
+import { toast } from 'sonner';
 import { 
   User, 
   Mail, 
@@ -23,15 +26,22 @@ const menuItems = [
   { icon: Award, label: 'Specialties' },
   { icon: Settings, label: 'Settings' },
   { icon: HelpCircle, label: 'Help & Support' },
-  { icon: LogOut, label: 'Sign Out', danger: true },
 ];
 
 export default function AgronomistProfilePage() {
+  const navigate = useNavigate();
   const { diagnoses } = useDiagnosisStore();
   const { getMyArticles } = useArticleStore();
+  const { user, logout } = useAppStore();
 
   const approvedByMe = diagnoses.filter((d) => d.status === 'APPROVED').length;
   const myArticles = getMyArticles();
+
+  const handleLogout = () => {
+    logout();
+    toast.success('Logged out successfully');
+    navigate('/auth/agronomist');
+  };
 
   return (
     <div className="min-h-screen pb-20">
@@ -50,10 +60,10 @@ export default function AgronomistProfilePage() {
               </div>
             </div>
             <div className="pt-12">
-              <h2 className="font-semibold text-lg">Dr. Sarah Green</h2>
+              <h2 className="font-semibold text-lg">{user?.name || 'Dr. Sarah Green'}</h2>
               <p className="text-sm text-muted-foreground flex items-center gap-1 mt-0.5">
                 <Mail className="w-3.5 h-3.5" />
-                sarah.green@agri.com
+                {user?.email || 'sarah.green@agri.com'}
               </p>
               <div className="flex items-center gap-2 mt-2">
                 <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-accent/20 text-accent text-xs font-medium">
@@ -134,8 +144,8 @@ export default function AgronomistProfilePage() {
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <item.icon className={`w-5 h-5 ${item.danger ? 'text-destructive' : 'text-muted-foreground'}`} />
-                  <span className={item.danger ? 'text-destructive' : ''}>{item.label}</span>
+                  <item.icon className="w-5 h-5 text-muted-foreground" />
+                  <span>{item.label}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   {item.badge && (
@@ -149,6 +159,16 @@ export default function AgronomistProfilePage() {
             ))}
           </CardContent>
         </Card>
+
+        {/* Logout Button */}
+        <Button
+          variant="outline"
+          className="w-full gap-2 text-destructive hover:text-destructive hover:bg-destructive/10"
+          onClick={handleLogout}
+        >
+          <LogOut className="w-4 h-4" />
+          Sign Out
+        </Button>
       </main>
     </div>
   );
