@@ -1,19 +1,12 @@
 import { Link } from 'react-router-dom';
-import { Camera, FileCheck, Clock, Sprout, ChevronRight, Leaf } from 'lucide-react';
+import { Camera, Sprout, ChevronRight, Leaf } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { StatCard } from '@/components/home/StatCard';
 import { DiagnosisCard } from '@/components/diagnosis/DiagnosisCard';
 import { useDiagnosisStore } from '@/stores/diagnosisStore';
 
 export default function HomePage() {
   const diagnoses = useDiagnosisStore((s) => s.diagnoses);
   const recentDiagnoses = diagnoses.slice(0, 3);
-  
-  const stats = {
-    total: diagnoses.length,
-    approved: diagnoses.filter((d) => d.status === 'APPROVED').length,
-    pending: diagnoses.filter((d) => d.status === 'PENDING').length,
-  };
 
   return (
     <div className="min-h-screen pb-20">
@@ -45,17 +38,8 @@ export default function HomePage() {
         </Link>
       </div>
 
-      {/* Stats */}
-      <div className="px-5 -mt-4">
-        <div className="grid grid-cols-3 gap-3 animate-fade-up" style={{ animationDelay: '0.3s' }}>
-          <StatCard icon={Sprout} label="Total Scans" value={stats.total} color="primary" />
-          <StatCard icon={FileCheck} label="Approved" value={stats.approved} color="approved" />
-          <StatCard icon={Clock} label="Pending" value={stats.pending} color="pending" />
-        </div>
-      </div>
-
       {/* Recent Activity */}
-      <div className="px-5 mt-8">
+      <div className="px-5 mt-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold">Recent Diagnoses</h2>
           <Link to="/history" className="text-sm text-primary font-medium flex items-center gap-1">
