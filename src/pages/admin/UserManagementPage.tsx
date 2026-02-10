@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { AdminSidebar } from '@/components/layout/AdminSidebar';
 import { UserTable } from '@/components/admin/UserTable';
+import { UserFormDialog } from '@/components/admin/UserFormDialog';
 import { useAdminStore } from '@/stores/adminStore';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { 
   Select,
   SelectContent,
@@ -10,14 +12,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Search, Users } from 'lucide-react';
-import { UserRole } from '@/types/admin';
+import { Search, Users, Plus } from 'lucide-react';
+import { User, UserRole } from '@/types/admin';
 import { toast } from 'sonner';
 
 export default function UserManagementPage() {
-  const { users, updateUserRole, toggleUserActive, deleteUser } = useAdminStore();
+  const { users, addUser, updateUser, updateUserRole, toggleUserActive, deleteUser } = useAdminStore();
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState<UserRole | 'ALL'>('ALL');
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingUser, setEditingUser] = useState<User | null>(null);
 
   const filteredUsers = users.filter((user) => {
     const matchesSearch = 
@@ -42,20 +46,46 @@ export default function UserManagementPage() {
     toast.success('User deleted successfully');
   };
 
+  const handleEdit = (user: User) => {
+    setEditingUser(user);
+    setDialogOpen(true);
+  };
+
+  const handleAddNew = () => {
+    setEditingUser(null);
+    setDialogOpen(true);
+  };
+
+  const handleFormSubmit = (data: { name: string; email: string; role: UserRole; isActive: boolean }) => {
+    if (editingUser) {
+      updateUser(editingUser.id, data);
+      toast.success('User updated successfully');
+    } else {
+      addUser({ ...data, lastLoginAt: undefined });
+      toast.success('User added successfully');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <AdminSidebar />
       
       <main className="lg:ml-72 pt-16 lg:pt-0">
         <div className="p-4 lg:p-8">
-          <div className="flex items-center gap-3 mb-8">
-            <div className="p-2 rounded-lg bg-primary/10">
-              <Users className="w-6 h-6 text-primary" />
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-primary/10">
+                <Users className="w-6 h-6 text-primary" />
+              </div>
+              <div>
+                <h1 className="text-2xl lg:text-3xl font-bold">User Management</h1>
+                <p className="text-muted-foreground">Manage users and their roles</p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-2xl lg:text-3xl font-bold">User Management</h1>
-              <p className="text-muted-foreground">Manage users and their roles</p>
-            </div>
+            <Button onClick={handleAddNew} className="gap-2">
+              <Plus className="w-4 h-4" />
+              Add User
+            </Button>
           </div>
 
           {/* Filters */}
@@ -111,6 +141,7 @@ export default function UserManagementPage() {
             onRoleChange={handleRoleChange}
             onToggleActive={handleToggleActive}
             onDelete={handleDelete}
+            onEdit={handleEdit}
           />
 
           {filteredUsers.length === 0 && (
@@ -119,6 +150,13 @@ export default function UserManagementPage() {
               <p className="text-muted-foreground">No users found</p>
             </div>
           )}
+
+          <UserFormDialog
+            open={dialogOpen}
+            onOpenChange={setDialogOpen}
+            user={editingUser}
+            onSubmit={handleFormSubmit}
+          />
         </div>
       </main>
     </div>

@@ -103,6 +103,8 @@ interface AdminStore {
   // User management
   getUsers: () => User[];
   getUsersByRole: (role: UserRole) => User[];
+  addUser: (user: Omit<User, 'id' | 'createdAt'>) => void;
+  updateUser: (userId: string, data: Partial<Omit<User, 'id' | 'createdAt'>>) => void;
   updateUserRole: (userId: string, role: UserRole) => void;
   toggleUserActive: (userId: string) => void;
   deleteUser: (userId: string) => void;
@@ -129,6 +131,21 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
   getUsers: () => get().users,
   
   getUsersByRole: (role) => get().users.filter((u) => u.role === role),
+
+  addUser: (userData) => {
+    const newUser: User = {
+      ...userData,
+      id: crypto.randomUUID(),
+      createdAt: new Date(),
+    };
+    set((state) => ({ users: [newUser, ...state.users] }));
+  },
+
+  updateUser: (userId, data) => {
+    set((state) => ({
+      users: state.users.map((u) => (u.id === userId ? { ...u, ...data } : u)),
+    }));
+  },
   
   updateUserRole: (userId, role) => {
     set((state) => ({
