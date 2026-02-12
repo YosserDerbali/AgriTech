@@ -28,3 +28,5 @@ export const Article = sequelize.define(
 
 User.hasMany(Article, { foreignKey: "author_id" });
 Article.belongsTo(User, { foreignKey: "author_id" });
+
+//we need to add fields to this table (cover_image_url, tags, etc...)

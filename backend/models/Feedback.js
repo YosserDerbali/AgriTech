@@ -27,3 +27,5 @@ Feedback.belongsTo(Prediction, { foreignKey: "prediction_id" });
 
 User.hasMany(Feedback, { foreignKey: "user_id" });
 Feedback.belongsTo(User, { foreignKey: "user_id" });
+
+//remark: I think it should be 1 to 1 relationship between Feedback and Prediction, but I will keep it as is for now.
