@@ -1,7 +1,8 @@
 import React from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View, SafeAreaView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { Feather } from '@expo/vector-icons';
 import { FarmerStackParamList } from '../../navigation/types';
 import { useDiagnosisStore } from '../../stores/diagnosisStore';
 import { DiagnosisCard } from '../../components/diagnosis/DiagnosisCard';
@@ -14,61 +15,69 @@ export default function HomeScreen() {
   const recentDiagnoses = diagnoses.slice(0, 3);
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <View style={styles.hero}>
-        <Text style={styles.heroTitle}>Welcome back! 👋</Text>
-        <Text style={styles.heroSubtitle}>
-          Protect your crops with AI-powered disease detection
-        </Text>
-        <Button
-          title="New Diagnosis"
-          onPress={() => navigation.navigate('FarmerTabs', { screen: 'Diagnose' } as never)}
-          style={styles.heroButton}
-        />
-      </View>
-
-      <View style={styles.section}>
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Recent Diagnoses</Text>
-          <Text style={styles.link} onPress={() => navigation.navigate('FarmerTabs', { screen: 'History' } as never)}>
-            View all
+    <SafeAreaView style={styles.safeContainer}>
+      <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+        <View style={styles.hero}>
+          <Text style={styles.heroTitle}>Welcome back! 👋</Text>
+          <Text style={styles.heroSubtitle}>
+            Protect your crops with AI-powered disease detection
           </Text>
+          <Button
+            title="New Diagnosis"
+            icon={<Feather name="camera" size={20} color={colors.success} />}
+            textColor={colors.success}
+            onPress={() => navigation.navigate('FarmerTabs', { screen: 'Diagnose' } as never)}
+            style={styles.heroButton}
+          />
         </View>
 
-        {recentDiagnoses.length > 0 ? (
-          recentDiagnoses.map((diagnosis) => (
-            <DiagnosisCard
-              key={diagnosis.id}
-              diagnosis={diagnosis}
-              onPress={() => navigation.navigate('DiagnosisDetail', { id: diagnosis.id })}
-            />
-          ))
-        ) : (
-          <View style={styles.emptyState}>
-            <Text style={styles.emptyTitle}>No diagnoses yet</Text>
-            <Text style={styles.emptyText}>Start by scanning your first plant.</Text>
-            <Button
-              title="Scan Plant"
-              onPress={() => navigation.navigate('FarmerTabs', { screen: 'Diagnose' } as never)}
-              style={styles.emptyButton}
-            />
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Recent Diagnoses</Text>
+            <Text style={styles.link} onPress={() => navigation.navigate('FarmerTabs', { screen: 'History' } as never)}>
+              View all
+            </Text>
           </View>
-        )}
-      </View>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Quick Tips</Text>
-        <View style={styles.tipCard}>
-          <Text style={styles.tipText}>
-            💡 Pro tip: Take photos in natural daylight and focus on the affected area.
-          </Text>
+          {recentDiagnoses.length > 0 ? (
+            recentDiagnoses.map((diagnosis) => (
+              <DiagnosisCard
+                key={diagnosis.id}
+                diagnosis={diagnosis}
+                onPress={() => navigation.navigate('DiagnosisDetail', { id: diagnosis.id })}
+              />
+            ))
+          ) : (
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyTitle}>No diagnoses yet</Text>
+              <Text style={styles.emptyText}>Start by scanning your first plant.</Text>
+              <Button
+                title="Scan Plant"
+                onPress={() => navigation.navigate('FarmerTabs', { screen: 'Diagnose' } as never)}
+                style={styles.emptyButton}
+              />
+            </View>
+          )}
         </View>
-      </View>
-    </ScrollView>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Quick Tips</Text>
+          <View style={styles.tipCard}>
+            <Text style={styles.tipText}>
+              💡 Pro tip: Take photos in natural daylight and focus on the affected area.
+            </Text>
+          </View>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeContainer: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
   container: {
     flex: 1,
     backgroundColor: colors.background,

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Linking, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Linking, ScrollView, StyleSheet, Text, View, SafeAreaView } from 'react-native';
 import { RouteProp, useRoute } from '@react-navigation/native';
 import { formatDistanceToNow } from 'date-fns';
 import { FarmerStackParamList } from '../../navigation/types';
@@ -13,9 +13,11 @@ export default function ArticleDetailScreen() {
 
   if (!article) {
     return (
-      <View style={styles.centered}>
-        <Text style={styles.title}>Article not found</Text>
-      </View>
+      <SafeAreaView style={styles.safeContainer}>
+        <View style={styles.centered}>
+          <Text style={styles.title}>Article not found</Text>
+        </View>
+      </SafeAreaView>
     );
   }
 
@@ -64,38 +66,44 @@ export default function ArticleDetailScreen() {
   };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Text style={styles.title}>{article.title}</Text>
-      <View style={styles.metaRow}>
-        <Text style={styles.meta}>{article.authorName}</Text>
-        <Text style={styles.meta}>{formatDistanceToNow(article.createdAt, { addSuffix: true })}</Text>
-      </View>
-      <Badge
-        label={article.source === 'EXTERNAL' ? 'External Source' : 'Expert Article'}
-        variant={article.source === 'EXTERNAL' ? 'outline' : 'secondary'}
-        style={styles.badge}
-      />
-
-      {article.tags.length > 0 ? (
-        <View style={styles.tagsRow}>
-          {article.tags.map((tag) => (
-            <Badge key={tag} label={tag} variant="outline" style={styles.tag} />
-          ))}
+    <SafeAreaView style={styles.safeContainer}>
+      <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+        <Text style={styles.title}>{article.title}</Text>
+        <View style={styles.metaRow}>
+          <Text style={styles.meta}>{article.authorName}</Text>
+          <Text style={styles.meta}>{formatDistanceToNow(article.createdAt, { addSuffix: true })}</Text>
         </View>
-      ) : null}
+        <Badge
+          label={article.source === 'EXTERNAL' ? 'External Source' : 'Expert Article'}
+          variant={article.source === 'EXTERNAL' ? 'outline' : 'secondary'}
+          style={styles.badge}
+        />
 
-      {article.source === 'EXTERNAL' && article.externalUrl ? (
-        <Text style={styles.link} onPress={() => Linking.openURL(article.externalUrl!)}>
-          Read on original source
-        </Text>
-      ) : null}
+        {article.tags.length > 0 ? (
+          <View style={styles.tagsRow}>
+            {article.tags.map((tag) => (
+              <Badge key={tag} label={tag} variant="outline" style={styles.tag} />
+            ))}
+          </View>
+        ) : null}
 
-      <View style={styles.contentBlock}>{renderContent(article.content)}</View>
-    </ScrollView>
+        {article.source === 'EXTERNAL' && article.externalUrl ? (
+          <Text style={styles.link} onPress={() => Linking.openURL(article.externalUrl!)}>
+            Read on original source
+          </Text>
+        ) : null}
+
+        <View style={styles.contentBlock}>{renderContent(article.content)}</View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeContainer: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
   container: {
     flex: 1,
     backgroundColor: colors.background,

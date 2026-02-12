@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Linking, Pressable, ScrollView, StyleSheet, Text, View, SafeAreaView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { formatDistanceToNow } from 'date-fns';
@@ -25,9 +25,10 @@ export default function FarmerArticlesScreen() {
     : externalArticles;
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Text style={styles.title}>Articles</Text>
-      <Text style={styles.subtitle}>Learn from experts and trusted sources</Text>
+    <SafeAreaView style={styles.safeContainer}>
+      <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+        <Text style={styles.title}>Articles</Text>
+        <Text style={styles.subtitle}>Learn from experts and trusted sources</Text>
 
       <View style={styles.tabs}>
         {['all', 'agronomist', 'external'].map((value) => (
@@ -69,7 +70,8 @@ export default function FarmerArticlesScreen() {
           ))
         )}
       </View>
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
@@ -84,6 +86,10 @@ function ArticleListItem({ article, onPress }: { article: Article; onPress: () =
 }
 
 const styles = StyleSheet.create({
+  safeContainer: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
   container: {
     flex: 1,
     backgroundColor: colors.background,

@@ -1,7 +1,8 @@
 import React from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View, SafeAreaView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { Feather } from '@expo/vector-icons';
 import { AgronomistStackParamList } from '../../navigation/types';
 import { useDiagnosisStore } from '../../stores/diagnosisStore';
 import { useArticleStore } from '../../stores/articleStore';
@@ -21,13 +22,14 @@ export default function AgronomistDashboardScreen() {
   const myArticles = getMyArticles();
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Text style={styles.title}>Dashboard</Text>
+    <SafeAreaView style={styles.safeContainer}>
+      <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+        <Text style={styles.title}>Dashboard</Text>
 
-      <View style={styles.welcomeCard}>
-        <Text style={styles.welcomeTitle}>Welcome back, Dr. Green!</Text>
-        <Text style={styles.welcomeText}>
-          You have {pendingDiagnoses.length} diagnoses waiting for your review.
+        <View style={styles.welcomeCard}>
+          <Text style={styles.welcomeTitle}>Welcome back, Dr. Green!</Text>
+          <Text style={styles.welcomeText}>
+            You have {pendingDiagnoses.length} diagnoses waiting for your review.
         </Text>
       </View>
 
@@ -76,22 +78,29 @@ export default function AgronomistDashboardScreen() {
           <Button
             title="Review Queue"
             variant="outline"
+            icon={<Feather name="camera" size={18} color={colors.text} />}
             onPress={() => navigation.navigate('AgronomistTabs', { screen: 'PendingQueue' } as never)}
             style={styles.quickButton}
           />
           <Button
             title="Write Article"
             variant="outline"
+            icon={<Feather name="camera" size={18} color={colors.text} />}
             onPress={() => navigation.navigate('ArticleEditor', {})}
             style={styles.quickButtonLast}
           />
         </View>
       </View>
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeContainer: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
   container: {
     flex: 1,
     backgroundColor: colors.background,

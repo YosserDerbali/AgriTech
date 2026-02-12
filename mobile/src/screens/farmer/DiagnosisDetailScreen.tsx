@@ -1,5 +1,5 @@
 import React from 'react';
-import { Alert, Image, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, Image, ScrollView, StyleSheet, Text, View, SafeAreaView } from 'react-native';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { format } from 'date-fns';
@@ -17,10 +17,12 @@ export default function DiagnosisDetailScreen() {
 
   if (!diagnosis) {
     return (
-      <View style={styles.centered}>
-        <Text style={styles.title}>Diagnosis not found</Text>
-        <Button title="Go to History" variant="outline" onPress={() => navigation.goBack()} />
-      </View>
+      <SafeAreaView style={styles.safeContainer}>
+        <View style={styles.centered}>
+          <Text style={styles.title}>Diagnosis not found</Text>
+          <Button title="Go to History" variant="outline" onPress={() => navigation.goBack()} />
+        </View>
+      </SafeAreaView>
     );
   }
 
@@ -29,66 +31,72 @@ export default function DiagnosisDetailScreen() {
   };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Image source={{ uri: diagnosis.imageUrl }} style={styles.image} />
-      <View style={styles.statusWrap}>
-        <StatusBadge status={diagnosis.status} />
-      </View>
+    <SafeAreaView style={styles.safeContainer}>
+      <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+        <Image source={{ uri: diagnosis.imageUrl }} style={styles.image} />
+        <View style={styles.statusWrap}>
+          <StatusBadge status={diagnosis.status} />
+        </View>
 
-      <View style={styles.section}>
-        <Text style={styles.heading}>{diagnosis.diseaseName || 'Pending Analysis'}</Text>
-        <Text style={styles.subheading}>Plant: {diagnosis.plantName}</Text>
-        <Text style={styles.metaText}>Submitted {format(diagnosis.createdAt, 'MMM d, yyyy h:mm a')}</Text>
-      </View>
+        <View style={styles.section}>
+          <Text style={styles.heading}>{diagnosis.diseaseName || 'Pending Analysis'}</Text>
+          <Text style={styles.subheading}>Plant: {diagnosis.plantName}</Text>
+          <Text style={styles.metaText}>Submitted {format(diagnosis.createdAt, 'MMM d, yyyy h:mm a')}</Text>
+        </View>
 
-      {diagnosis.confidence !== null && (
-        <Card style={styles.card}>
-          <Text style={styles.cardTitle}>AI Confidence</Text>
-          <View style={styles.progressTrack}>
-            <View style={[styles.progressFill, { width: `${diagnosis.confidence * 100}%` }]} />
-          </View>
-          <Text style={styles.progressValue}>{Math.round(diagnosis.confidence * 100)}%</Text>
-        </Card>
-      )}
+        {diagnosis.confidence !== null && (
+          <Card style={styles.card}>
+            <Text style={styles.cardTitle}>AI Confidence</Text>
+            <View style={styles.progressTrack}>
+              <View style={[styles.progressFill, { width: `${diagnosis.confidence * 100}%` }]} />
+            </View>
+            <Text style={styles.progressValue}>{Math.round(diagnosis.confidence * 100)}%</Text>
+          </Card>
+        )}
 
-      {diagnosis.status === 'APPROVED' && diagnosis.treatment && (
-        <Card style={styles.card}>
-          <Text style={styles.cardTitle}>Treatment Recommendation</Text>
-          <Text style={styles.cardText}>{diagnosis.treatment}</Text>
-        </Card>
-      )}
+        {diagnosis.status === 'APPROVED' && diagnosis.treatment && (
+          <Card style={styles.card}>
+            <Text style={styles.cardTitle}>Treatment Recommendation</Text>
+            <Text style={styles.cardText}>{diagnosis.treatment}</Text>
+          </Card>
+        )}
 
-      {diagnosis.agronomistNotes && (
-        <Card style={styles.card}>
-          <Text style={styles.cardTitle}>Agronomist Notes</Text>
-          <Text style={styles.cardText}>{diagnosis.agronomistNotes}</Text>
-        </Card>
-      )}
+        {diagnosis.agronomistNotes && (
+          <Card style={styles.card}>
+            <Text style={styles.cardTitle}>Agronomist Notes</Text>
+            <Text style={styles.cardText}>{diagnosis.agronomistNotes}</Text>
+          </Card>
+        )}
 
-      {diagnosis.status === 'PENDING' && (
-        <Card style={styles.card}>
-          <Text style={styles.cardTitle}>Awaiting Expert Review</Text>
-          <Text style={styles.cardText}>
-            An agronomist will review your submission and provide treatment recommendations soon.
-          </Text>
-        </Card>
-      )}
+        {diagnosis.status === 'PENDING' && (
+          <Card style={styles.card}>
+            <Text style={styles.cardTitle}>Awaiting Expert Review</Text>
+            <Text style={styles.cardText}>
+              An agronomist will review your submission and provide treatment recommendations soon.
+            </Text>
+          </Card>
+        )}
 
-      {diagnosis.status === 'REJECTED' && (
-        <Card style={[styles.card, styles.rejected]}>
-          <Text style={styles.cardTitle}>Review Required</Text>
-          <Text style={styles.cardText}>
-            {diagnosis.agronomistNotes || 'Please submit a new image with better quality for accurate diagnosis.'}
-          </Text>
-        </Card>
-      )}
+        {diagnosis.status === 'REJECTED' && (
+          <Card style={[styles.card, styles.rejected]}>
+            <Text style={styles.cardTitle}>Review Required</Text>
+            <Text style={styles.cardText}>
+              {diagnosis.agronomistNotes || 'Please submit a new image with better quality for accurate diagnosis.'}
+            </Text>
+          </Card>
+        )}
 
-      <Button title="Report Incorrect Prediction" variant="outline" onPress={handleReport} />
-    </ScrollView>
+        <Button title="Report Incorrect Prediction" variant="outline" onPress={handleReport} />
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeContainer: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
   container: {
     flex: 1,
     backgroundColor: colors.background,

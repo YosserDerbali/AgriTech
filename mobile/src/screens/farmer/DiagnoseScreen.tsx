@@ -1,5 +1,16 @@
 import React, { useState } from 'react';
-import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
+import {
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+  SafeAreaView,
+  KeyboardAvoidingView,
+  Platform,
+  Keyboard,
+  TouchableOpacity,
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { FarmerStackParamList } from '../../navigation/types';
@@ -52,56 +63,80 @@ export default function DiagnoseScreen() {
   };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Text style={styles.title}>New Diagnosis</Text>
+    <SafeAreaView style={styles.safeContainer}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.keyboardAvoid}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+      >
+        <ScrollView
+          style={styles.container}
+          contentContainerStyle={styles.content}
+          scrollEnabled={true}
+          keyboardShouldPersistTaps="handled"
+        >
+          <Text style={styles.title}>New Diagnosis</Text>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Plant Image</Text>
-        <ImageUploader
-          selectedImage={selectedImage}
-          onImageSelect={setSelectedImage}
-          onClear={() => setSelectedImage(null)}
-        />
-      </View>
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Plant Image</Text>
+            <ImageUploader
+              selectedImage={selectedImage}
+              onImageSelect={setSelectedImage}
+              onClear={() => setSelectedImage(null)}
+            />
+          </View>
 
-      <View style={styles.section}>
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Additional Context</Text>
-          <Text style={styles.optional}>(Optional)</Text>
-        </View>
-        <Textarea
-          placeholder="Describe any symptoms, growing conditions, or concerns..."
-          value={context}
-          onChangeText={setContext}
-          style={styles.textarea}
-        />
-        <Button
-          title={isRecording ? 'Stop Recording' : 'Add Voice Note'}
-          variant={isRecording ? 'destructive' : 'outline'}
-          onPress={toggleRecording}
-          style={styles.voiceButton}
-        />
-        {isRecording ? <Text style={styles.recording}>Recording voice note...</Text> : null}
-      </View>
+          <TouchableOpacity
+            activeOpacity={1}
+            style={styles.section}
+            onPress={Keyboard.dismiss}
+          >
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Additional Context</Text>
+              <Text style={styles.optional}>(Optional)</Text>
+            </View>
+            <Textarea
+              placeholder="Describe any symptoms, growing conditions, or concerns..."
+              value={context}
+              onChangeText={setContext}
+              style={styles.textarea}
+            />
+            <Button
+              title={isRecording ? 'Stop Recording' : 'Add Voice Note'}
+              variant={isRecording ? 'destructive' : 'outline'}
+              onPress={toggleRecording}
+              style={styles.voiceButton}
+            />
+            {isRecording ? <Text style={styles.recording}>Recording voice note...</Text> : null}
+          </TouchableOpacity>
 
-      <View style={styles.infoBox}>
-        <Text style={styles.infoTitle}>How it works</Text>
-        <Text style={styles.infoText}>
-          Your image will be analyzed by AI and reviewed by an agronomist for accurate diagnosis and treatment.
-        </Text>
-      </View>
+          <View style={styles.infoBox}>
+            <Text style={styles.infoTitle}>How it works</Text>
+            <Text style={styles.infoText}>
+              Your image will be analyzed by AI and reviewed by an agronomist for accurate diagnosis and treatment.
+            </Text>
+          </View>
 
-      <Button
-        title={isLoading ? 'Analyzing...' : 'Submit for Diagnosis'}
-        onPress={handleSubmit}
-        disabled={!selectedImage || isLoading}
-        style={styles.submitButton}
-      />
-    </ScrollView>
+          <Button
+            title={isLoading ? 'Analyzing...' : 'Submit for Diagnosis'}
+            onPress={handleSubmit}
+            disabled={!selectedImage || isLoading}
+            style={styles.submitButton}
+          />
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeContainer: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  keyboardAvoid: {
+    flex: 1,
+  },
   container: {
     flex: 1,
     backgroundColor: colors.background,
