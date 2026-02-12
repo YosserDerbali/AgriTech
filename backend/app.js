@@ -1,13 +1,16 @@
 const express = require('express')
 const app = express();
+const cors = require("cors");
 const { sequelize } = require("./models/index.js");
 require("./models/index.js");
 const cron = require("node-cron");
 const cleanupNotifications = require("./services/cleanUpNotification.js");
+const adminRoutes = require("./routes/admin.js");
+
 
 app.use(express.json());
-
-
+app.use(cors());
+app.use("/admin", adminRoutes);
 
 (async () => {
   try {
