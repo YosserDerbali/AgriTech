@@ -1,5 +1,5 @@
 import React from 'react';
-import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, ScrollView, StyleSheet, Text, View, SafeAreaView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { FarmerStackParamList } from '../../navigation/types';
@@ -25,46 +25,52 @@ export default function FarmerProfileScreen() {
   };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Text style={styles.title}>Profile</Text>
+    <SafeAreaView style={styles.safeContainer}>
+      <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+        <Text style={styles.title}>Profile</Text>
 
-      <Card style={styles.card}>
-        <Text style={styles.name}>{user?.name || 'Farmer User'}</Text>
-        <Text style={styles.email}>{user?.email || 'farmer@example.com'}</Text>
-        <Button title="Edit" variant="outline" onPress={() => Alert.alert('Edit profile', 'Coming soon.')} />
-      </Card>
+        <Card style={styles.card}>
+          <Text style={styles.name}>{user?.name || 'Farmer User'}</Text>
+          <Text style={styles.email}>{user?.email || 'farmer@example.com'}</Text>
+          <Button title="Edit" variant="outline" onPress={() => Alert.alert('Edit profile', 'Coming soon.')} />
+        </Card>
 
-      <View style={styles.statsRow}>
-        <View style={styles.statBox}>
-          <Text style={styles.statValue}>12</Text>
-          <Text style={styles.statLabel}>Total Scans</Text>
+        <View style={styles.statsRow}>
+          <View style={styles.statBox}>
+            <Text style={styles.statValue}>12</Text>
+            <Text style={styles.statLabel}>Total Scans</Text>
+          </View>
+          <View style={styles.statBox}>
+            <Text style={styles.statValue}>8</Text>
+            <Text style={styles.statLabel}>Treated</Text>
+          </View>
+          <View style={styles.statBox}>
+            <Text style={styles.statValue}>92%</Text>
+            <Text style={styles.statLabel}>Accuracy</Text>
+          </View>
         </View>
-        <View style={styles.statBox}>
-          <Text style={styles.statValue}>8</Text>
-          <Text style={styles.statLabel}>Treated</Text>
-        </View>
-        <View style={styles.statBox}>
-          <Text style={styles.statValue}>92%</Text>
-          <Text style={styles.statLabel}>Accuracy</Text>
-        </View>
-      </View>
 
-      <Card style={styles.card}>
-        {menuItems.map((item) => (
-          <Text key={item} style={styles.menuItem} onPress={() => handleMenuClick(item)}>
-            {item}
-          </Text>
-        ))}
-      </Card>
+        <Card style={styles.card}>
+          {menuItems.map((item) => (
+            <Text key={item} style={styles.menuItem} onPress={() => handleMenuClick(item)}>
+              {item}
+            </Text>
+          ))}
+        </Card>
 
-      <Button title="Log Out" variant="outline" onPress={handleLogout} />
+        <Button title="Log Out" variant="outline" onPress={handleLogout} />
 
-      <Text style={styles.footer}>AgriScan v1.0.0 · Made with 🌱 for farmers</Text>
-    </ScrollView>
+        <Text style={styles.footer}>AgriScan v1.0.0 · Made with 🌱 for farmers</Text>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeContainer: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
   container: {
     flex: 1,
     backgroundColor: colors.background,

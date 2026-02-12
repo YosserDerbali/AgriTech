@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View, SafeAreaView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AgronomistStackParamList } from '../../navigation/types';
@@ -14,10 +14,11 @@ export default function AgronomistArticlesScreen() {
   const myArticles = getMyArticles();
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <View style={styles.headerRow}>
-        <Text style={styles.title}>My Articles</Text>
-        <Button title="New" onPress={() => navigation.navigate('ArticleEditor', {})} />
+    <SafeAreaView style={styles.safeContainer}>
+      <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+        <View style={styles.headerRow}>
+          <Text style={styles.title}>My Articles</Text>
+          <Button title="New" onPress={() => navigation.navigate('ArticleEditor', {})} />
       </View>
 
       {myArticles.length === 0 ? (
@@ -37,11 +38,16 @@ export default function AgronomistArticlesScreen() {
           />
         ))
       )}
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeContainer: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
   container: {
     flex: 1,
     backgroundColor: colors.background,

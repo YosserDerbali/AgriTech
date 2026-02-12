@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, ScrollView, StyleSheet, Text, View, SafeAreaView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AuthStackParamList } from '../../navigation/types';
@@ -54,8 +54,9 @@ export default function FarmerAuthScreen() {
   };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Text style={styles.title}>{isSignUp ? 'Create Account' : 'Welcome Back'}</Text>
+    <SafeAreaView style={styles.safeContainer}>
+      <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+        <Text style={styles.title}>{isSignUp ? 'Create Account' : 'Farmer portal'}</Text>
       <Text style={styles.subtitle}>
         {isSignUp
           ? 'Join thousands of farmers using AI to protect their crops'
@@ -98,10 +99,15 @@ export default function FarmerAuthScreen() {
 
       <Text style={styles.demo}>Demo: farmer@test.com / password123</Text>
     </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeContainer: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
   container: {
     flex: 1,
     backgroundColor: colors.background,

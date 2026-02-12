@@ -1,5 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
+import {
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+  SafeAreaView,
+  KeyboardAvoidingView,
+  Platform,
+  Keyboard,
+  TouchableOpacity,
+} from 'react-native';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AgronomistStackParamList } from '../../navigation/types';
@@ -79,37 +90,57 @@ export default function ArticleEditorScreen() {
   };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Text style={styles.title}>{isEditing ? 'Edit Article' : 'New Article'}</Text>
+    <SafeAreaView style={styles.safeContainer}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.keyboardAvoid}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+      >
+        <ScrollView
+          style={styles.container}
+          contentContainerStyle={styles.content}
+          scrollEnabled={true}
+          keyboardShouldPersistTaps="handled"
+        >
+          <Text style={styles.title}>{isEditing ? 'Edit Article' : 'New Article'}</Text>
 
-      {isEditing ? (
-        <Button title="Delete" variant="destructive" onPress={handleDelete} style={styles.deleteButton} />
-      ) : null}
+          {isEditing ? (
+            <Button title="Delete" variant="destructive" onPress={handleDelete} style={styles.deleteButton} />
+          ) : null}
 
-      <Text style={styles.label}>Cover Image URL (Optional)</Text>
-      <Input placeholder="https://example.com/image.jpg" value={coverImageUrl} onChangeText={setCoverImageUrl} style={styles.input} />
+          <Text style={styles.label}>Cover Image URL (Optional)</Text>
+          <Input placeholder="https://example.com/image.jpg" value={coverImageUrl} onChangeText={setCoverImageUrl} style={styles.input} />
 
-      <Text style={styles.label}>Title *</Text>
-      <Input placeholder="Enter article title..." value={title} onChangeText={setTitle} style={styles.input} />
+          <Text style={styles.label}>Title *</Text>
+          <Input placeholder="Enter article title..." value={title} onChangeText={setTitle} style={styles.input} />
 
-      <Text style={styles.label}>Excerpt *</Text>
-      <Textarea placeholder="Write a short summary..." value={excerpt} onChangeText={setExcerpt} style={styles.textarea} />
+          <Text style={styles.label}>Excerpt *</Text>
+          <Textarea placeholder="Write a short summary..." value={excerpt} onChangeText={setExcerpt} style={styles.textarea} />
 
-      <Text style={styles.label}>Content *</Text>
-      <Textarea placeholder="Write your article content here..." value={content} onChangeText={setContent} style={styles.textareaLarge} />
+          <Text style={styles.label}>Content *</Text>
+          <Textarea placeholder="Write your article content here..." value={content} onChangeText={setContent} style={styles.textareaLarge} />
 
-      <Text style={styles.label}>Tags</Text>
-      <Input placeholder="e.g., tomato, disease prevention, organic" value={tags} onChangeText={setTags} style={styles.input} />
+          <Text style={styles.label}>Tags</Text>
+          <Input placeholder="e.g., tomato, disease prevention, organic" value={tags} onChangeText={setTags} style={styles.input} />
 
-      <View style={styles.actionRow}>
-        <Button title="Cancel" variant="outline" onPress={() => navigation.goBack()} style={styles.actionButton} />
-        <Button title={isEditing ? 'Update' : 'Publish'} onPress={handleSubmit} disabled={isSubmitting} style={styles.actionButtonLast} />
-      </View>
-    </ScrollView>
+          <View style={styles.actionRow}>
+            <Button title="Cancel" variant="outline" onPress={() => navigation.goBack()} style={styles.actionButton} />
+            <Button title={isEditing ? 'Update' : 'Publish'} onPress={handleSubmit} disabled={isSubmitting} style={styles.actionButtonLast} />
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeContainer: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  keyboardAvoid: {
+    flex: 1,
+  },
   container: {
     flex: 1,
     backgroundColor: colors.background,

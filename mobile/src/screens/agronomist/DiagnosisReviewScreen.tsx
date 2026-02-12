@@ -1,5 +1,17 @@
 import React, { useState } from 'react';
-import { Alert, Image, ScrollView, StyleSheet, Text, View } from 'react-native';
+import {
+  Alert,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+  SafeAreaView,
+  KeyboardAvoidingView,
+  Platform,
+  Keyboard,
+  TouchableOpacity,
+} from 'react-native';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { format, formatDistanceToNow } from 'date-fns';
@@ -28,9 +40,11 @@ export default function DiagnosisReviewScreen() {
 
   if (!diagnosis) {
     return (
-      <View style={styles.centered}>
-        <Text style={styles.title}>Diagnosis not found</Text>
-      </View>
+      <SafeAreaView style={styles.safeContainer}>
+        <View style={styles.centered}>
+          <Text style={styles.title}>Diagnosis not found</Text>
+        </View>
+      </SafeAreaView>
     );
   }
 
@@ -63,9 +77,20 @@ export default function DiagnosisReviewScreen() {
   };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Text style={styles.title}>Review Diagnosis</Text>
-      <StatusBadge status={diagnosis.status} />
+    <SafeAreaView style={styles.safeContainer}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.keyboardAvoid}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+      >
+        <ScrollView
+          style={styles.container}
+          contentContainerStyle={styles.content}
+          scrollEnabled={true}
+          keyboardShouldPersistTaps="handled"
+        >
+          <Text style={styles.title}>Review Diagnosis</Text>
+          <StatusBadge status={diagnosis.status} />
 
       <Card style={styles.card}>
         <Image source={{ uri: diagnosis.imageUrl }} style={styles.image} />
@@ -170,11 +195,20 @@ export default function DiagnosisReviewScreen() {
           />
         </View>
       ) : null}
-    </ScrollView>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeContainer: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  keyboardAvoid: {
+    flex: 1,
+  },
   container: {
     flex: 1,
     backgroundColor: colors.background,
