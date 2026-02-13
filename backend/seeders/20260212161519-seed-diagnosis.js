@@ -3,7 +3,7 @@ const { v4: uuidv4 } = require("uuid");
 
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.bulkInsert("diagnoses", [
+    await queryInterface.bulkInsert("diagnosis", [
       {
         id: uuidv4(),
         image_url: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400',
@@ -44,6 +44,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.bulkDelete("diagnoses", null, {});
+    await queryInterface.bulkDelete("diagnosis", null, {});
   },
 };

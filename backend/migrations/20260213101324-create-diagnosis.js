@@ -2,7 +2,7 @@
 
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable("diagnoses", {
+    await queryInterface.createTable("diagnosis", {
       id: {
         type: Sequelize.UUID,
         defaultValue: Sequelize.UUIDV4,
@@ -26,10 +26,8 @@ module.exports = {
       },
       status: {
         type: Sequelize.ENUM(
-          "APPROVED",
           "PENDING",
-          "COMPLETED",
-          "REVIEWED",
+          "APPROVED",
           "REJECTED"
         ),
         allowNull: false,
@@ -55,6 +53,6 @@ module.exports = {
   },
 
   async down(queryInterface) {
-    await queryInterface.dropTable("diagnoses");
+    await queryInterface.dropTable("diagnosis");
   },
 };
