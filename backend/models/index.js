@@ -1,14 +1,16 @@
-const { sequelize } = require("../config/database");
+const { sequelize } = require("../config/database.js");
 
-const { User } = require("./User");
-const { AgronomistProfile } = require("./AgronomistProfile");
-const { Article } = require("./Article");
-const { Notification } = require("./Notification");
-const { Plant } = require("./Plant");
-const { Disease } = require("./Disease");
-const { Image } = require("./Image");
-const { Prediction } = require("./Prediction");
-const { Feedback } = require("./Feedback");
+const { User } = require("./User.js");
+const { AgronomistProfile } = require("./AgronomistProfile.js");
+const { Article } = require("./Article.js");
+const { Notification } = require("./Notification.js");
+const { Plant } = require("./Plant.js");
+const { Disease } = require("./Disease.js");
+const { Image } = require("./Image.js");
+const { Prediction } = require("./Prediction.js");
+const { Feedback } = require("./Feedback.js");
+const { Diagnosis } = require("./Diagnosis.js");
+const { AiModel } = require("./AiModel.js");
 
 module.exports = {
   sequelize,
@@ -21,4 +23,6 @@ module.exports = {
   Image,
   Prediction,
   Feedback,
+  Diagnosis,
+  AiModel,
 };

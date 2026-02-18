@@ -1,9 +1,7 @@
-import { DataTypes } from "sequelize";
-import { sequelize } from "../config/database.js";
-import { User } from "./User.js";
-import { Plant } from "./Plant.js";
+const { DataTypes } = require("sequelize");
+const { sequelize } = require("../config/database.js");
 
-export const Image = sequelize.define(
+const Image = sequelize.define(
   "Image",
   {
     id: {
@@ -22,8 +20,4 @@ export const Image = sequelize.define(
   }
 );
 
-User.hasMany(Image, { foreignKey: "user_id" });
-Image.belongsTo(User, { foreignKey: "user_id" });
-
-Plant.hasMany(Image, { foreignKey: "plant_id" });
-Image.belongsTo(Plant, { foreignKey: "plant_id" });
+module.exports = { Image };

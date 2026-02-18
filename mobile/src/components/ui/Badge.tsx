@@ -1,17 +1,23 @@
 import React from 'react';
-import { StyleSheet, Text, View, ViewStyle } from 'react-native';
-import { colors } from '../../theme/colors';
+import { StyleSheet, Text, View, ViewStyle, TextStyle } from 'react-native';
+import { colors, shadows } from '../../theme/colors';
+import { typography, fontFamilies } from '../../theme/typography';
+import { radius, spacing } from '../../theme/spacing';
+
+type BadgeVariant = 'default' | 'outline' | 'secondary' | 'success' | 'warning' | 'error' | 'pending';
 
 type BadgeProps = {
   label: string;
-  variant?: 'default' | 'outline' | 'secondary';
+  variant?: BadgeVariant;
   style?: ViewStyle;
+  icon?: React.ReactNode;
 };
 
-export function Badge({ label, variant = 'default', style }: BadgeProps) {
+export function Badge({ label, variant = 'default', style, icon }: BadgeProps) {
   const stylesByVariant = variantStyles[variant];
   return (
-    <View style={[styles.base, stylesByVariant.container, style]}>
+    <View style={[styles.base, stylesByVariant.container, icon && styles.withIcon, style]}>
+      {icon && <View style={styles.iconContainer}>{icon}</View>}
       <Text style={[styles.text, stylesByVariant.text]}>{label}</Text>
     </View>
   );
@@ -19,28 +25,71 @@ export function Badge({ label, variant = 'default', style }: BadgeProps) {
 
 const styles = StyleSheet.create({
   base: {
-    borderRadius: 999,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
+    borderRadius: radius.full,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
     alignSelf: 'flex-start',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  withIcon: {
+    paddingLeft: spacing.sm,
+  },
+  iconContainer: {
+    marginRight: spacing.xs,
   },
   text: {
-    fontSize: 12,
+    fontFamily: fontFamilies.semibold,
     fontWeight: '600',
+    fontSize: 12,
+    lineHeight: 16,
   },
 });
 
-const variantStyles = {
+const variantStyles: Record<BadgeVariant, { container: ViewStyle; text: TextStyle }> = {
   default: {
-    container: { backgroundColor: colors.primarySoft },
+    container: {
+      backgroundColor: colors.primarySoft,
+    },
     text: { color: colors.primary },
   },
-  outline: {
-    container: { borderWidth: 1, borderColor: colors.border, backgroundColor: 'transparent' },
-    text: { color: colors.muted },
-  },
   secondary: {
-    container: { backgroundColor: '#E2E8F0' },
+    container: {
+      backgroundColor: colors.accentSoft,
+    },
+    text: { color: colors.accent },
+  },
+  outline: {
+    container: {
+      borderWidth: 1,
+      borderColor: colors.border,
+      backgroundColor: colors.surface,
+    },
     text: { color: colors.text },
+  },
+  success: {
+    container: {
+      backgroundColor: colors.successLight,
+    },
+    text: { color: colors.success },
+  },
+  warning: {
+    container: {
+      backgroundColor: colors.warningLight,
+    },
+    text: { color: colors.warning },
+  },
+  error: {
+    container: {
+      backgroundColor: colors.errorLight,
+    },
+    text: { color: colors.error },
+  },
+  pending: {
+    container: {
+      backgroundColor: colors.pendingLight,
+    },
+    text: { color: colors.pending },
   },
 };

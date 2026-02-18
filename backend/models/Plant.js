@@ -1,7 +1,7 @@
-import { DataTypes } from "sequelize";
-import { sequelize } from "../config/database.js";
+const { DataTypes } = require("sequelize");
+const { sequelize } = require("../config/database.js");
 
-export const Plant = sequelize.define(
+const Plant = sequelize.define(
   "Plant",
   {
     id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
@@ -13,3 +13,5 @@ export const Plant = sequelize.define(
     timestamps: false,
   }
 );
+
+module.exports = { Plant };

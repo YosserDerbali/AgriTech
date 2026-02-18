@@ -1,8 +1,7 @@
-import { DataTypes } from "sequelize";
-import { sequelize } from "../config/database.js";
-import { User } from "./User.js";
+const { DataTypes } = require("sequelize");
+const { sequelize } = require("../config/database.js");
 
-export const Notification = sequelize.define(
+const Notification = sequelize.define(
   "Notification",
   {
     id: {
@@ -26,5 +25,4 @@ export const Notification = sequelize.define(
   }
 );
 
-User.hasMany(Notification, { foreignKey: "user_id" });
-Notification.belongsTo(User, { foreignKey: "user_id" });
+module.exports = { Notification };
