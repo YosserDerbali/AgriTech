@@ -1,7 +1,7 @@
-import { DataTypes } from "sequelize";
-import { sequelize } from "../config/database.js";
+const { DataTypes } = require("sequelize");
+const { sequelize } = require("../config/database.js");
 
-export const Diagnosis = sequelize.define(
+const Diagnosis = sequelize.define(
   "Diagnosis",
   {
     id: {
@@ -67,3 +67,5 @@ export const Diagnosis = sequelize.define(
     timestamps: false,
   }
 );
+
+module.exports = { Diagnosis };

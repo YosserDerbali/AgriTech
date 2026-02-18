@@ -1,10 +1,7 @@
-import { DataTypes } from "sequelize";
-import { sequelize } from "../config/database.js";
-import { Image } from "./Image.js";
-import { Disease } from "./Disease.js";
-import { User } from "./User.js";
+const { DataTypes } = require("sequelize");
+const { sequelize } = require("../config/database.js");
 
-export const Prediction = sequelize.define(
+const Prediction = sequelize.define(
   "Prediction",
   {
     id: {
@@ -30,11 +27,4 @@ export const Prediction = sequelize.define(
   }
 );
 
-Image.hasMany(Prediction, { foreignKey: "image_id" });
-Prediction.belongsTo(Image, { foreignKey: "image_id" });
-
-Disease.hasMany(Prediction, { foreignKey: "disease_id" });
-Prediction.belongsTo(Disease, { foreignKey: "disease_id" });
-
-User.hasMany(Prediction, { foreignKey: "validated_by" });
-Prediction.belongsTo(User, { foreignKey: "validated_by", as: "validator" });
+module.exports = { Prediction };

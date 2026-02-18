@@ -1,8 +1,7 @@
-import { DataTypes } from "sequelize";
-import { sequelize } from "../config/database.js";
-import { Plant } from "./Plant.js";
+const { DataTypes } = require("sequelize");
+const { sequelize } = require("../config/database.js");
 
-export const Disease = sequelize.define(
+const Disease = sequelize.define(
   "Disease",
   {
     id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
@@ -17,5 +16,4 @@ export const Disease = sequelize.define(
   }
 );
 
-Plant.hasMany(Disease, { foreignKey: "plant_id" });
-Disease.belongsTo(Plant, { foreignKey: "plant_id" });
+module.exports = { Disease };

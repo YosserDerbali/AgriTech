@@ -1,8 +1,7 @@
-import { DataTypes } from "sequelize";
-import { sequelize } from "../config/database.js";
-import { User } from "./User.js";
+const { DataTypes } = require("sequelize");
+const { sequelize } = require("../config/database.js");
 
-export const AgronomistProfile = sequelize.define(
+const AgronomistProfile = sequelize.define(
   "AgronomistProfile",
   {
     user_id: {
@@ -19,5 +18,4 @@ export const AgronomistProfile = sequelize.define(
   }
 );
 
-User.hasOne(AgronomistProfile, { foreignKey: "user_id" });
-AgronomistProfile.belongsTo(User, { foreignKey: "user_id" });
+module.exports = { AgronomistProfile };

@@ -1,9 +1,7 @@
-import { DataTypes } from "sequelize";
-import { sequelize } from "../config/database.js";
-import { Prediction } from "./Prediction.js";
-import { User } from "./User.js";
+const { DataTypes } = require("sequelize");
+const { sequelize } = require("../config/database.js");
 
-export const Feedback = sequelize.define(
+const Feedback = sequelize.define(
   "Feedback",
   {
     id: {
@@ -22,10 +20,4 @@ export const Feedback = sequelize.define(
   }
 );
 
-Prediction.hasMany(Feedback, { foreignKey: "prediction_id" });
-Feedback.belongsTo(Prediction, { foreignKey: "prediction_id" });
-
-User.hasMany(Feedback, { foreignKey: "user_id" });
-Feedback.belongsTo(User, { foreignKey: "user_id" });
-
-//remark: I think it should be 1 to 1 relationship between Feedback and Prediction, but I will keep it as is for now.
+module.exports = { Feedback };

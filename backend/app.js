@@ -6,10 +6,12 @@ require("./models/index.js");
 const cron = require("node-cron");
 const cleanupNotifications = require("./services/cleanUpNotification.js");
 const adminRoutes = require("./routes/admin.js");
+const authRoutes = require("./routes/auth.js");
 
 
 app.use(express.json());
 app.use(cors());
+app.use("/auth", authRoutes);  // ADD THIS LINE
 app.use("/admin", adminRoutes);
 
 (async () => {

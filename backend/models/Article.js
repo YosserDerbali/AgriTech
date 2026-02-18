@@ -1,8 +1,7 @@
-import { DataTypes } from "sequelize";
-import { sequelize } from "../config/database.js";
-import { User } from "./User.js";
+const { DataTypes } = require("sequelize");
+const { sequelize } = require("../config/database.js");
 
-export const Article = sequelize.define(
+const Article = sequelize.define(
   "Article",
   {
     id: {
@@ -36,5 +35,4 @@ export const Article = sequelize.define(
   }
 );
 
-User.hasMany(Article, { foreignKey: "author_id" });
-Article.belongsTo(User, { foreignKey: "author_id" });
+module.exports = { Article };
