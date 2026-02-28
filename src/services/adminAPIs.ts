@@ -3,37 +3,68 @@ import { User, UserRole } from "@/types/admin";
 
 const API = axios.create({
   baseURL: "http://localhost:3000/admin",
-  withCredentials: true, // keep if using cookies/sessions
+  withCredentials: true, // keep if using cookies
 });
 
-// Add token to requests if available
-API.interceptors.request.use((config) => {
-  const token = localStorage.getItem("authToken");
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
+// ============================
+// 🔹 USERS
+// ============================
 
-// 🔹 Get all users
+// API.interceptors.request.use((config) => {
+//   const token = localStorage.getItem("token"); // wherever you store it
+
+//   if (token) {
+//     config.headers.Authorization = `Bearer ${token}`;
+//   }
+
+//   return config;
+// });
+// Get all users
 export const fetchUsers = async (): Promise<User[]> => {
   const res = await API.get("/users");
-  return res.data;
+  console.log("Fetched users:", res.data.data);
+  return res.data.data;
 };
 
-// 🔹 Update user role
-export const updateUserRole = async (userId: string, role: UserRole): Promise<User> => {
+// Create new user
+export const createUser = async (
+  data: Omit<User, "id" | "createdAt" | "lastLoginAt">
+): Promise<User> => {
+  console.log("Creating user with data:", data);
+  const res = await API.post("/users", data);
+  return res.data.data;
+};
+
+// Update user general details (name, email, etc.)
+export const updateUserDetails = async (
+  userId: string,
+  data: Partial<Omit<User, "id" | "createdAt">>
+): Promise<User> => {
+  const res = await API.patch(`/users/${userId}`, data);
+  return res.data.data;
+};
+
+// Update user role
+export const updateUserRole = async (
+  userId: string,
+  role: UserRole
+): Promise<User> => {
   const res = await API.patch(`/users/${userId}/role`, { role });
-  return res.data;
+  return res.data.data;
 };
 
-// 🔹 Update user active status
-export const updateUserStatus = async (userId: string): Promise<User> => {
+// Toggle user active status
+export const updateUserStatus = async (
+  userId: string
+): Promise<User> => {
   const res = await API.patch(`/users/${userId}/status`);
-  return res.data;
+  console.log("Updated user status:", res.data.data);
+  return res.data.data;
 };
 
-// 🔹 Delete user
+
+// Delete user
 export const deleteUser = async (userId: string): Promise<void> => {
-  await API.delete(`/users/${userId}`);
+ const res = await API.delete(`/users/${userId}`);
+  return res.data.data;
 };
