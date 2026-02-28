@@ -6,13 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAppStore } from '@/stores/appStore';
 import { useToast } from '@/hooks/use-toast';
-
-// Mock credentials for testing
-const MOCK_FARMER = {
-  email: 'farmer@test.com',
-  password: 'password123',
-  name: 'John Farmer',
-};
+import { registerUser, loginUser, setAuthToken } from '@/services/authAPIs';
 
 export default function FarmerAuthPage() {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -32,48 +26,75 @@ export default function FarmerAuthPage() {
     e.preventDefault();
     setIsLoading(true);
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    try {
+      if (isSignUp) {
+        // Call register API
+        if (!formData.email || !formData.password || !formData.name) {
+          toast({
+            title: 'Error',
+            description: 'Please fill in all fields',
+            variant: 'destructive',
+          });
+          setIsLoading(false);
+          return;
+        }
 
-    if (isSignUp) {
-      // Mock sign up - just accept any valid input
-      if (formData.email && formData.password && formData.name) {
-        setUser({ name: formData.name, email: formData.email, role: 'farmer' });
+        const response = await registerUser({
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+          role: 'FARMER',
+        });
+
+        // Store token and user data
+        setAuthToken(response.token);
+        setUser({ 
+          name: response.user.name, 
+          email: response.user.email, 
+          role: 'farmer' 
+        });
         setRole('farmer');
         setIsAuthenticated(true);
+        
         toast({
           title: 'Account created!',
           description: 'Welcome to Smart Agriculture Platform',
         });
         navigate('/');
       } else {
-        toast({
-          title: 'Error',
-          description: 'Please fill in all fields',
-          variant: 'destructive',
+        // Call login API
+        const response = await loginUser({
+          email: formData.email,
+          password: formData.password,
+          role: 'FARMER',
         });
-      }
-    } else {
-      // Mock sign in - check credentials
-      if (formData.email === MOCK_FARMER.email && formData.password === MOCK_FARMER.password) {
-        setUser({ name: MOCK_FARMER.name, email: MOCK_FARMER.email, role: 'farmer' });
+
+        // Store token and user data
+        setAuthToken(response.token);
+        setUser({ 
+          name: response.user.name, 
+          email: response.user.email, 
+          role: 'farmer' 
+        });
         setRole('farmer');
         setIsAuthenticated(true);
+        
         toast({
           title: 'Welcome back!',
-          description: `Signed in as ${MOCK_FARMER.name}`,
+          description: `Signed in as ${response.user.name}`,
         });
         navigate('/');
-      } else {
-        toast({
-          title: 'Invalid credentials',
-          description: 'Use farmer@test.com / password123',
-          variant: 'destructive',
-        });
       }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Authentication failed';
+      toast({
+        title: 'Error',
+        description: errorMessage,
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   return (

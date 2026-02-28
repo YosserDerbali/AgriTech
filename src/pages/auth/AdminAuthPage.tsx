@@ -7,13 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAppStore } from '@/stores/appStore';
 import { useToast } from '@/hooks/use-toast';
-
-// Mock credentials for testing
-const MOCK_ADMIN = {
-  email: 'admin@test.com',
-  password: 'password123',
-  name: 'System Admin',
-};
+import { loginAdmin, setAuthToken } from '@/services/authAPIs';
 
 export default function AdminAuthPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -31,28 +25,37 @@ export default function AdminAuthPage() {
     e.preventDefault();
     setIsLoading(true);
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    try {
+      const response = await loginAdmin({
+        email: formData.email,
+        password: formData.password,
+      });
 
-    // Mock sign in - only sign in for admin (no sign up)
-    if (formData.email === MOCK_ADMIN.email && formData.password === MOCK_ADMIN.password) {
-      setUser({ name: MOCK_ADMIN.name, email: MOCK_ADMIN.email, role: 'admin' });
+      // Store token and user data
+      setAuthToken(response.token);
+      setUser({ 
+        name: response.user.name, 
+        email: response.user.email, 
+        role: 'admin' 
+      });
       setRole('admin');
       setIsAuthenticated(true);
+      
       toast({
         title: 'Welcome back!',
-        description: `Signed in as ${MOCK_ADMIN.name}`,
+        description: `Signed in as ${response.user.name}`,
       });
       navigate('/admin');
-    } else {
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Admin login failed';
       toast({
         title: 'Invalid credentials',
-        description: 'Use admin@test.com / password123',
+        description: errorMessage,
         variant: 'destructive',
       });
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   return (

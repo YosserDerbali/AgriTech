@@ -7,13 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useAppStore } from '@/stores/appStore';
 import { useToast } from '@/hooks/use-toast';
-
-// Mock credentials for testing
-const MOCK_AGRONOMIST = {
-  email: 'agronomist@test.com',
-  password: 'password123',
-  name: 'Dr. Sarah Green',
-};
+import { registerUser, loginUser, setAuthToken } from '@/services/authAPIs';
 
 export default function AgronomistAuthPage() {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -35,48 +29,75 @@ export default function AgronomistAuthPage() {
     e.preventDefault();
     setIsLoading(true);
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    try {
+      if (isSignUp) {
+        // Call register API
+        if (!formData.email || !formData.password || !formData.name) {
+          toast({
+            title: 'Error',
+            description: 'Please fill in all required fields',
+            variant: 'destructive',
+          });
+          setIsLoading(false);
+          return;
+        }
 
-    if (isSignUp) {
-      // Mock sign up
-      if (formData.email && formData.password && formData.name) {
-        setUser({ name: formData.name, email: formData.email, role: 'agronomist' });
+        const response = await registerUser({
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+          role: 'AGRONOMIST',
+        });
+
+        // Store token and user data
+        setAuthToken(response.token);
+        setUser({ 
+          name: response.user.name, 
+          email: response.user.email, 
+          role: 'agronomist' 
+        });
         setRole('agronomist');
         setIsAuthenticated(true);
+        
         toast({
           title: 'Account created!',
           description: 'Welcome to the Agronomist Portal',
         });
         navigate('/agronomist');
       } else {
-        toast({
-          title: 'Error',
-          description: 'Please fill in all required fields',
-          variant: 'destructive',
+        // Call login API
+        const response = await loginUser({
+          email: formData.email,
+          password: formData.password,
+          role: 'AGRONOMIST',
         });
-      }
-    } else {
-      // Mock sign in
-      if (formData.email === MOCK_AGRONOMIST.email && formData.password === MOCK_AGRONOMIST.password) {
-        setUser({ name: MOCK_AGRONOMIST.name, email: MOCK_AGRONOMIST.email, role: 'agronomist' });
+
+        // Store token and user data
+        setAuthToken(response.token);
+        setUser({ 
+          name: response.user.name, 
+          email: response.user.email, 
+          role: 'agronomist' 
+        });
         setRole('agronomist');
         setIsAuthenticated(true);
+        
         toast({
           title: 'Welcome back!',
-          description: `Signed in as ${MOCK_AGRONOMIST.name}`,
+          description: `Signed in as ${response.user.name}`,
         });
         navigate('/agronomist');
-      } else {
-        toast({
-          title: 'Invalid credentials',
-          description: 'Use agronomist@test.com / password123',
-          variant: 'destructive',
-        });
       }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Authentication failed';
+      toast({
+        title: 'Error',
+        description: errorMessage,
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   return (

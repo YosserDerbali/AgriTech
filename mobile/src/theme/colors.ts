@@ -31,7 +31,7 @@ export const colors = {
   textMuted: '#A8B8AA',
   textLight: '#D0D8D2',
   textInverse: '#FFFFFF',
-
+  muted: '#9CA3AF',
   // Border Colors
   border: '#E0E4DE',
   borderLight: '#EDEFE9',
