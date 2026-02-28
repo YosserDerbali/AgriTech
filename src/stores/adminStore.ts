@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { User, AIModel, SystemStats, SystemConfig, UserRole } from '@/types/admin';
-
+import { fetchUsers, createUser, updateUserDetails, updateUserRole, updateUserStatus, deleteUser } from '@/services/adminAPIs';
 // Mock users data
 const mockUsers: User[] = [
   {
@@ -101,13 +101,14 @@ interface AdminStore {
   isLoading: boolean;
   
   // User management
+  loadUsers: () => Promise<void>;
   getUsers: () => User[];
   getUsersByRole: (role: UserRole) => User[];
-  addUser: (user: Omit<User, 'id' | 'createdAt'>) => void;
-  updateUser: (userId: string, data: Partial<Omit<User, 'id' | 'createdAt'>>) => void;
-  updateUserRole: (userId: string, role: UserRole) => void;
-  toggleUserActive: (userId: string) => void;
-  deleteUser: (userId: string) => void;
+  addUser: (user: Omit<User, 'id' | 'createdAt'>) => Promise<void>;
+  updateUser: (userId: string, data: Partial<Omit<User, 'id' | 'createdAt'>>) => Promise<void>;
+  updateUserRole: (userId: string, role: UserRole) => Promise<void>;
+  toggleUserActive: (userId: string) => Promise<void>;
+  deleteUser: (userId: string) => Promise<void>;
   
   // AI Model management
   getAIModels: () => AIModel[];
@@ -123,49 +124,69 @@ interface AdminStore {
 }
 
 export const useAdminStore = create<AdminStore>((set, get) => ({
-  users: mockUsers,
+  users: [],
   aiModels: mockAIModels,
   systemConfig: mockConfig,
   isLoading: false,
-  
+   loadUsers: async () => {
+    set({ isLoading: true });
+    const users = await fetchUsers();
+    set({ users, isLoading: false });
+  },
   getUsers: () => get().users,
   
   getUsersByRole: (role) => get().users.filter((u) => u.role === role),
 
-  addUser: (userData) => {
-    const newUser: User = {
-      ...userData,
-      id: crypto.randomUUID(),
-      createdAt: new Date(),
-    };
-    set((state) => ({ users: [newUser, ...state.users] }));
+  addUser: async (userData) => {
+    set({ isLoading: true });
+    const newUser = await createUser(userData);
+    set((state) => ({
+      users: [newUser, ...state.users],
+      isLoading: false,
+    }));
   },
 
-  updateUser: (userId, data) => {
-    set((state) => ({
-      users: state.users.map((u) => (u.id === userId ? { ...u, ...data } : u)),
-    }));
-  },
-  
-  updateUserRole: (userId, role) => {
+
+ updateUser: async (userId, data) => {
+    set({ isLoading: true });
+    const updatedUser = await updateUserDetails(userId, data);
     set((state) => ({
       users: state.users.map((u) =>
-        u.id === userId ? { ...u, role } : u
+        u.id === userId ? updatedUser : u
       ),
+      isLoading: false,
     }));
   },
   
-  toggleUserActive: (userId) => {
+ updateUserRole: async (userId, role) => {
+    set({ isLoading: true });
+    const updatedUser = await updateUserRole(userId, role);
     set((state) => ({
       users: state.users.map((u) =>
-        u.id === userId ? { ...u, isActive: !u.isActive } : u
+        u.id === userId ? updatedUser : u
       ),
+      isLoading: false,
     }));
   },
   
-  deleteUser: (userId) => {
+ toggleUserActive: async (userId) => {
+  set({ isLoading: true });
+
+  const updatedUser = await updateUserStatus(userId);
+
+  set((state) => ({
+    users: state.users.map((u) =>
+      u.id === userId ? updatedUser : u
+    ),
+    isLoading: false,
+  }));
+},
+    deleteUser: async (userId) => {
+    set({ isLoading: true });
+    await deleteUser(userId);
     set((state) => ({
       users: state.users.filter((u) => u.id !== userId),
+      isLoading: false,
     }));
   },
   

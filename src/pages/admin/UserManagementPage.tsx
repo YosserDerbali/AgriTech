@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AdminSidebar } from '@/components/layout/AdminSidebar';
 import { UserTable } from '@/components/admin/UserTable';
 import { UserFormDialog } from '@/components/admin/UserFormDialog';
@@ -17,12 +17,15 @@ import { User, UserRole } from '@/types/admin';
 import { toast } from 'sonner';
 
 export default function UserManagementPage() {
-  const { users, addUser, updateUser, updateUserRole, toggleUserActive, deleteUser } = useAdminStore();
+  const { users, addUser, loadUsers, updateUser, updateUserRole, toggleUserActive, deleteUser } = useAdminStore();
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState<UserRole | 'ALL'>('ALL');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
-
+  useEffect((   ) => {
+    loadUsers();
+    console.log("Users loaded in UserManagementPage:", users);
+  }, []);
   const filteredUsers = users.filter((user) => {
     const matchesSearch = 
       user.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -36,10 +39,10 @@ export default function UserManagementPage() {
     toast.success('User role updated successfully');
   };
 
-  const handleToggleActive = (userId: string) => {
-    toggleUserActive(userId);
-    toast.success('User status updated');
-  };
+ const handleToggleActive = (userId) => {
+  toggleUserActive(userId);
+  toast.success('User status updated');
+};
 
   const handleDelete = (userId: string) => {
     deleteUser(userId);

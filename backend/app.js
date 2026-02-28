@@ -9,8 +9,17 @@ const adminRoutes = require("./routes/admin.js");
 const authRoutes = require("./routes/auth.js");
 
 
+
+app.use(
+  cors({
+    origin: "http://localhost:8080",
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 app.use(express.json());
-app.use(cors());
+
 app.use("/auth", authRoutes);  // ADD THIS LINE
 app.use("/admin", adminRoutes);
 

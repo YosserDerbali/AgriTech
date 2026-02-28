@@ -10,11 +10,11 @@ exports.getAllUsers = async () => {
 };
 
 // 🔹 Create a new user
-exports.createUser = async ({ name, email, role, isActive = true, password }) => {
+exports.createUser = async ({ name, email, role, isActive = true, password="password123" }) => {
   if (!["FARMER", "AGRONOMIST", "ADMIN"].includes(role)) {
     throw new Error("Invalid role");
   }
-
+  console.log("Creating user with email:", password);
   // Check if email already exists
   const existing = await User.findOne({ where: { email } });
   if (existing) throw new Error("Email already in use");
@@ -76,11 +76,11 @@ exports.updateUserRole = async (userId, newRole) => {
 };
 
 // 🔹 Update a user's status (active/inactive)
-exports.updateUserStatus = async (userId, isActive) => {
+exports.updateUserStatus = async (userId) => {
   const user = await User.findByPk(userId);
   if (!user) throw new Error("User not found");
 
-  user.isActive = isActive;
+  user.isActive = !user.isActive;
   await user.save();
   return user;
 };
@@ -88,6 +88,7 @@ exports.updateUserStatus = async (userId, isActive) => {
 // 🔹 Delete a user (hard delete)
 exports.deleteUser = async (userId) => {
   const user = await User.findByPk(userId);
+
   if (!user) throw new Error("User not found");
 
   await user.destroy();

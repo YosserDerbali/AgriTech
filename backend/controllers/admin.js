@@ -10,6 +10,7 @@ const sanitizeUser = (user) => {
 exports.getAllUsers = async (req, res) => {
   try {
     const users = await adminService.getAllUsers();
+    console.log("Fetched users:", users);
     res.json({
       success: true,
       data: users.map(sanitizeUser),
@@ -108,9 +109,9 @@ exports.updateUserRole = async (req, res) => {
 exports.updateUserStatus = async (req, res) => {
   try {
     const { userId } = req.params;
-    const { isActive } = req.body;
+  
 
-    const user = await adminService.updateUserStatus(userId, isActive);
+    const user = await adminService.updateUserStatus(userId);
 
     res.json({
       success: true,
@@ -133,11 +134,11 @@ exports.deleteUser = async (req, res) => {
     const { userId } = req.params;
 
     // Prevent self-delete
-    if (userId === req.user.id) {
-      return res
-        .status(403)
-        .json({ success: false, message: "Admins cannot delete themselves" });
-    }
+    // if (userId === req.user.id) {
+    //   return res
+    //     .status(403)
+    //     .json({ success: false, message: "Admins cannot delete themselves" });
+    // }
 
     const user = await adminService.deleteUser(userId);
 
