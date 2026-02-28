@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://192.168.100.246:3000';
+const API_BASE_URL = 'http://192.168.0.190:3000';
 
 
 

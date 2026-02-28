@@ -2,8 +2,17 @@ import axios from "axios";
 import { User, UserRole } from "@/types/admin";
 
 const API = axios.create({
-  baseURL: "http://localhost:5000/api/admin", // adjust if needed
+  baseURL: "http://localhost:3000/admin",
   withCredentials: true, // keep if using cookies/sessions
+});
+
+// Add token to requests if available
+API.interceptors.request.use((config) => {
+  const token = localStorage.getItem("authToken");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
 });
 
 // 🔹 Get all users

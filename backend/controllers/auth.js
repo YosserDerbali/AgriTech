@@ -38,7 +38,7 @@ exports.register = async (req, res) => {
       password_hash,
       role,
       lastLoginAt: now,
-      status: "ACTIVE", // if your model has status
+      isActive: true,
     });
 
     const token = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, {
@@ -68,7 +68,7 @@ exports.login = async (req, res) => {
       return res.status(403).json({ message: "Role mismatch" });
     }
 
-    if (user.status === "INACTIVE") {
+    if (!user.isActive) {
       return res.status(403).json({ message: "Account is inactive" });
     }
 
@@ -105,7 +105,7 @@ exports.adminLogin = async (req, res) => {
     const valid = await bcrypt.compare(password, user.password_hash);
     if (!valid) return res.status(401).json({ message: "Invalid credentials" });
 
-    if (user.status === "INACTIVE") {
+    if (!user.isActive) {
       return res.status(403).json({ message: "Account is inactive" });
     }
 
