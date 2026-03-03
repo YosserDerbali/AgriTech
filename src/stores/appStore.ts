@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import {jwtDecode} from 'jwt-decode';
 
 export type UserRole = 'farmer' | 'agronomist' | 'admin';
 
@@ -16,7 +17,13 @@ interface AppStore {
   setUser: (user: UserInfo | null) => void;
   setIsAuthenticated: (isAuthenticated: boolean) => void;
   logout: () => void;
+  hydrateAuth:() => void;
 }
+interface JwtPayload {
+  id: string;
+  role: UserRole;
+  exp?: number;
+} 
 
 export const useAppStore = create<AppStore>((set) => ({
   currentRole: 'farmer',
@@ -25,5 +32,32 @@ export const useAppStore = create<AppStore>((set) => ({
   setRole: (role) => set({ currentRole: role }),
   setUser: (user) => set({ user }),
   setIsAuthenticated: (isAuthenticated) => set({ isAuthenticated }),
-  logout: () => set({ isAuthenticated: false, user: null, currentRole: 'farmer' }),
+   logout: () => {
+    localStorage.removeItem('token');
+    set({ isAuthenticated: false, user: null, currentRole: 'farmer' });
+  },
+  hydrateAuth: () => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    try {
+      const decoded = jwtDecode<JwtPayload>(token);
+
+      // Optionally check expiration
+      const lowerCasedRole = decoded.role.toLowerCase() as UserRole;
+      set({
+        isAuthenticated: true,
+        currentRole: lowerCasedRole,
+        // user info from token, fallback to null
+        user: {
+          name: '', // can optionally fetch name from backend if needed
+          email: '',
+          role: decoded.role,
+        },
+      });
+    } catch (err) {
+      console.error('Invalid token', err);
+      localStorage.removeItem('token');
+    }
+  },
 }));

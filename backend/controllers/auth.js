@@ -94,17 +94,18 @@ exports.login = async (req, res) => {
 exports.adminLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
-
+    
     if (!email || !password) {
       return res.status(400).json({ message: "Email and password are required" });
     }
 
     const user = await User.findOne({ where: { email, role: "ADMIN" } });
     if (!user) return res.status(403).json({ message: "Admins only" });
-
-    const valid = await bcrypt.compare(password, user.password_hash);
+   
+    const valid = await bcrypt.compare(password, user.dataValues.password_hash);
+    
     if (!valid) return res.status(401).json({ message: "Invalid credentials" });
-
+    
     if (!user.isActive) {
       return res.status(403).json({ message: "Account is inactive" });
     }

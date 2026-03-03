@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAppStore } from '@/stores/appStore';
 import { useToast } from '@/hooks/use-toast';
-import { registerUser, loginUser, setAuthToken } from '@/services/authAPIs';
+import { adminLogin, setAuthToken } from '@/services/authAPIs';
 
 export default function FarmerAuthPage() {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -39,18 +39,13 @@ export default function FarmerAuthPage() {
           return;
         }
 
-        const response = await registerUser({
-          name: formData.name,
-          email: formData.email,
-          password: formData.password,
-          role: 'FARMER',
-        });
+        
 
         // Store token and user data
-        setAuthToken(response.token);
+        
         setUser({ 
-          name: response.user.name, 
-          email: response.user.email, 
+          name: formData.name, 
+          email: formData.email, 
           role: 'farmer' 
         });
         setRole('farmer');
@@ -63,17 +58,13 @@ export default function FarmerAuthPage() {
         navigate('/');
       } else {
         // Call login API
-        const response = await loginUser({
-          email: formData.email,
-          password: formData.password,
-          role: 'FARMER',
-        });
+        
 
         // Store token and user data
-        setAuthToken(response.token);
+        
         setUser({ 
-          name: response.user.name, 
-          email: response.user.email, 
+          name: formData.name, 
+          email: formData.email, 
           role: 'farmer' 
         });
         setRole('farmer');
@@ -81,7 +72,7 @@ export default function FarmerAuthPage() {
         
         toast({
           title: 'Welcome back!',
-          description: `Signed in as ${response.user.name}`,
+          description: `Signed in as ${formData.name}`,
         });
         navigate('/');
       }

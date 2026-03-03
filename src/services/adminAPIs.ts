@@ -10,15 +10,15 @@ const API = axios.create({
 // 🔹 USERS
 // ============================
 
-// API.interceptors.request.use((config) => {
-//   const token = localStorage.getItem("token"); // wherever you store it
+ API.interceptors.request.use((config) => {
+   const token = localStorage.getItem("token"); // wherever you store it
 
-//   if (token) {
-//     config.headers.Authorization = `Bearer ${token}`;
-//   }
+   if (token) {
+     config.headers.Authorization = `Bearer ${token}`;
+   }
 
-//   return config;
-// });
+   return config;
+ });
 // Get all users
 export const fetchUsers = async (): Promise<User[]> => {
   const res = await API.get("/users");

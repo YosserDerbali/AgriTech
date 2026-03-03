@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { AgronomistBottomNav } from "@/components/layout/AgronomistBottomNav";
-
+import { useEffect } from "react";
 import { useAppStore } from "@/stores/appStore";
 import HomePage from "./pages/HomePage";
 import DiagnosePage from "./pages/DiagnosePage";
@@ -67,7 +67,8 @@ function ProtectedRoute({
 
 function AppContent() {
   const location = useLocation();
-  const { isAuthenticated, currentRole } = useAppStore();
+  const { isAuthenticated, currentRole,hydrateAuth } = useAppStore();
+ 
   const isAgronomistRoute = location.pathname.startsWith('/agronomist');
   const isAdminRoute = location.pathname.startsWith('/admin');
   const isAuthRoute = location.pathname.startsWith('/auth');
@@ -75,6 +76,9 @@ function AppContent() {
   // Don't show nav on auth pages
   const showNav = isAuthenticated && !isAuthRoute;
 
+  useEffect(() => {
+    hydrateAuth();
+  }, []);
   return (
     <div className="min-h-screen bg-background">
       

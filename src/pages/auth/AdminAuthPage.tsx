@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Shield, Mail, Lock, Eye, EyeOff, Sprout } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAppStore } from '@/stores/appStore';
 import { useToast } from '@/hooks/use-toast';
-import { loginAdmin, setAuthToken } from '@/services/authAPIs';
+import { adminLogin, setAuthToken } from '@/services/authAPIs';
 
 export default function AdminAuthPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -18,19 +18,22 @@ export default function AdminAuthPage() {
   });
 
   const navigate = useNavigate();
-  const { setRole, setUser, setIsAuthenticated } = useAppStore();
+  const { setRole, setUser, setIsAuthenticated,isAuthenticated } = useAppStore();
   const { toast } = useToast();
+
+
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      const response = await loginAdmin({
-        email: formData.email,
-        password: formData.password,
-      });
-
+      const response = await adminLogin(
+        formData.email,
+        formData.password,
+      );
+      console.log(response);
       // Store token and user data
       setAuthToken(response.token);
       setUser({ 
@@ -57,6 +60,11 @@ export default function AdminAuthPage() {
       setIsLoading(false);
     }
   };
+  useEffect(() => {
+  if (isAuthenticated) {
+    navigate("/admin");
+  }
+}, [isAuthenticated, navigate]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-background flex items-center justify-center p-4">
