@@ -1,15 +1,23 @@
 const { DataTypes } = require("sequelize");
 const { sequelize } = require("../config/database.js");
 
-const Diagnosis = sequelize.define(
-  "Diagnosis",
+const Diagnoses = sequelize.define(
+  "Diagnoses",
   {
     id: {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
     },
-
+     user_id: {
+      type: DataTypes.UUID,
+      allowNull: true,
+      references: {
+        model: "users",
+        key: "id",
+      },
+      onDelete: "CASCADE",
+    },
     image_url: {
       type: DataTypes.TEXT,
       allowNull: false,
@@ -68,4 +76,4 @@ const Diagnosis = sequelize.define(
   }
 );
 
-module.exports = { Diagnosis };
+module.exports = { Diagnoses };

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Alert, Image, ScrollView, StyleSheet, Text, View, SafeAreaView } from 'react-native';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -9,11 +9,24 @@ import { StatusBadge } from '../../components/ui/StatusBadge';
 import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
 import { colors } from '../../theme/colors';
-
+import { Diagnosis } from '../../types/diagnosis';
 export default function DiagnosisDetailScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<FarmerStackParamList>>();
   const route = useRoute<RouteProp<FarmerStackParamList, 'DiagnosisDetail'>>();
-  const diagnosis = useDiagnosisStore((s) => s.getDiagnosis(route.params.id));
+  const {getDiagnosis} = useDiagnosisStore();
+  const diagnosis = useDiagnosisStore((state) => state.getDiagnosis(route.params.id));
+  // const [diagnosis, setDiagnosis] = useState<Diagnosis | null>(null);
+
+  // React.useEffect(() => {
+  //   const fetchDiagnosis = async () => {
+  //     const diagnosisData = await getDiagnosis(route.params.id);
+  //     if (diagnosisData) {
+  //       setDiagnosis(diagnosisData);
+  //     }
+  //   };
+
+  //   fetchDiagnosis();
+  // }, [route.params.id]);
 
   if (!diagnosis) {
     return (

@@ -11,7 +11,7 @@ import { colors } from '../../theme/colors';
 
 export default function FarmerAuthScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<AuthStackParamList>>();
-  const { setRole, setUser, setIsAuthenticated, setToken } = useAppStore();
+  const { setRole, setUser, setIsAuthenticated, setToken, restoreToken } = useAppStore();
 
   const [isSignUp, setIsSignUp] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -40,7 +40,7 @@ export default function FarmerAuthScreen() {
           password: formData.password,
           role: 'FARMER',
         });
-
+        
         await setToken(response.token);
         setUser({
           id: response.user.id,
@@ -64,7 +64,7 @@ export default function FarmerAuthScreen() {
           password: formData.password,
           role: 'FARMER',
         });
-
+        
         await setToken(response.token);
         setUser({
           id: response.user.id,
@@ -82,7 +82,7 @@ export default function FarmerAuthScreen() {
       setIsLoading(false);
     }
   };
-
+  
   return (
     <SafeAreaView style={styles.safeContainer}>
       <ScrollView style={styles.container} contentContainerStyle={styles.content}>

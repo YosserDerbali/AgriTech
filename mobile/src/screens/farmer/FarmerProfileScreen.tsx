@@ -7,13 +7,13 @@ import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { useAppStore } from '../../stores/appStore';
 import { colors } from '../../theme/colors';
-
+import { useDiagnosisStore } from '../../stores/diagnosisStore';
 const menuItems = ['Notifications', 'Settings', 'Privacy & Security', 'Help & Support'];
 
 export default function FarmerProfileScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<FarmerStackParamList>>();
   const { user, logout } = useAppStore();
-
+  const { diagnoses } = useDiagnosisStore();
   const handleMenuClick = (label: string) => {
     Alert.alert(label, 'Ready for backend integration.');
   };
@@ -37,7 +37,7 @@ export default function FarmerProfileScreen() {
 
         <View style={styles.statsRow}>
           <View style={styles.statBox}>
-            <Text style={styles.statValue}>12</Text>
+            <Text style={styles.statValue}>{diagnoses.length}</Text>
             <Text style={styles.statLabel}>Total Scans</Text>
           </View>
           <View style={styles.statBox}>

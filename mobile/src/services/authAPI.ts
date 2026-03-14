@@ -1,6 +1,8 @@
-const API_BASE_URL = 'http://192.168.1.20:3000';
+import axios from "axios";
 
-
+const API = axios.create({
+  baseURL: "http://172.20.10.8:3000",
+});
 
 export interface LoginRequest {
   email: string;
@@ -27,32 +29,24 @@ export interface AuthResponse {
 
 export const authAPI = {
   login: async (data: LoginRequest): Promise<AuthResponse> => {
-    const response = await fetch(`${API_BASE_URL}/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || 'Login failed');
+    try {
+      const response = await API.post("/auth/login", data);
+      return response.data;
+    } catch (error: any) {
+      throw new Error(
+        error.response?.data?.message || "Login failed"
+      );
     }
-
-    return response.json();
   },
 
   register: async (data: RegisterRequest): Promise<AuthResponse> => {
-    const response = await fetch(`${API_BASE_URL}/auth/register`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || 'Registration failed');
+    try {
+      const response = await API.post("/auth/register", data);
+      return response.data;
+    } catch (error: any) {
+      throw new Error(
+        error.response?.data?.message || "Registration failed"
+      );
     }
-
-    return response.json();
   },
 };

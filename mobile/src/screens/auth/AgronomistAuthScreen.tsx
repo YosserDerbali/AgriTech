@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Alert, ScrollView, StyleSheet, Text, View, SafeAreaView, Keyboard } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -12,7 +12,7 @@ import { colors } from '../../theme/colors';
 
 export default function AgronomistAuthScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<AuthStackParamList>>();
-  const { setRole, setUser, setIsAuthenticated, setToken } = useAppStore();
+  const { setRole, setUser, setIsAuthenticated, setToken, restoreToken, isAuthenticated } = useAppStore();
 
   const [isSignUp, setIsSignUp] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -29,6 +29,7 @@ export default function AgronomistAuthScreen() {
     setIsLoading(true);
 
     try {
+      
       if (isSignUp) {
         // Register
         if (!formData.name || !formData.email || !formData.password) {

@@ -13,12 +13,12 @@ import { Button } from '../../components/ui/Button';
 import { colors, shadows } from '../../theme/colors';
 import { typography, fontFamilies, textPresets } from '../../theme/typography';
 import { spacing, radius, padding } from '../../theme/spacing';
-
+import { useEffect } from 'react';
 
 export default function HomeScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<FarmerStackParamList>>();
   const insets = useSafeAreaInsets();
-  const diagnoses = useDiagnosisStore((s) => s.diagnoses);
+  const { diagnoses, fetchDiagnoses } = useDiagnosisStore();
   const recentDiagnoses = diagnoses.slice(0, 3);
 
   const handleHaptics = () => {
@@ -29,6 +29,10 @@ export default function HomeScreen() {
 
   const pendingCount = diagnoses.filter((d) => d.status === 'PENDING').length;
   const approvedCount = diagnoses.filter((d) => d.status === 'APPROVED').length;
+
+  useEffect(() => {
+    fetchDiagnoses();
+  }, []);
 
   return (
     <SafeAreaView style={styles.safeContainer}>
@@ -124,7 +128,7 @@ export default function HomeScreen() {
                 ]}
                 onPress={() => {
                   handleHaptics();
-                  navigation.navigate('FarmerTabs', { screen: 'Articles' } as never);
+                  navigation.navigate('FarmerTabs', { screen: 'FarmerArticles' } as never);
                 }}
               >
                 <View style={[styles.actionIcon, { backgroundColor: colors.accentSoft }]}>

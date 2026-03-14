@@ -14,8 +14,7 @@ exports.createUser = async ({ name, email, role, isActive = true, password="pass
   if (!["FARMER", "AGRONOMIST", "ADMIN"].includes(role)) {
     throw new Error("Invalid role");
   }
-  console.log("Creating user with email:", password);
-  // Check if email already exists
+   // Check if email already exists
   const existing = await User.findOne({ where: { email } });
   if (existing) throw new Error("Email already in use");
 

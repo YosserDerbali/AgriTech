@@ -9,7 +9,7 @@ const { Disease } = require("./Disease.js");
 const { Image } = require("./Image.js");
 const { Prediction } = require("./Prediction.js");
 const { Feedback } = require("./Feedback.js");
-const { Diagnosis } = require("./Diagnosis.js");
+const { Diagnosis } = require("./Diagnoses.js");
 const { AiModel } = require("./AiModel.js");
 
 module.exports = {

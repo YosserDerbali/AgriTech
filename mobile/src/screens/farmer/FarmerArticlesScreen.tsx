@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Linking, Pressable, ScrollView, StyleSheet, Text, View, SafeAreaView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -12,7 +12,7 @@ type FilterTab = 'all' | 'agronomist' | 'external';
 
 export default function FarmerArticlesScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<FarmerStackParamList>>();
-  const articles = useArticleStore((state) => state.articles);
+  const {articles, getAllArticles} = useArticleStore();
   const [tab, setTab] = useState<FilterTab>('all');
 
   const agronomistArticles = articles.filter((a) => a.source === 'AGRONOMIST');
@@ -23,7 +23,9 @@ export default function FarmerArticlesScreen() {
     : tab === 'agronomist'
     ? agronomistArticles
     : externalArticles;
-
+  useEffect(() => {
+  getAllArticles();
+}, []);
   return (
     <SafeAreaView style={styles.safeContainer}>
       <ScrollView style={styles.container} contentContainerStyle={styles.content}>

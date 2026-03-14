@@ -7,7 +7,7 @@ const cron = require("node-cron");
 const cleanupNotifications = require("./services/cleanUpNotification.js");
 const adminRoutes = require("./routes/admin.js");
 const authRoutes = require("./routes/auth.js");
-
+const farmerRoutes = require("./routes/farmer.js");
 
 
 app.use(
@@ -22,6 +22,7 @@ app.use(express.json());
 
 app.use("/auth", authRoutes);  // ADD THIS LINE
 app.use("/admin", adminRoutes);
+app.use("/farmer", farmerRoutes);
 
 (async () => {
   try {

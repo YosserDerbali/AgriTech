@@ -32,12 +32,13 @@ export const useAppStore = create<AppStore>((set) => ({
   setUser: (user) => set({ user }),
   setIsAuthenticated: (isAuthenticated) => set({ isAuthenticated }),
   setToken: async (token: string | null) => {
-    if (token) {
+    if (token) {  
       await AsyncStorage.setItem('authToken', token);
     } else {
       await AsyncStorage.removeItem('authToken');
     }
     set({ token });
+
   },
   logout: async () => {
     await AsyncStorage.removeItem('authToken');

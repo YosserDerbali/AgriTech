@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Alert,
   ScrollView,
@@ -19,7 +19,8 @@ import { Button } from '../../components/ui/Button';
 import { Textarea } from '../../components/ui/Textarea';
 import { useDiagnosisStore } from '../../stores/diagnosisStore';
 import { colors } from '../../theme/colors';
-
+import axios from 'axios';
+import { useAppStore } from '../../stores/appStore';
 export default function DiagnoseScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<FarmerStackParamList>>();
   const { addDiagnosis, setLoading, isLoading } = useDiagnosisStore();
@@ -32,9 +33,8 @@ export default function DiagnoseScreen() {
       Alert.alert('Missing image', 'Please select an image first.');
       return;
     }
-
     setLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    
 
     addDiagnosis({
       imageUrl: selectedImage,
@@ -45,7 +45,7 @@ export default function DiagnoseScreen() {
       treatment: null,
       agronomistNotes: null,
     });
-
+    
     setLoading(false);
     Alert.alert('Submitted', 'Diagnosis submitted for review.');
     navigation.navigate('FarmerTabs', { screen: 'History' } as never);
@@ -61,7 +61,6 @@ export default function DiagnoseScreen() {
       Alert.alert('Voice recording', 'Voice recording is ready for backend integration.');
     }
   };
-
   return (
     <SafeAreaView style={styles.safeContainer}>
       <KeyboardAvoidingView

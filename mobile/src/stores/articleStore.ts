@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { Article, ArticleFormData } from '../types/article';
-
+import { getArticles, getArticleById } from '../services/farmerAPI';
 const mockArticles: Article[] = [
   {
     id: '1',
@@ -129,6 +129,7 @@ Farmers who embrace climate-smart practices today will be better positioned for 
 interface ArticleStore {
   articles: Article[];
   isLoading: boolean;
+  getAllArticles: () => Promise<void>;
   addArticle: (data: ArticleFormData) => void;
   updateArticle: (id: string, data: Partial<ArticleFormData>) => void;
   deleteArticle: (id: string) => void;
@@ -138,8 +139,28 @@ interface ArticleStore {
 }
 
 export const useArticleStore = create<ArticleStore>((set, get) => ({
-  articles: mockArticles,
+  articles: [],
   isLoading: false,
+ getAllArticles: async () => {
+  try {
+    set({ isLoading: true });
+
+    const articles = await getArticles();
+    const formattedArticles = articles.map((article: any) => ({
+      ...article,
+      createdAt: new Date(article.created_at),
+      updatedAt: new Date(article.updated_at),
+    }));
+    
+    set({
+      articles: formattedArticles,
+      isLoading: false,
+    });
+  } catch (error) {
+    console.error("Failed to fetch articles", error);
+    set({ isLoading: false });
+  }
+},
   addArticle: (data) => {
     const newArticle: Article = {
       id: Date.now().toString(),
