@@ -18,6 +18,9 @@ router.get("/articles/:id",authenticate,requireFarmer,farmerController.getArticl
 // Create new diagnosis
 router.post("/diagnose",authenticate, requireFarmer, upload.single("image"), farmerController.createDiagnosis);
 
+// Transcribe voice note via AI speech service
+router.post("/transcribe", authenticate, requireFarmer, upload.single("audio"), farmerController.transcribeVoiceNote);
+
 // Get single diagnosis by ID
 router.get("/diagnoses/:id", authenticate, requireFarmer, farmerController.getSingleDiagnosis);
 

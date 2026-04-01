@@ -44,7 +44,7 @@ interface DiagnosisStore {
   diagnoses: Diagnosis[];
   isLoading: boolean;
   fetchDiagnoses: () => Promise<void>;
-  addDiagnosis: (diagnosis: Omit<Diagnosis, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void>;
+  addDiagnosis: (payload: { imageUrl: string; plantName: string; context?: string }) => Promise<void>;
   getDiagnosis: (id: string) => Diagnosis | undefined;
   getPendingDiagnoses: () => Diagnosis[];
   approveDiagnosis: (id: string, treatment: string, notes?: string) => void;
@@ -80,11 +80,11 @@ export const useDiagnosisStore = create<DiagnosisStore>((set, get) => ({
     setLoading(false);
   }
 },
-  addDiagnosis: async (diagnosis) => {
+  addDiagnosis: async ({ imageUrl, plantName, context }) => {
   try {
     set({ isLoading: true });
 
-    const data = await createDiagnosis(diagnosis.imageUrl);
+    const data = await createDiagnosis(imageUrl, plantName, context);
     const newDiagnosis: Diagnosis = {
       id: data.diagnosis.id,
       imageUrl: data.diagnosis.image_url,

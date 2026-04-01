@@ -55,6 +55,11 @@ const Diagnoses = sequelize.define(
       allowNull: true,
     },
 
+    context: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+
     agronomist_notes: {
       type: DataTypes.TEXT,
       allowNull: true,

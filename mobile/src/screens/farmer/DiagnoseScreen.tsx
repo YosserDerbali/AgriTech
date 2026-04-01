@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import {
+  ActivityIndicator,
   Alert,
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   View,
   SafeAreaView,
   KeyboardAvoidingView,
@@ -11,39 +13,69 @@ import {
   Keyboard,
   TouchableOpacity,
 } from 'react-native';
+import { Feather } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { Audio } from 'expo-av';
 import { FarmerStackParamList } from '../../navigation/types';
 import { ImageUploader } from '../../components/diagnosis/ImageUploader';
 import { Button } from '../../components/ui/Button';
 import { Textarea } from '../../components/ui/Textarea';
 import { useDiagnosisStore } from '../../stores/diagnosisStore';
+import { transcribeVoiceNote } from '../../services/farmerAPI';
 import { colors } from '../../theme/colors';
-import axios from 'axios';
-import { useAppStore } from '../../stores/appStore';
+
 export default function DiagnoseScreen() {
+  const minimumRecordingDurationMs = 1000;
   const navigation = useNavigation<NativeStackNavigationProp<FarmerStackParamList>>();
   const { addDiagnosis, setLoading, isLoading } = useDiagnosisStore();
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [plantName, setPlantName] = useState('');
   const [context, setContext] = useState('');
   const [isRecording, setIsRecording] = useState(false);
+  const [isTranscribing, setIsTranscribing] = useState(false);
+  const [recording, setRecording] = useState<Audio.Recording | null>(null);
+  const [recordingDurationMs, setRecordingDurationMs] = useState(0);
+
+  useEffect(() => {
+    return () => {
+      if (recording) {
+        recording.stopAndUnloadAsync().catch(() => null);
+      }
+    };
+  }, [recording]);
+
+  const appendTranscript = (transcript: string) => {
+    if (!transcript.trim()) {
+      return;
+    }
+
+    setContext((previous) => {
+      const current = previous.trimEnd();
+      return current.length > 0 ? `${current}\n${transcript.trim()}` : transcript.trim();
+    });
+  };
 
   const handleSubmit = async () => {
+    const trimmedPlantName = plantName.trim();
+
     if (!selectedImage) {
       Alert.alert('Missing image', 'Please select an image first.');
       return;
     }
+
+    if (!trimmedPlantName) {
+      Alert.alert('Missing plant name', 'Please enter the plant name.');
+      return;
+    }
+
     setLoading(true);
     
 
-    addDiagnosis({
+    await addDiagnosis({
       imageUrl: selectedImage,
-      plantName: 'Unknown Plant',
-      diseaseName: 'Analyzing...',
-      confidence: null,
-      status: 'PENDING',
-      treatment: null,
-      agronomistNotes: null,
+      plantName: trimmedPlantName,
+      context: context.trim() || undefined,
     });
     
     setLoading(false);
@@ -51,16 +83,146 @@ export default function DiagnoseScreen() {
     navigation.navigate('FarmerTabs', { screen: 'History' } as never);
   };
 
-  const toggleRecording = () => {
+  const startRecording = async () => {
     if (!selectedImage) {
       Alert.alert('Add an image first', 'Please select an image before adding voice notes.');
       return;
     }
-    setIsRecording(!isRecording);
-    if (!isRecording) {
-      Alert.alert('Voice recording', 'Voice recording is ready for backend integration.');
+
+    try {
+      const currentPermission = await Audio.getPermissionsAsync();
+      const permission =
+        currentPermission.status === 'granted'
+          ? currentPermission
+          : await Audio.requestPermissionsAsync();
+
+      if (permission.status !== 'granted') {
+        Alert.alert('Microphone permission needed', 'Please allow microphone access to record voice notes.');
+        return;
+      }
+
+      await Audio.setAudioModeAsync({
+        allowsRecordingIOS: true,
+        playsInSilentModeIOS: true,
+      });
+
+      const result = await Audio.Recording.createAsync(Audio.RecordingOptionsPresets.HIGH_QUALITY);
+      result.recording.setProgressUpdateInterval(200);
+      result.recording.setOnRecordingStatusUpdate((status) => {
+        if (typeof status.durationMillis === 'number') {
+          setRecordingDurationMs(status.durationMillis);
+        }
+      });
+      setRecording(result.recording);
+      setRecordingDurationMs(0);
+      setIsRecording(true);
+    } catch (error) {
+      const code = (error as any)?.code;
+      const message = (error as Error)?.message || 'Unknown error while starting recording.';
+      const lowerMessage = message.toLowerCase();
+      const isSimulatorHint =
+        Platform.OS === 'ios' &&
+        (lowerMessage.includes('simulator') || lowerMessage.includes('not available on ios simulator'));
+
+      const helpText = isSimulatorHint
+        ? 'Voice recording is not supported on iOS Simulator. Please test on a physical iPhone.'
+        : 'Please verify microphone access in device settings and try again.';
+
+      const diagnostic = code ? `Error code: ${String(code)}\n${message}` : message;
+      Alert.alert('Recording could not start', `${diagnostic}\n\n${helpText}`);
     }
   };
+
+  const stopRecordingAndTranscribe = async () => {
+    if (!recording) {
+      return;
+    }
+
+    try {
+      setIsRecording(false);
+      console.info('[DiagnoseScreen] Stopping voice recording', {
+        durationMs: recordingDurationMs,
+      });
+
+      await recording.stopAndUnloadAsync();
+      console.info('[DiagnoseScreen] Recording stopped and unloaded successfully');
+
+      const uri = recording.getURI();
+      console.info('[DiagnoseScreen] Recording URI resolved', { uri });
+
+      setRecording(null);
+      setRecordingDurationMs(0);
+
+      await Audio.setAudioModeAsync({ allowsRecordingIOS: false });
+
+      if (!uri) {
+        Alert.alert('Recording failed', 'No audio was captured. Please try again.');
+        return;
+      }
+
+      setIsTranscribing(true);
+      console.info('[DiagnoseScreen] Sending voice note for transcription', { uri });
+      const transcript = await transcribeVoiceNote(uri);
+      console.info('[DiagnoseScreen] Transcription completed', {
+        transcriptLength: transcript.trim().length,
+      });
+
+      if (!transcript.trim()) {
+        Alert.alert('No speech detected', 'Try speaking closer to the microphone and record again.');
+        return;
+      }
+
+      appendTranscript(transcript);
+      Alert.alert('Voice note added', 'Your speech was converted to text and appended to Additional Context.');
+    } catch (error) {
+      const code = (error as any)?.code;
+      const rawMessage = (error as Error)?.message || '';
+      const lowerMessage = rawMessage.toLowerCase();
+
+      console.error('[DiagnoseScreen] Voice note recording/transcription failed', {
+        code,
+        message: rawMessage,
+        durationMs: recordingDurationMs,
+      });
+
+      if (code === 1010 || lowerMessage.includes('e_audio_nodata')) {
+        setRecording(null);
+        setRecordingDurationMs(0);
+        Alert.alert(
+          'Recording too short',
+          'No audio data was captured (error 1010). Please hold recording for at least 1 second, then stop.'
+        );
+        return;
+      }
+
+      const message =
+        (error as any)?.response?.data?.message ||
+        rawMessage ||
+        'Could not process voice note. Please try again.';
+      Alert.alert('Transcription failed', message);
+    } finally {
+      await Audio.setAudioModeAsync({ allowsRecordingIOS: false }).catch(() => null);
+      setIsTranscribing(false);
+    }
+  };
+
+  const toggleRecording = async () => {
+    if (isRecording) {
+      if (recordingDurationMs < minimumRecordingDurationMs) {
+        Alert.alert(
+          'Recording too short',
+          'Please keep recording for at least 1 second before stopping.'
+        );
+        return;
+      }
+
+      await stopRecordingAndTranscribe();
+      return;
+    }
+
+    await startRecording();
+  };
+
   return (
     <SafeAreaView style={styles.safeContainer}>
       <KeyboardAvoidingView
@@ -85,6 +247,18 @@ export default function DiagnoseScreen() {
             />
           </View>
 
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Plant Name</Text>
+            <TextInput
+              placeholder="Enter the plant name"
+              placeholderTextColor={colors.muted}
+              value={plantName}
+              onChangeText={setPlantName}
+              style={styles.plantNameInput}
+              returnKeyType="done"
+            />
+          </View>
+
           <TouchableOpacity
             activeOpacity={1}
             style={styles.section}
@@ -105,8 +279,26 @@ export default function DiagnoseScreen() {
               variant={isRecording ? 'destructive' : 'outline'}
               onPress={toggleRecording}
               style={styles.voiceButton}
+              disabled={isTranscribing}
+              icon={
+                <Feather
+                  name={isRecording ? 'mic-off' : 'mic'}
+                  size={18}
+                  color={isRecording ? colors.textInverse : colors.primary}
+                />
+              }
             />
-            {isRecording ? <Text style={styles.recording}>Recording voice note...</Text> : null}
+            {isRecording ? (
+              <Text style={styles.recording}>
+                Recording voice note... {(recordingDurationMs / 1000).toFixed(1)}s
+              </Text>
+            ) : null}
+            {isTranscribing ? (
+              <View style={styles.transcribingRow}>
+                <ActivityIndicator size="small" color={colors.primary} />
+                <Text style={styles.transcribingText}>Transcribing voice note...</Text>
+              </View>
+            ) : null}
           </TouchableOpacity>
 
           <View style={styles.infoBox}>
@@ -171,12 +363,31 @@ const styles = StyleSheet.create({
   textarea: {
     minHeight: 110,
   },
+  plantNameInput: {
+    height: 48,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    color: colors.text,
+    backgroundColor: colors.surface,
+  },
   voiceButton: {
     marginTop: 10,
   },
   recording: {
     marginTop: 8,
     color: colors.destructive,
+    fontSize: 12,
+  },
+  transcribingRow: {
+    marginTop: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  transcribingText: {
+    marginLeft: 8,
+    color: colors.primary,
     fontSize: 12,
   },
   infoBox: {

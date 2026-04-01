@@ -1,5 +1,5 @@
-const { get } = require('http');
 const farmerService = require('../services/farmer');
+const { transcribeWithAIService } = require('../services/speechRecognition');
 
 const getArticles = async (req, res) => {
   try {
@@ -43,6 +43,7 @@ const createDiagnosis = async (req, res) => {
       userId: req.user.id,
       file: req.file,
       context: req.body.context,
+      plantName: req.body.plantName,
     });
     
 
@@ -54,6 +55,33 @@ const createDiagnosis = async (req, res) => {
   } catch (error) {
     return res.status(400).json({
       message: error.message,
+    });
+  }
+};
+
+const transcribeVoiceNote = async (req, res) => {
+  try {
+    console.info("[farmer.transcribeVoiceNote] Incoming request", {
+      hasFile: Boolean(req.file),
+      fileName: req.file?.originalname,
+      mimeType: req.file?.mimetype,
+      size: req.file?.size,
+      bodyKeys: Object.keys(req.body || {}),
+    });
+
+    if (!req.file) {
+      return res.status(422).json({
+        message: 'Audio file is required',
+        code: 'AUDIO_FILE_MISSING',
+      });
+    }
+
+    const text = await transcribeWithAIService(req.file);
+    return res.status(200).json({ text });
+  } catch (error) {
+    return res.status(error.status || 400).json({
+      message: error.message,
+      code: error.code || 'TRANSCRIPTION_ERROR',
     });
   }
 };
@@ -77,5 +105,6 @@ module.exports = {
   getMyDiagnoses,
   getArticle,
   createDiagnosis,
-  getSingleDiagnosis
+  getSingleDiagnosis,
+  transcribeVoiceNote,
 };
