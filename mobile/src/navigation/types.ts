@@ -15,6 +15,9 @@ export type FarmerStackParamList = {
   FarmerTabs: undefined;
   DiagnosisDetail: { id: string };
   ArticleDetail: { id: string };
+  Settings: undefined;
+  Privacy: undefined;
+  Help: undefined;
 };
 
 export type AgronomistTabsParamList = {

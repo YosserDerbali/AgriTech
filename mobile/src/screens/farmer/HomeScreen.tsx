@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { ScrollView, StyleSheet, Text, View, SafeAreaView, Platform, Pressable } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -11,9 +11,8 @@ import { useDiagnosisStore } from '../../stores/diagnosisStore';
 import { DiagnosisCard } from '../../components/diagnosis/DiagnosisCard';
 import { Button } from '../../components/ui/Button';
 import { colors, shadows } from '../../theme/colors';
-import { typography, fontFamilies, textPresets } from '../../theme/typography';
-import { spacing, radius, padding } from '../../theme/spacing';
-import { useEffect } from 'react';
+import { typography } from '../../theme/typography';
+import { spacing, radius } from '../../theme/spacing';
 
 export default function HomeScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<FarmerStackParamList>>();
@@ -115,8 +114,8 @@ export default function HomeScreen() {
                   navigation.navigate('FarmerTabs', { screen: 'History' } as never);
                 }}
               >
-                <View style={[styles.actionIcon, { backgroundColor: colors.pendingLight }]}>
-                  <Ionicons name="time-outline" size={24} color={colors.pending} />
+                <View style={[styles.actionIcon, { backgroundColor: colors.primarySoft }]}>
+                  <Ionicons name="time-outline" size={24} color={colors.primary} />
                 </View>
                 <Text style={styles.actionText}>History</Text>
               </Pressable>
@@ -233,12 +232,14 @@ const styles = StyleSheet.create({
     marginBottom: spacing.xl,
   },
   greeting: {
-    ...textPresets.greeting,
+    fontSize: 14,
+    fontWeight: '500',
     color: 'rgba(255,255,255,0.8)',
     marginBottom: spacing.xs,
   },
   heroTitle: {
-    ...textPresets.greetingName,
+    fontSize: 28,
+    fontWeight: '700',
     color: '#fff',
   },
   notifButton: {
@@ -278,15 +279,16 @@ const styles = StyleSheet.create({
     borderRadius: radius.xl,
     padding: spacing.lg,
     alignItems: 'center',
-    backdropFilter: 'blur(10px)',
   },
   statNumber: {
-    ...textPresets.statNumber,
+    fontSize: 24,
+    fontWeight: '700',
     color: '#fff',
     marginBottom: spacing.xs,
   },
   statLabel: {
-    ...textPresets.statLabel,
+    fontSize: 12,
+    fontWeight: '500',
     color: 'rgba(255,255,255,0.8)',
   },
 
@@ -307,11 +309,13 @@ const styles = StyleSheet.create({
     marginBottom: spacing.lg,
   },
   sectionTitle: {
-    ...typography.heading4,
+    fontSize: 18,
+    fontWeight: '600',
     color: colors.text,
   },
   seeAll: {
-    ...typography.bodySemibold,
+    fontSize: 14,
+    fontWeight: '600',
     color: colors.primary,
   },
 
@@ -341,7 +345,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   actionText: {
-    ...typography.bodySemibold,
+    fontSize: 14,
+    fontWeight: '600',
     color: colors.text,
     textAlign: 'center',
   },
@@ -356,11 +361,12 @@ const styles = StyleSheet.create({
     ...shadows.sm,
   },
   emptyTitle: {
-    ...typography.heading5,
+    fontSize: 16,
+    fontWeight: '600',
     color: colors.text,
   },
   emptyText: {
-    ...typography.body,
+    fontSize: 14,
     color: colors.textSecondary,
     textAlign: 'center',
   },
@@ -390,12 +396,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   tipTitle: {
-    ...typography.bodySemibold,
+    fontSize: 14,
+    fontWeight: '600', 
     color: colors.text,
     marginBottom: spacing.xs,
   },
   tipText: {
-    ...typography.small,
+    fontSize: 12,
     color: colors.textSecondary,
     lineHeight: 20,
   },

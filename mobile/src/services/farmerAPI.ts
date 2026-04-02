@@ -2,7 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { useAppStore } from "../stores/appStore";
 const {token, restoreToken} = useAppStore.getState(); // Get token from Zustand store
-const API_URL = "http://172.20.10.8:3000/farmer";
+const API_URL = "http://192.168.51.196:3000/farmer";
 
 
 

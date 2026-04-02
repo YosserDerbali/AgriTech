@@ -21,6 +21,7 @@ import { useDiagnosisStore } from '../../stores/diagnosisStore';
 import { colors } from '../../theme/colors';
 import axios from 'axios';
 import { useAppStore } from '../../stores/appStore';
+
 export default function DiagnoseScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<FarmerStackParamList>>();
   const { addDiagnosis, setLoading, isLoading } = useDiagnosisStore();
@@ -35,7 +36,6 @@ export default function DiagnoseScreen() {
     }
     setLoading(true);
     
-
     addDiagnosis({
       imageUrl: selectedImage,
       plantName: 'Unknown Plant',
@@ -61,6 +61,7 @@ export default function DiagnoseScreen() {
       Alert.alert('Voice recording', 'Voice recording is ready for backend integration.');
     }
   };
+
   return (
     <SafeAreaView style={styles.safeContainer}>
       <KeyboardAvoidingView
@@ -166,7 +167,7 @@ const styles = StyleSheet.create({
   },
   optional: {
     fontSize: 12,
-    color: colors.muted,
+    color: colors.textSecondary, // Changed from colors.muted
   },
   textarea: {
     minHeight: 110,
@@ -176,11 +177,11 @@ const styles = StyleSheet.create({
   },
   recording: {
     marginTop: 8,
-    color: colors.destructive,
+    color: colors.error, // Changed from colors.destructive to colors.error
     fontSize: 12,
   },
   infoBox: {
-    backgroundColor: colors.card,
+    backgroundColor: colors.surface, // Changed from colors.card to colors.surface
     borderRadius: 16,
     padding: 16,
     borderWidth: 1,
@@ -195,7 +196,7 @@ const styles = StyleSheet.create({
   },
   infoText: {
     fontSize: 13,
-    color: colors.muted,
+    color: colors.textSecondary, // Changed from colors.muted
   },
   submitButton: {
     marginTop: 6,
