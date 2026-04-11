@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useAppStore } from '@/stores/appStore';
 import { useToast } from '@/hooks/use-toast';
-import {  setAuthToken } from '@/services/authAPIs';
+import { loginUser, registerUser, setAuthToken } from '@/services/authAPIs';
 
 export default function AgronomistAuthPage() {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -42,14 +42,18 @@ export default function AgronomistAuthPage() {
           return;
         }
 
-       
+        const response = await registerUser({
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+          role: 'AGRONOMIST',
+        });
 
-        // Store token and user data
-        
-        setUser({ 
-          name: formData.name, 
-          email: formData.email, 
-          role: 'agronomist' 
+        setAuthToken(response.token);
+        setUser({
+          name: response.user.name,
+          email: response.user.email,
+          role: 'agronomist',
         });
         setRole('agronomist');
         setIsAuthenticated(true);
@@ -61,21 +65,25 @@ export default function AgronomistAuthPage() {
         navigate('/agronomist');
       } else {
         // Call login API
-        
 
-        // Store token and user data
-     
-        setUser({ 
-          name: formData.name, 
-          email: formData.email, 
-          role: 'agronomist' 
+        const response = await loginUser({
+          email: formData.email,
+          password: formData.password,
+          role: 'AGRONOMIST',
+        });
+
+        setAuthToken(response.token);
+        setUser({
+          name: response.user.name,
+          email: response.user.email,
+          role: 'agronomist',
         });
         setRole('agronomist');
         setIsAuthenticated(true);
         
         toast({
           title: 'Welcome back!',
-          description: `Signed in as ${formData.name}`,
+          description: `Signed in as ${response.user.name}`,
         });
         navigate('/agronomist');
       }
@@ -133,7 +141,7 @@ export default function AgronomistAuthPage() {
               <Input
                 id="email"
                 type="email"
-                placeholder="agronomist@test.com"
+                placeholder="sarah@agro.com"
                 className="pl-10 h-12"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -233,7 +241,7 @@ export default function AgronomistAuthPage() {
       {/* Demo credentials */}
       <div className="px-6 py-4 bg-muted/50 border-t border-border">
         <p className="text-xs text-muted-foreground text-center">
-          <strong>Demo:</strong> agronomist@test.com / password123
+          <strong>Demo:</strong> sarah@agro.com / password123
         </p>
       </div>
     </div>
