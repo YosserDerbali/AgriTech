@@ -13,7 +13,7 @@ const farmerRoutes = require("./routes/farmer.js");
 
 app.use(
   cors({
-    origin: "http://localhost:8080",
+    origin: ["http://localhost:5173", "http://localhost:8080"],
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
