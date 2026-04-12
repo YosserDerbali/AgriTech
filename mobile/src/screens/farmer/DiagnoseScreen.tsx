@@ -24,8 +24,6 @@ import { Textarea } from '../../components/ui/Textarea';
 import { useDiagnosisStore } from '../../stores/diagnosisStore';
 import { transcribeVoiceNote } from '../../services/farmerAPI';
 import { colors } from '../../theme/colors';
-import axios from 'axios';
-import { useAppStore } from '../../stores/appStore';
 
 export default function DiagnoseScreen() {
   const minimumRecordingDurationMs = 1000;
@@ -73,7 +71,8 @@ export default function DiagnoseScreen() {
 
     setLoading(true);
     
-    addDiagnosis({
+
+    await addDiagnosis({
       imageUrl: selectedImage,
       plantName: trimmedPlantName,
       context: context.trim() || undefined,
@@ -132,6 +131,96 @@ export default function DiagnoseScreen() {
       const diagnostic = code ? `Error code: ${String(code)}\n${message}` : message;
       Alert.alert('Recording could not start', `${diagnostic}\n\n${helpText}`);
     }
+  };
+
+  const stopRecordingAndTranscribe = async () => {
+    if (!recording) {
+      return;
+    }
+
+    try {
+      setIsRecording(false);
+      console.info('[DiagnoseScreen] Stopping voice recording', {
+        durationMs: recordingDurationMs,
+      });
+
+      await recording.stopAndUnloadAsync();
+      console.info('[DiagnoseScreen] Recording stopped and unloaded successfully');
+
+      const uri = recording.getURI();
+      console.info('[DiagnoseScreen] Recording URI resolved', { uri });
+
+      setRecording(null);
+      setRecordingDurationMs(0);
+
+      await Audio.setAudioModeAsync({ allowsRecordingIOS: false });
+
+      if (!uri) {
+        Alert.alert('Recording failed', 'No audio was captured. Please try again.');
+        return;
+      }
+
+      setIsTranscribing(true);
+      console.info('[DiagnoseScreen] Sending voice note for transcription', { uri });
+      const transcript = await transcribeVoiceNote(uri);
+      console.info('[DiagnoseScreen] Transcription completed', {
+        transcriptLength: transcript.trim().length,
+      });
+
+      if (!transcript.trim()) {
+        Alert.alert('No speech detected', 'Try speaking closer to the microphone and record again.');
+        return;
+      }
+
+      appendTranscript(transcript);
+      Alert.alert('Voice note added', 'Your speech was converted to text and appended to Additional Context.');
+    } catch (error) {
+      const code = (error as any)?.code;
+      const rawMessage = (error as Error)?.message || '';
+      const lowerMessage = rawMessage.toLowerCase();
+
+      console.error('[DiagnoseScreen] Voice note recording/transcription failed', {
+        code,
+        message: rawMessage,
+        durationMs: recordingDurationMs,
+      });
+
+      if (code === 1010 || lowerMessage.includes('e_audio_nodata')) {
+        setRecording(null);
+        setRecordingDurationMs(0);
+        Alert.alert(
+          'Recording too short',
+          'No audio data was captured (error 1010). Please hold recording for at least 1 second, then stop.'
+        );
+        return;
+      }
+
+      const message =
+        (error as any)?.response?.data?.message ||
+        rawMessage ||
+        'Could not process voice note. Please try again.';
+      Alert.alert('Transcription failed', message);
+    } finally {
+      await Audio.setAudioModeAsync({ allowsRecordingIOS: false }).catch(() => null);
+      setIsTranscribing(false);
+    }
+  };
+
+  const toggleRecording = async () => {
+    if (isRecording) {
+      if (recordingDurationMs < minimumRecordingDurationMs) {
+        Alert.alert(
+          'Recording too short',
+          'Please keep recording for at least 1 second before stopping.'
+        );
+        return;
+      }
+
+      await stopRecordingAndTranscribe();
+      return;
+    }
+
+    await startRecording();
   };
 
   return (
@@ -269,7 +358,7 @@ const styles = StyleSheet.create({
   },
   optional: {
     fontSize: 12,
-    color: colors.textSecondary, // Changed from colors.muted
+    color: colors.muted,
   },
   textarea: {
     minHeight: 110,
@@ -288,7 +377,7 @@ const styles = StyleSheet.create({
   },
   recording: {
     marginTop: 8,
-    color: colors.error, // Changed from colors.destructive to colors.error
+    color: colors.destructive,
     fontSize: 12,
   },
   transcribingRow: {
@@ -302,7 +391,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   infoBox: {
-    backgroundColor: colors.surface, // Changed from colors.card to colors.surface
+    backgroundColor: colors.card,
     borderRadius: 16,
     padding: 16,
     borderWidth: 1,
@@ -317,7 +406,7 @@ const styles = StyleSheet.create({
   },
   infoText: {
     fontSize: 13,
-    color: colors.textSecondary, // Changed from colors.muted
+    color: colors.muted,
   },
   submitButton: {
     marginTop: 6,
