@@ -26,7 +26,7 @@ const getArticleById = async (articleId) => {
     },
   });
 };
-const createDiagnosis = async ({ userId, file, context }) => {
+const createDiagnosis = async ({ userId, file, context, plantName }) => {
   if (!file) {
     throw new Error("Image file is required");
   }
@@ -53,7 +53,7 @@ const createDiagnosis = async ({ userId, file, context }) => {
   const imageUrl = publicUrlData.publicUrl;
   // Placeholder AI result
   const aiResult = {
-    plant_name: "Unknown Plant",
+    plant_name: plantName || "Unknown Plant",
     disease_name: "Analyzing...",
     confidence: null,
   };
@@ -68,6 +68,7 @@ const createDiagnosis = async ({ userId, file, context }) => {
     confidence: aiResult.confidence,
     status: "PENDING",
     treatment: null,
+    context: context || null,
     agronomist_notes: null,
   });
   return diagnosis;
