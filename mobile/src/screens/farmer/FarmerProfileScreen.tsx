@@ -82,7 +82,7 @@ export default function FarmerProfileScreen() {
             <Text style={styles.statLabel}>Total Scans</Text>
           </View>
           <View style={styles.statBox}>
-            <Text style={styles.statValue}>8</Text>
+            <Text style={styles.statValue}>{diagnoses?.filter(d => d.status === 'APPROVED').length || 0}</Text>
             <Text style={styles.statLabel}>Treated</Text>
           </View>
           <View style={styles.statBox}>
