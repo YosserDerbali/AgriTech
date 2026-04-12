@@ -25,4 +25,7 @@ dist-ssr
 
 
 .env
-backend/.env
+backend/.env.env~
+.expo/
+*.env~
+*.env.backup

@@ -12,66 +12,81 @@ type FilterTab = 'all' | 'agronomist' | 'external';
 
 export default function FarmerArticlesScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<FarmerStackParamList>>();
-  const {articles, getAllArticles} = useArticleStore();
+  const { articles, isLoading, getAllArticles } = useArticleStore(); // Changed to getAllArticles
   const [tab, setTab] = useState<FilterTab>('all');
 
-  const agronomistArticles = articles.filter((a) => a.source === 'AGRONOMIST');
-  const externalArticles = articles.filter((a) => a.source === 'EXTERNAL');
+  // Filter articles based on source
+  const agronomistArticles = articles?.filter((a: Article) => a.source === 'AGRONOMIST') || [];
+  const externalArticles = articles?.filter((a: Article) => a.source === 'EXTERNAL') || [];
 
   const filtered = tab === 'all'
-    ? articles
+    ? articles || []
     : tab === 'agronomist'
     ? agronomistArticles
     : externalArticles;
+  
   useEffect(() => {
-  getAllArticles();
-}, []);
+    getAllArticles(); // Changed to getAllArticles
+  }, []);
+
+  if (isLoading) {
+    return (
+      <SafeAreaView style={styles.safeContainer}>
+        <View style={styles.loadingContainer}>
+          <Text style={styles.loadingText}>Loading articles...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.safeContainer}>
       <ScrollView style={styles.container} contentContainerStyle={styles.content}>
         <Text style={styles.title}>Articles</Text>
         <Text style={styles.subtitle}>Learn from experts and trusted sources</Text>
 
-      <View style={styles.tabs}>
-        {['all', 'agronomist', 'external'].map((value) => (
-          <Text
-            key={value}
-            onPress={() => setTab(value as FilterTab)}
-            style={[styles.tab, tab === value && styles.tabActive]}
-          >
-            {value === 'all' ? 'All' : value === 'agronomist' ? 'Experts' : 'External'}
-          </Text>
-        ))}
-      </View>
+        <View style={styles.tabs}>
+          {['all', 'agronomist', 'external'].map((value) => (
+            <Pressable
+              key={value}
+              onPress={() => setTab(value as FilterTab)}
+              style={[styles.tab, tab === value && styles.tabActive]}
+            >
+              <Text style={[styles.tabText, tab === value && styles.tabTextActive]}>
+                {value === 'all' ? 'All' : value === 'agronomist' ? 'Experts' : 'External'}
+              </Text>
+            </Pressable>
+          ))}
+        </View>
 
-      <View style={styles.list}>
-        {filtered.length === 0 ? (
-          <View style={styles.emptyState}>
-            <Text style={styles.emptyTitle}>No articles yet</Text>
-            <Text style={styles.emptyText}>
-              {tab === 'agronomist'
-                ? 'Expert articles will appear here'
-                : tab === 'external'
-                ? 'External articles will be synced automatically'
-                : 'Check back later for new articles'}
-            </Text>
-          </View>
-        ) : (
-          filtered.map((article) => (
-            <ArticleListItem
-              key={article.id}
-              article={article}
-              onPress={() => {
-                if (article.source === 'EXTERNAL' && article.externalUrl) {
-                  Linking.openURL(article.externalUrl);
-                } else {
-                  navigation.navigate('ArticleDetail', { id: article.id });
-                }
-              }}
-            />
-          ))
-        )}
-      </View>
+        <View style={styles.list}>
+          {filtered.length === 0 ? (
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyTitle}>No articles yet</Text>
+              <Text style={styles.emptyText}>
+                {tab === 'agronomist'
+                  ? 'Expert articles will appear here'
+                  : tab === 'external'
+                  ? 'External articles will be synced automatically'
+                  : 'Check back later for new articles'}
+              </Text>
+            </View>
+          ) : (
+            filtered.map((article: Article) => (
+              <ArticleListItem
+                key={article.id}
+                article={article}
+                onPress={() => {
+                  if (article.source === 'EXTERNAL' && article.externalUrl) {
+                    Linking.openURL(article.externalUrl);
+                  } else {
+                    navigation.navigate('ArticleDetail', { id: article.id });
+                  }
+                }}
+              />
+            ))
+          )}
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -82,7 +97,10 @@ function ArticleListItem({ article, onPress }: { article: Article; onPress: () =
     <Pressable onPress={onPress} style={styles.card}>
       <Text style={styles.cardTitle}>{article.title}</Text>
       <Text style={styles.cardExcerpt}>{article.excerpt}</Text>
-      <Text style={styles.cardMeta}>{article.source === 'EXTERNAL' ? 'External' : 'Expert'} · {formatDistanceToNow(article.createdAt, { addSuffix: true })}</Text>
+      <Text style={styles.cardMeta}>
+        {article.authorName} · {article.source === 'EXTERNAL' ? 'External' : 'Expert'} · 
+        {formatDistanceToNow(new Date(article.createdAt), { addSuffix: true })}
+      </Text>
     </Pressable>
   );
 }
@@ -107,7 +125,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 13,
-    color: colors.muted,
+    color: colors.textSecondary,
     marginBottom: 14,
   },
   tabs: {
@@ -121,15 +139,20 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     borderWidth: 1,
     borderColor: colors.border,
-    color: colors.text,
-    fontSize: 12,
     marginRight: 8,
     marginBottom: 8,
+    backgroundColor: colors.surface,
   },
   tabActive: {
     backgroundColor: colors.primary,
-    color: '#FFFFFF',
     borderColor: colors.primary,
+  },
+  tabText: {
+    fontSize: 12,
+    color: colors.text,
+  },
+  tabTextActive: {
+    color: colors.textInverse,
   },
   list: {
     marginTop: 6,
@@ -139,7 +162,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     borderWidth: 1,
     borderColor: colors.border,
-    backgroundColor: colors.card,
+    backgroundColor: colors.surface,
   },
   emptyTitle: {
     fontSize: 16,
@@ -149,10 +172,10 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 13,
-    color: colors.muted,
+    color: colors.textSecondary,
   },
   card: {
-    backgroundColor: colors.card,
+    backgroundColor: colors.surface,
     borderRadius: 16,
     padding: 14,
     borderWidth: 1,
@@ -168,11 +191,22 @@ const styles = StyleSheet.create({
   },
   cardExcerpt: {
     fontSize: 13,
-    color: colors.muted,
+    color: colors.textSecondary,
     marginBottom: 8,
   },
   cardMeta: {
     fontSize: 12,
-    color: colors.muted,
+    color: colors.textMuted,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: colors.background,
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 14,
+    color: colors.textSecondary,
   },
 });

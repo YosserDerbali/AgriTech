@@ -17,8 +17,11 @@ export default function FarmerTabs() {
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: colors.muted,
-        tabBarStyle: { backgroundColor: colors.card, borderTopColor: colors.border },
+        tabBarInactiveTintColor: colors.textMuted, // Changed from colors.muted to colors.textMuted
+        tabBarStyle: { 
+          backgroundColor: colors.surface, // Changed from colors.card to colors.surface
+          borderTopColor: colors.border 
+        },
       }}
     >
       <Tab.Screen
