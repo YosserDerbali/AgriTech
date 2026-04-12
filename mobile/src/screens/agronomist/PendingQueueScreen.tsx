@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View, SafeAreaView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -11,9 +11,13 @@ type SortOption = 'newest' | 'oldest' | 'confidence';
 
 export default function PendingQueueScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<AgronomistStackParamList>>();
-  const { getPendingDiagnoses } = useDiagnosisStore();
+  const { getPendingDiagnoses, fetchPendingDiagnoses } = useDiagnosisStore();
   const [sortBy, setSortBy] = useState<SortOption>('newest');
   const [showLowConfidenceOnly, setShowLowConfidenceOnly] = useState(false);
+
+  useEffect(() => {
+    fetchPendingDiagnoses();
+  }, []);
 
   const pendingDiagnoses = getPendingDiagnoses();
   const filteredDiagnoses = pendingDiagnoses
