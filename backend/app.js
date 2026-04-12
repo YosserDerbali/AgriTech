@@ -9,6 +9,7 @@ const cleanupNotifications = require("./services/cleanUpNotification.js");
 const adminRoutes = require("./routes/admin.js");
 const authRoutes = require("./routes/auth.js");
 const farmerRoutes = require("./routes/farmer.js");
+const agronomistRoutes = require("./routes/agronomist.js");
 
 
 app.use(
@@ -24,6 +25,7 @@ app.use(express.json());
 app.use("/auth", authRoutes);  // ADD THIS LINE
 app.use("/admin", adminRoutes);
 app.use("/farmer", farmerRoutes);
+app.use("/agronomist", agronomistRoutes);
 
 (async () => {
   try {
