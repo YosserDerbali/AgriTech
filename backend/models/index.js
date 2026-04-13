@@ -11,6 +11,10 @@ const { Prediction } = require("./Prediction.js");
 const { Feedback } = require("./Feedback.js");
 const { Diagnosis } = require("./Diagnoses.js");
 const { AiModel } = require("./AiModel.js");
+const initRssConfiguration = require("./RssConfiguration.js");
+
+// Initialize RssConfiguration model with sequelize instance
+const RssConfiguration = initRssConfiguration(sequelize);
 
 module.exports = {
   sequelize,
@@ -25,4 +29,5 @@ module.exports = {
   Feedback,
   Diagnosis,
   AiModel,
+  RssConfiguration,
 };

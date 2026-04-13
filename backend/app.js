@@ -6,6 +6,7 @@ const { sequelize } = require("./models/index.js");
 require("./models/index.js");
 const cron = require("node-cron");
 const cleanupNotifications = require("./services/cleanUpNotification.js");
+const { initializeRssSync } = require("./services/cronRescheduler.js");
 const adminRoutes = require("./routes/admin.js");
 const authRoutes = require("./routes/auth.js");
 const farmerRoutes = require("./routes/farmer.js");
@@ -46,6 +47,9 @@ app.use("/farmer", farmerRoutes);
    console.log("🧹 Running daily notification cleanup");
    cleanupNotifications();
  });
+
+ // Initialize RSS sync with dynamic scheduling from database
+ initializeRssSync();
 
 app.post("/create-admin-test", async (req, res) => {
   const { name, email, password } = req.body;
