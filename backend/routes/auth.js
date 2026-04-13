@@ -8,6 +8,9 @@ router.post("/register", authController.register);
 // Login (mobile & web)
 router.post("/login", authController.login);
 
+// Google sign in / sign up
+router.post("/google", authController.googleAuth);
+
 // Admin-only login (optional separate route)
 router.post("/admin/login", authController.adminLogin);
 

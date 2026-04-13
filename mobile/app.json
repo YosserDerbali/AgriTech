@@ -36,7 +36,8 @@
         {
           "microphonePermission": "Allow this app to access your microphone for voice notes in diagnoses."
         }
-      ]
+      ],
+      "expo-web-browser"
     ],
     "web": {
       "favicon": "./assets/favicon.png"
