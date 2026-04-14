@@ -8,7 +8,7 @@ import { Input } from '../../components/ui/Input';
 import { Textarea } from '../../components/ui/Textarea';
 import { useAppStore } from '../../stores/appStore';
 import { authAPI } from '../../services/authAPI';
-import { colors } from '../../theme/colors';
+import { colors, roleColors } from '../../theme/colors';
 
 export default function AgronomistAuthScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<AuthStackParamList>>();
@@ -197,7 +197,7 @@ const styles = StyleSheet.create({
   },
   toggle: {
     marginTop: 12,
-    color: colors.accent,
+    color: roleColors.agronomist.primary,
     fontWeight: '600',
   },
   switchRole: {

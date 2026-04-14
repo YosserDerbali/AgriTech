@@ -5,7 +5,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AgronomistStackParamList } from '../../navigation/types';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
-import { colors } from '../../theme/colors';
+import { colors, roleColors } from '../../theme/colors';
 import { Feather } from '@expo/vector-icons';
 
 export default function HelpAndSupportScreen() {
@@ -89,7 +89,7 @@ export default function HelpAndSupportScreen() {
                 onPress={method.action}
               >
                 <View style={styles.contactIcon}>
-                  <Feather name={method.icon as any} size={24} color={colors.primary} />
+                  <Feather name={method.icon as any} size={24} color={roleColors.agronomist.primary} />
                 </View>
                 <View style={styles.contactContent}>
                   <Text style={styles.contactType}>{method.type}</Text>
@@ -116,7 +116,7 @@ export default function HelpAndSupportScreen() {
                 <Feather
                   name={expandedFaqId === faq.id ? 'chevron-up' : 'chevron-down'}
                   size={20}
-                  color={colors.primary}
+                  color={roleColors.agronomist.primary}
                 />
               </TouchableOpacity>
               {expandedFaqId === faq.id && (
@@ -136,7 +136,7 @@ export default function HelpAndSupportScreen() {
               style={styles.resourceItem}
               onPress={() => Linking.openURL('https://www.agritech.com/docs')}
             >
-              <Feather name="book" size={20} color={colors.primary} />
+              <Feather name="book" size={20} color={roleColors.agronomist.primary} />
               <Text style={styles.resourceText}>Documentation & Guides</Text>
               <Feather name="arrow-right" size={16} color="#ccc" />
             </TouchableOpacity>
@@ -145,7 +145,7 @@ export default function HelpAndSupportScreen() {
               style={styles.resourceItem}
               onPress={() => Linking.openURL('https://www.agritech.com/blog')}
             >
-              <Feather name="file-text" size={20} color={colors.primary} />
+              <Feather name="file-text" size={20} color={roleColors.agronomist.primary} />
               <Text style={styles.resourceText}>Blog & Articles</Text>
               <Feather name="arrow-right" size={16} color="#ccc" />
             </TouchableOpacity>
@@ -154,7 +154,7 @@ export default function HelpAndSupportScreen() {
               style={styles.resourceItem}
               onPress={() => Linking.openURL('https://www.agritech.com/community')}
             >
-              <Feather name="users" size={20} color={colors.primary} />
+              <Feather name="users" size={20} color={roleColors.agronomist.primary} />
               <Text style={styles.resourceText}>Community Forum</Text>
               <Feather name="arrow-right" size={16} color="#ccc" />
             </TouchableOpacity>

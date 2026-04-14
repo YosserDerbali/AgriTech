@@ -7,7 +7,7 @@ import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { useAppStore } from '../../stores/appStore';
 import { authAPI } from '../../services/authAPI';
-import { colors } from '../../theme/colors';
+import { colors, roleColors } from '../../theme/colors';
 
 export default function FarmerAuthScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<AuthStackParamList>>();
@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
   },
   toggle: {
     marginTop: 12,
-    color: colors.primary,
+    color: roleColors.farmer.primary,
     fontWeight: '600',
   },
   switchRole: {

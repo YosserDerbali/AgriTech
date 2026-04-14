@@ -8,7 +8,7 @@ import { useArticleStore } from '../../stores/articleStore';
 import { useAppStore } from '../../stores/appStore';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
-import { colors } from '../../theme/colors';
+import { colors, roleColors } from '../../theme/colors';
 import { Feather } from '@expo/vector-icons';
 
 export default function AgronomistProfileScreen() {
@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   badge: {
-    backgroundColor: '#E0F2FE',
+    backgroundColor: roleColors.agronomist.primarySoft,
     color: colors.text,
     paddingVertical: 4,
     paddingHorizontal: 10,

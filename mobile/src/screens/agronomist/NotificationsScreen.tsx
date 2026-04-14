@@ -4,7 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AgronomistStackParamList } from '../../navigation/types';
 import { Card } from '../../components/ui/Card';
-import { colors } from '../../theme/colors';
+import { colors, roleColors } from '../../theme/colors';
 import { Feather } from '@expo/vector-icons';
 
 export default function NotificationsScreen() {

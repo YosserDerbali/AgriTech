@@ -5,7 +5,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AgronomistStackParamList } from '../../navigation/types';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
-import { colors } from '../../theme/colors';
+import { colors, roleColors } from '../../theme/colors';
 import { Feather } from '@expo/vector-icons';
 import { useAppStore } from '../../stores/appStore';
 
@@ -46,11 +46,11 @@ export default function EditProfileScreen() {
         <Card style={styles.photoCard}>
           <View style={styles.photoContainer}>
             <View style={styles.profilePhoto}>
-              <Feather name="user" size={48} color={colors.primary} />
+              <Feather name="user" size={48} color={roleColors.agronomist.primary} />
             </View>
             <View style={styles.photoActions}>
               <TouchableOpacity style={styles.photoButton}>
-                <Feather name="camera" size={16} color={colors.primary} />
+                <Feather name="camera" size={16} color={roleColors.agronomist.primary} />
                 <Text style={styles.photoButtonText}>Change Photo</Text>
               </TouchableOpacity>
               <TouchableOpacity style={[styles.photoButton, styles.removeButton]}>
@@ -183,12 +183,12 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: colors.primarySoft,
+    backgroundColor: roleColors.agronomist.primarySoft,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 16,
     borderWidth: 2,
-    borderColor: colors.primary,
+    borderColor: roleColors.agronomist.primary,
   },
   photoActions: {
     flexDirection: 'row',
@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 12,
     borderRadius: 8,
-    backgroundColor: `${colors.primary}10`,
+    backgroundColor: `${roleColors.agronomist.primary}10`,
     gap: 6,
   },
   removeButton: {
@@ -209,7 +209,7 @@ const styles = StyleSheet.create({
   photoButtonText: {
     fontSize: 12,
     fontWeight: '600',
-    color: colors.primary,
+    color: roleColors.agronomist.primary,
   },
   section: {
     marginBottom: 16,

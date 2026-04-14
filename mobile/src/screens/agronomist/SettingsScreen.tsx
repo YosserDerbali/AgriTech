@@ -4,7 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AgronomistStackParamList } from '../../navigation/types';
 import { Card } from '../../components/ui/Card';
-import { colors } from '../../theme/colors';
+import { colors, roleColors } from '../../theme/colors';
 import { Feather } from '@expo/vector-icons';
 
 export default function SettingsScreen() {
@@ -77,7 +77,7 @@ export default function SettingsScreen() {
             style={styles.editProfileButton}
             onPress={() => navigation.navigate('EditProfile')}
           >
-            <Feather name="edit-3" size={20} color={colors.primary} />
+            <Feather name="edit-3" size={20} color={roleColors.agronomist.primary} />
             <View style={styles.editProfileContent}>
               <Text style={styles.editProfileTitle}>Edit Profile</Text>
               <Text style={styles.editProfileSubtitle}>Update your personal information</Text>
@@ -99,14 +99,14 @@ export default function SettingsScreen() {
                   ]}
                 >
                   <View style={styles.settingContent}>
-                    <Feather name={item.icon as any} size={20} color={colors.primary} />
+                    <Feather name={item.icon as any} size={20} color={roleColors.agronomist.primary} />
                     <Text style={styles.settingLabel}>{item.label}</Text>
                   </View>
                   <Switch
                     value={item.value}
                     onValueChange={item.onToggle}
-                    trackColor={{ false: '#ccc', true: colors.primary + '40' }}
-                    thumbColor={item.value ? colors.primary : '#999'}
+                    trackColor={{ false: '#ccc', true: roleColors.agronomist.primary + '40' }}
+                    thumbColor={item.value ? roleColors.agronomist.primary : '#999'}
                   />
                 </View>
               ))}

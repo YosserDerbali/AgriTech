@@ -4,7 +4,7 @@
  */
 
 export const colors = {
-  // Primary Brand Colors - Enhanced Green
+  // Primary Brand Colors - Green (Farmer Default)
   primary: '#1B5E20',
   primaryLight: '#2E7D32',
   primaryDark: '#0D3B12',
@@ -55,6 +55,30 @@ export const colors = {
   // Gradient anchors
   gradientStart: '#1B5E20',
   gradientEnd: '#2E7D32',
+};
+
+/**
+ * Role-Specific Color Palettes
+ */
+export const roleColors = {
+  farmer: {
+    primary: '#1B5E20',
+    primaryLight: '#2E7D32',
+    primaryDark: '#0D3B12',
+    primarySoft: '#E8F5E9',
+    primaryExtraLight: '#F1F8F4',
+    gradientStart: '#1B5E20',
+    gradientEnd: '#2E7D32',
+  },
+  agronomist: {
+    primary: '#F57C00',
+    primaryLight: '#FF9100',
+    primaryDark: '#E65100',
+    primarySoft: '#FFE0B2',
+    primaryExtraLight: '#FFF3E0',
+    gradientStart: '#F57C00',
+    gradientEnd: '#FF9100',
+  },
 };
 
 /**
