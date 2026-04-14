@@ -8,8 +8,6 @@ import {
   SafeAreaView,
   KeyboardAvoidingView,
   Platform,
-  Keyboard,
-  TouchableOpacity,
 } from 'react-native';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -61,16 +59,21 @@ export default function ArticleEditorScreen() {
       tags: tags.split(',').map((t) => t.trim()).filter(Boolean),
     };
 
-    if (isEditing && route.params?.id) {
-      updateArticle(route.params.id, articleData);
-      Alert.alert('Updated', 'Article updated successfully.');
-    } else {
-      addArticle(articleData);
-      Alert.alert('Published', 'Article published successfully.');
-    }
+    try {
+      if (isEditing && route.params?.id) {
+        await updateArticle(route.params.id, articleData);
+        Alert.alert('Updated', 'Article updated successfully.');
+      } else {
+        await addArticle(articleData);
+        Alert.alert('Published', 'Article published successfully.');
+      }
 
-    setIsSubmitting(false);
-    navigation.goBack();
+      navigation.goBack();
+    } catch (error) {
+      Alert.alert('Error', 'Failed to save article. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleDelete = () => {
@@ -80,10 +83,14 @@ export default function ArticleEditorScreen() {
       {
         text: 'Delete',
         style: 'destructive',
-        onPress: () => {
-          deleteArticle(route.params!.id!);
-          Alert.alert('Deleted', 'Article deleted.');
-          navigation.goBack();
+        onPress: async () => {
+          try {
+            await deleteArticle(route.params!.id!);
+            Alert.alert('Deleted', 'Article deleted.');
+            navigation.goBack();
+          } catch (error) {
+            Alert.alert('Error', 'Failed to delete article. Please try again.');
+          }
         },
       },
     ]);

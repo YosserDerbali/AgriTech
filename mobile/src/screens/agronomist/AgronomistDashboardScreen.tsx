@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { ScrollView, StyleSheet, Text, View, SafeAreaView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -13,13 +13,18 @@ import { colors } from '../../theme/colors';
 
 export default function AgronomistDashboardScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<AgronomistStackParamList>>();
-  const { diagnoses, getPendingDiagnoses } = useDiagnosisStore();
-  const { getMyArticles } = useArticleStore();
+  const { diagnoses, getPendingDiagnoses, fetchPendingDiagnoses } = useDiagnosisStore();
+  const { getMyArticles, fetchMyArticles } = useArticleStore();
 
   const pendingDiagnoses = getPendingDiagnoses();
   const approvedCount = diagnoses.filter((d) => d.status === 'APPROVED').length;
   const rejectedCount = diagnoses.filter((d) => d.status === 'REJECTED').length;
   const myArticles = getMyArticles();
+
+  useEffect(() => {
+    fetchPendingDiagnoses();
+    fetchMyArticles();
+  }, []);
 
   return (
     <SafeAreaView style={styles.safeContainer}>
