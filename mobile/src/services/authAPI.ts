@@ -27,11 +27,6 @@ export interface AuthResponse {
   };
 }
 
-export interface GoogleAuthRequest {
-  accessToken: string;
-  role: 'FARMER' | 'AGRONOMIST';
-}
-
 export const authAPI = {
   login: async (data: LoginRequest): Promise<AuthResponse> => {
     try {
@@ -51,17 +46,6 @@ export const authAPI = {
     } catch (error: any) {
       throw new Error(
         error.response?.data?.message || "Registration failed"
-      );
-    }
-  },
-
-  googleAuth: async (data: GoogleAuthRequest): Promise<AuthResponse> => {
-    try {
-      const response = await API.post("/auth/google", data);
-      return response.data;
-    } catch (error: any) {
-      throw new Error(
-        error.response?.data?.message || "Google sign-in failed"
       );
     }
   },

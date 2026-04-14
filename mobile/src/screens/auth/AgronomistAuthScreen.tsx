@@ -2,15 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { Alert, ScrollView, StyleSheet, Text, View, SafeAreaView, Keyboard } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import * as Google from 'expo-auth-session/providers/google';
-import { FontAwesome } from '@expo/vector-icons';
 import { AuthStackParamList } from '../../navigation/types';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Textarea } from '../../components/ui/Textarea';
 import { useAppStore } from '../../stores/appStore';
 import { authAPI } from '../../services/authAPI';
-import { googleOAuthConfig, isGoogleAuthConfigured } from '../../services/googleAuth';
 import { colors } from '../../theme/colors';
 
 export default function AgronomistAuthScreen() {
@@ -19,7 +16,6 @@ export default function AgronomistAuthScreen() {
 
   const [isSignUp, setIsSignUp] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [request, , promptAsync] = Google.useAuthRequest(googleOAuthConfig);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -91,43 +87,6 @@ export default function AgronomistAuthScreen() {
     }
   };
 
-  const handleGoogleAuth = async () => {
-    if (!request) {
-      Alert.alert('Google sign-in unavailable', 'Set the Google OAuth client IDs first.');
-      return;
-    }
-
-    setIsLoading(true);
-
-    try {
-      const result = await promptAsync({ useProxy: true });
-
-      if (result.type !== 'success' || !result.authentication?.accessToken) {
-        return;
-      }
-
-      const response = await authAPI.googleAuth({
-        accessToken: result.authentication.accessToken,
-        role: 'AGRONOMIST',
-      });
-
-      await setToken(response.token);
-      setUser({
-        id: response.user.id,
-        name: response.user.name,
-        email: response.user.email,
-        role: 'agronomist',
-      });
-      setRole('agronomist');
-      setIsAuthenticated(true);
-      Alert.alert('Success', `Signed in as ${response.user.name}`);
-    } catch (error) {
-      Alert.alert('Error', error instanceof Error ? error.message : 'Google sign-in failed');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   return (
     <SafeAreaView style={styles.safeContainer}>
       <ScrollView style={styles.container} contentContainerStyle={styles.content}>
@@ -188,16 +147,6 @@ export default function AgronomistAuthScreen() {
           disabled={isLoading}
         />
 
-        <Button
-          title={isSignUp ? 'Continue with Google' : 'Sign in with Google'}
-          variant="outline"
-          onPress={handleGoogleAuth}
-          disabled={isLoading || !isGoogleAuthConfigured}
-          icon={<FontAwesome name="google" size={18} color="#DB4437" />}
-          textColor={colors.text}
-          style={styles.googleButton}
-        />
-
         <Text style={styles.toggle} onPress={() => setIsSignUp(!isSignUp)}>
           {isSignUp ? 'Already have an account? Sign In' : "Don't have an account? Sign Up"}
         </Text>
@@ -245,11 +194,6 @@ const styles = StyleSheet.create({
   textarea: {
     marginBottom: 12,
     minHeight: 90,
-  },
-  googleButton: {
-    marginTop: 12,
-    backgroundColor: '#FFFFFF',
-    borderColor: colors.border,
   },
   toggle: {
     marginTop: 12,
