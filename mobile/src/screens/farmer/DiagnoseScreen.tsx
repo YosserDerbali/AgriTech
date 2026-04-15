@@ -21,7 +21,7 @@ import { FarmerStackParamList } from '../../navigation/types';
 import { ImageUploader } from '../../components/diagnosis/ImageUploader';
 import { Button } from '../../components/ui/Button';
 import { Textarea } from '../../components/ui/Textarea';
-import { useDiagnosisStore } from '../../stores/
+import { useDiagnosisStore } from '../../stores/diagnosisStore';
 import { transcribeVoiceNote } from '../../services/farmerAPI';
 import { colors } from '../../theme/colors';
 
