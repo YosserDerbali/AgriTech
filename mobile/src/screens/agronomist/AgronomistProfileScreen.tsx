@@ -1,10 +1,5 @@
-<<<<<<< HEAD
-import React from 'react';
-import { Alert, ScrollView, StyleSheet, Text, View, SafeAreaView, TouchableOpacity } from 'react-native';
-=======
 import React, { useEffect } from 'react';
-import { Alert, ScrollView, StyleSheet, Text, View, SafeAreaView } from 'react-native';
->>>>>>> d981827 (Fix diagnosis schema and AI pipeline)
+import { Alert, ScrollView, StyleSheet, Text, View, SafeAreaView, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AgronomistStackParamList } from '../../navigation/types';

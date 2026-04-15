@@ -64,11 +64,7 @@ export default function DiagnosisReviewScreen() {
       Alert.alert('Approved', 'Diagnosis approved successfully.');
       navigation.goBack();
     } catch (error) {
-<<<<<<< HEAD
-      Alert.alert('Error', 'Failed to approve diagnosis. Please try again.');
-=======
       Alert.alert('Approval failed', (error as Error)?.message || 'Unable to approve diagnosis.');
->>>>>>> d981827 (Fix diagnosis schema and AI pipeline)
     }
   };
 
@@ -82,11 +78,7 @@ export default function DiagnosisReviewScreen() {
       Alert.alert('Rejected', 'Diagnosis rejected.');
       navigation.goBack();
     } catch (error) {
-<<<<<<< HEAD
-      Alert.alert('Error', 'Failed to reject diagnosis. Please try again.');
-=======
       Alert.alert('Rejection failed', (error as Error)?.message || 'Unable to reject diagnosis.');
->>>>>>> d981827 (Fix diagnosis schema and AI pipeline)
     }
   };
 
