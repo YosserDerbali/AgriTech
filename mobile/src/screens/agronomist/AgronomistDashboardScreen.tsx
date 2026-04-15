@@ -13,8 +13,17 @@ import { colors } from '../../theme/colors';
 
 export default function AgronomistDashboardScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<AgronomistStackParamList>>();
+<<<<<<< HEAD
   const { diagnoses, getPendingDiagnoses, fetchPendingDiagnoses } = useDiagnosisStore();
   const { getMyArticles, fetchMyArticles } = useArticleStore();
+=======
+  const { diagnoses, getPendingDiagnoses, fetchReviewQueue } = useDiagnosisStore();
+  const { getMyArticles } = useArticleStore();
+>>>>>>> d981827 (Fix diagnosis schema and AI pipeline)
+
+  useEffect(() => {
+    fetchReviewQueue().catch(() => null);
+  }, [fetchReviewQueue]);
 
   const pendingDiagnoses = getPendingDiagnoses();
   const approvedCount = diagnoses.filter((d) => d.status === 'APPROVED').length;

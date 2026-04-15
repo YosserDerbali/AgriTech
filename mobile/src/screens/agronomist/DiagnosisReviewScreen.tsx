@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Alert,
   Image,
@@ -25,7 +25,7 @@ import { colors } from '../../theme/colors';
 export default function DiagnosisReviewScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<AgronomistStackParamList>>();
   const route = useRoute<RouteProp<AgronomistStackParamList, 'DiagnosisReview'>>();
-  const { getDiagnosis, approveDiagnosis, rejectDiagnosis, updateDiagnosis } = useDiagnosisStore();
+  const { getDiagnosis, fetchReviewQueue, approveDiagnosis, rejectDiagnosis, updateDiagnosis } = useDiagnosisStore();
 
   const diagnosis = getDiagnosis(route.params.id);
 
@@ -35,6 +35,12 @@ export default function DiagnosisReviewScreen() {
   const [notes, setNotes] = useState(diagnosis?.agronomistNotes || '');
   const [rejectionReason, setRejectionReason] = useState('');
   const [showRejectForm, setShowRejectForm] = useState(false);
+
+  useEffect(() => {
+    if (!diagnosis) {
+      fetchReviewQueue().catch(() => null);
+    }
+  }, [diagnosis, fetchReviewQueue]);
 
   if (!diagnosis) {
     return (
@@ -58,7 +64,11 @@ export default function DiagnosisReviewScreen() {
       Alert.alert('Approved', 'Diagnosis approved successfully.');
       navigation.goBack();
     } catch (error) {
+<<<<<<< HEAD
       Alert.alert('Error', 'Failed to approve diagnosis. Please try again.');
+=======
+      Alert.alert('Approval failed', (error as Error)?.message || 'Unable to approve diagnosis.');
+>>>>>>> d981827 (Fix diagnosis schema and AI pipeline)
     }
   };
 
@@ -72,14 +82,22 @@ export default function DiagnosisReviewScreen() {
       Alert.alert('Rejected', 'Diagnosis rejected.');
       navigation.goBack();
     } catch (error) {
+<<<<<<< HEAD
       Alert.alert('Error', 'Failed to reject diagnosis. Please try again.');
+=======
+      Alert.alert('Rejection failed', (error as Error)?.message || 'Unable to reject diagnosis.');
+>>>>>>> d981827 (Fix diagnosis schema and AI pipeline)
     }
   };
 
-  const handleSaveEdits = () => {
-    updateDiagnosis(diagnosis.id, { diseaseName: editedDisease });
-    setIsEditing(false);
-    Alert.alert('Updated', 'Diagnosis updated.');
+  const handleSaveEdits = async () => {
+    try {
+      await updateDiagnosis(diagnosis.id, { diseaseName: editedDisease });
+      setIsEditing(false);
+      Alert.alert('Updated', 'Diagnosis updated.');
+    } catch (error) {
+      Alert.alert('Update failed', (error as Error)?.message || 'Unable to update diagnosis.');
+    }
   };
 
   return (
@@ -106,6 +124,13 @@ export default function DiagnosisReviewScreen() {
       <Card style={[styles.card, isLowConfidence && styles.lowConfidence]}>
         <Text style={styles.cardTitle}>AI Analysis</Text>
         {isLowConfidence ? <Text style={styles.warning}>Low confidence</Text> : null}
+
+        {diagnosis.symptoms ? (
+          <>
+            <Text style={styles.label}>Symptoms</Text>
+            <Text style={styles.value}>{diagnosis.symptoms}</Text>
+          </>
+        ) : null}
 
         <Text style={styles.label}>Detected Disease</Text>
         {isEditing ? (

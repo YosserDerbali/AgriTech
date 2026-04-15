@@ -1,17 +1,21 @@
 const agronomistService = require("../services/agronomist");
 
-exports.getPendingDiagnoses = async (req, res) => {
+const getDiagnoses = async (req, res) => {
   try {
-    const diagnoses = await agronomistService.getPendingDiagnoses();
+    const diagnoses = await agronomistService.getDiagnosisQueue();
     return res.status(200).json(diagnoses);
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    return res.status(error.status || 500).json({
+      message: error.message,
+      code: error.code || "AGRONOMIST_QUEUE_ERROR",
+      status: error.status || 500,
+    });
   }
 };
 
-exports.getDiagnosisById = async (req, res) => {
+const getDiagnosis = async (req, res) => {
   try {
-    const diagnosis = await agronomistService.getDiagnosisById(req.params.id);
+    const diagnosis = await agronomistService.getDiagnosisForReview(req.params.id);
 
     if (!diagnosis) {
       return res.status(404).json({ message: "Diagnosis not found" });
@@ -19,58 +23,45 @@ exports.getDiagnosisById = async (req, res) => {
 
     return res.status(200).json(diagnosis);
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    return res.status(error.status || 404).json({
+      message: error.message,
+      code: error.code || "DIAGNOSIS_NOT_FOUND",
+      status: error.status || 404,
+    });
   }
 };
 
-exports.approveDiagnosis = async (req, res) => {
+const updateDiagnosis = async (req, res) => {
   try {
-    const { treatment, agronomistNotes } = req.body;
+    const diagnosis = await agronomistService.updateDiagnosisReview({
+      diagnosisId: req.params.id,
+      reviewerId: req.user.id,
+      status: req.body.status,
+      treatment: req.body.treatment,
+      agronomistNotes: req.body.agronomistNotes ?? req.body.notes ?? req.body.agronomist_notes,
+      diseaseName: req.body.diseaseName ?? req.body.disease_name,
+      symptoms: req.body.symptoms,
+    });
 
-    if (!treatment || !String(treatment).trim()) {
-      return res.status(400).json({ message: "Treatment is required" });
-    }
-
-    const diagnosis = await agronomistService.approveDiagnosis(
-      req.params.id,
-      String(treatment).trim(),
-      agronomistNotes ? String(agronomistNotes).trim() : null
-    );
-
-    return res.status(200).json(diagnosis);
+    return res.status(200).json({
+      message: "Diagnosis review saved successfully",
+      diagnosis,
+    });
   } catch (error) {
-    if (error.message === "Diagnosis not found") {
-      return res.status(404).json({ message: error.message });
-    }
-
-    return res.status(500).json({ message: error.message });
+    return res.status(error.status || 400).json({
+      message: error.message,
+      code: error.code || "DIAGNOSIS_REVIEW_ERROR",
+      status: error.status || 400,
+    });
   }
 };
 
-exports.rejectDiagnosis = async (req, res) => {
-  try {
-    const { agronomistNotes } = req.body;
+const getPendingDiagnoses = getDiagnoses;
+const getDiagnosisById = getDiagnosis;
+const approveDiagnosis = updateDiagnosis;
+const rejectDiagnosis = updateDiagnosis;
 
-    if (!agronomistNotes || !String(agronomistNotes).trim()) {
-      return res.status(400).json({ message: "Rejection notes are required" });
-    }
-
-    const diagnosis = await agronomistService.rejectDiagnosis(
-      req.params.id,
-      String(agronomistNotes).trim()
-    );
-
-    return res.status(200).json(diagnosis);
-  } catch (error) {
-    if (error.message === "Diagnosis not found") {
-      return res.status(404).json({ message: error.message });
-    }
-
-    return res.status(500).json({ message: error.message });
-  }
-};
-
-exports.getMyArticles = async (req, res) => {
+const getMyArticles = async (req, res) => {
   try {
     const articles = await agronomistService.getMyArticles(req.user.id);
     return res.status(200).json(articles);
@@ -79,7 +70,7 @@ exports.getMyArticles = async (req, res) => {
   }
 };
 
-exports.createArticle = async (req, res) => {
+const createArticle = async (req, res) => {
   try {
     const { title, content, excerpt } = req.body;
 
@@ -94,7 +85,7 @@ exports.createArticle = async (req, res) => {
   }
 };
 
-exports.updateArticle = async (req, res) => {
+const updateArticle = async (req, res) => {
   try {
     const article = await agronomistService.updateArticle(req.user.id, req.params.id, req.body);
     return res.status(200).json(article);
@@ -107,7 +98,7 @@ exports.updateArticle = async (req, res) => {
   }
 };
 
-exports.deleteArticle = async (req, res) => {
+const deleteArticle = async (req, res) => {
   try {
     await agronomistService.deleteArticle(req.user.id, req.params.id);
     return res.status(200).json({ message: "Article deleted successfully" });
@@ -118,4 +109,18 @@ exports.deleteArticle = async (req, res) => {
 
     return res.status(500).json({ message: error.message });
   }
+};
+
+module.exports = {
+  getDiagnoses,
+  getDiagnosis,
+  updateDiagnosis,
+  getPendingDiagnoses,
+  getDiagnosisById,
+  approveDiagnosis,
+  rejectDiagnosis,
+  getMyArticles,
+  createArticle,
+  updateArticle,
+  deleteArticle,
 };

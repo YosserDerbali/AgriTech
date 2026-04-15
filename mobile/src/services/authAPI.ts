@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "http://192.168.1.120:3000",
+  baseURL: "http://192.168.0.190:3000",
 });
 
 export interface LoginRequest {
@@ -14,7 +14,7 @@ export interface RegisterRequest {
   name: string;
   email: string;
   password: string;
-  role: 'FARMER' | 'AGRONOMIST';
+  role: "FARMER" | "AGRONOMIST";
 }
 
 export interface AuthResponse {
@@ -33,9 +33,7 @@ export const authAPI = {
       const response = await API.post("/auth/login", data);
       return response.data;
     } catch (error: any) {
-      throw new Error(
-        error.response?.data?.message || "Login failed"
-      );
+      throw new Error(error.response?.data?.message || "Login failed");
     }
   },
 
@@ -44,9 +42,7 @@ export const authAPI = {
       const response = await API.post("/auth/register", data);
       return response.data;
     } catch (error: any) {
-      throw new Error(
-        error.response?.data?.message || "Registration failed"
-      );
+      throw new Error(error.response?.data?.message || "Registration failed");
     }
   },
 };

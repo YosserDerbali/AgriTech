@@ -64,7 +64,7 @@ export const getDiagnosisById = async (id: string) => {
 
 export const createDiagnosis = async (
   image: any,
-  plantName: string,
+  plantName?: string,
   context?: string
 ) => {
   const formData = new FormData();
@@ -79,7 +79,9 @@ export const createDiagnosis = async (
     formData.append("context", context);
   }
 
-  formData.append("plantName", plantName);
+  if (plantName && plantName.trim()) {
+    formData.append("plantName", plantName.trim());
+  }
 
   const response = await API.post(
     "/diagnose",

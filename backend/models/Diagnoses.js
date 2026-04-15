@@ -23,6 +23,36 @@ const Diagnoses = sequelize.define(
       allowNull: false,
     },
 
+    image_id: {
+      type: DataTypes.UUID,
+      allowNull: true,
+      references: {
+        model: "images",
+        key: "id",
+      },
+      onDelete: "SET NULL",
+    },
+
+    plant_id: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: "plants",
+        key: "id",
+      },
+      onDelete: "SET NULL",
+    },
+
+    disease_id: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: "diseases",
+        key: "id",
+      },
+      onDelete: "SET NULL",
+    },
+
     plant_name: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -51,6 +81,11 @@ const Diagnoses = sequelize.define(
     },
 
     treatment: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+
+    symptoms: {
       type: DataTypes.TEXT,
       allowNull: true,
     },

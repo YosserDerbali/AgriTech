@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Alert, Image, ScrollView, StyleSheet, Text, View, SafeAreaView } from 'react-native';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -66,6 +66,13 @@ export default function DiagnosisDetailScreen() {
             <Text style={styles.progressValue}>{Math.round(diagnosis.confidence * 100)}%</Text>
           </Card>
         )}
+
+        {diagnosis.symptoms ? (
+          <Card style={styles.card}>
+            <Text style={styles.cardTitle}>Symptoms</Text>
+            <Text style={styles.cardText}>{diagnosis.symptoms}</Text>
+          </Card>
+        ) : null}
 
         {diagnosis.status === 'APPROVED' && diagnosis.treatment && (
           <Card style={styles.card}>

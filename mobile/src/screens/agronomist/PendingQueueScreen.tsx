@@ -11,13 +11,22 @@ type SortOption = 'newest' | 'oldest' | 'confidence';
 
 export default function PendingQueueScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<AgronomistStackParamList>>();
+<<<<<<< HEAD
   const { getPendingDiagnoses, fetchPendingDiagnoses } = useDiagnosisStore();
+=======
+  const { getPendingDiagnoses, fetchReviewQueue } = useDiagnosisStore();
+>>>>>>> d981827 (Fix diagnosis schema and AI pipeline)
   const [sortBy, setSortBy] = useState<SortOption>('newest');
   const [showLowConfidenceOnly, setShowLowConfidenceOnly] = useState(false);
 
   useEffect(() => {
+<<<<<<< HEAD
     fetchPendingDiagnoses();
   }, []);
+=======
+    fetchReviewQueue().catch(() => null);
+  }, [fetchReviewQueue]);
+>>>>>>> d981827 (Fix diagnosis schema and AI pipeline)
 
   const pendingDiagnoses = getPendingDiagnoses();
   const filteredDiagnoses = pendingDiagnoses

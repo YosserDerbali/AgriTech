@@ -64,23 +64,23 @@ export default function DiagnoseScreen() {
       return;
     }
 
-    if (!trimmedPlantName) {
-      Alert.alert('Missing plant name', 'Please enter the plant name.');
-      return;
-    }
-
     setLoading(true);
-    
 
-    await addDiagnosis({
-      imageUrl: selectedImage,
-      plantName: trimmedPlantName,
-      context: context.trim() || undefined,
-    });
-    
-    setLoading(false);
-    Alert.alert('Submitted', 'Diagnosis submitted for review.');
-    navigation.navigate('FarmerTabs', { screen: 'History' } as never);
+    try {
+      await addDiagnosis({
+        imageUrl: selectedImage,
+        plantName: trimmedPlantName || undefined,
+        context: context.trim() || undefined,
+      });
+
+      Alert.alert('Submitted', 'Diagnosis submitted for review.');
+      navigation.navigate('FarmerTabs', { screen: 'History' } as never);
+    } catch (error) {
+      const message = (error as Error)?.message || 'Failed to submit diagnosis.';
+      Alert.alert('Diagnosis failed', message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const startRecording = async () => {

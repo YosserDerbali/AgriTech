@@ -1,13 +1,12 @@
 import axios from "axios";
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const axiosInstance = axios.create({
-  baseURL: "http://192.168.51.196:3000", // replace with your PC IP
+  baseURL: "http://192.168.0.190:3000",
 });
 
-// Request interceptor
 axiosInstance.interceptors.request.use(
-   async (config) => {
+  async (config) => {
     const token = await AsyncStorage.getItem("authToken");
 
     if (token) {
