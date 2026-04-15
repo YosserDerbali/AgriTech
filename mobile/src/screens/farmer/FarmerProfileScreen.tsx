@@ -3,54 +3,41 @@ import { Alert, ScrollView, StyleSheet, Text, View, SafeAreaView, TouchableOpaci
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { FarmerStackParamList } from '../../navigation/types';
+import { useDiagnosisStore } from '../../stores/diagnosisStore';
+import { useAppStore } from '../../stores/appStore';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
-import { useAppStore } from '../../stores/appStore';
 import { colors } from '../../theme/colors';
-import { useDiagnosisStore } from '../../stores/diagnosisStore';
-
-type MenuItem = {
-  label: string;
-  screen?: 'Settings' | 'Privacy' | 'Help'; // Explicitly define the screens
-  icon: string;
-};
-
-const menuItems: MenuItem[] = [
-  { label: 'Notifications', screen: undefined, icon: '🔔' },
-  { label: 'Settings', screen: 'Settings', icon: '⚙️' },
-  { label: 'Privacy & Security', screen: 'Privacy', icon: '🔒' },
-  { label: 'Help & Support', screen: 'Help', icon: '❓' },
-];
+import { Feather } from '@expo/vector-icons';
 
 export default function FarmerProfileScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<FarmerStackParamList>>();
-  const { user, logout } = useAppStore();
   const { diagnoses } = useDiagnosisStore();
+  const { user, logout } = useAppStore();
 
-  const handleMenuClick = (item: MenuItem) => {
-    if (item.screen) {
-      try {
-        // Navigate based on the screen name
-        if (item.screen === 'Settings') {
-          navigation.navigate('Settings');
-        } else if (item.screen === 'Privacy') {
-          navigation.navigate('Privacy');
-        } else if (item.screen === 'Help') {
-          navigation.navigate('Help');
-        }
-      } catch (error) {
-        console.error('Navigation error:', error);
-        Alert.alert('Error', 'Unable to navigate to ' + item.label);
-      }
-    } else {
-      Alert.alert(item.label, 'Ready for backend integration.');
+  // Calculate farmer stats
+  const totalScans = diagnoses?.length || 0;
+  const treatedCount = diagnoses?.filter(d => d.status === 'APPROVED').length || 0;
+  const accuracy = totalScans > 0 ? Math.round((treatedCount / totalScans) * 100) : 92;
+
+  const menuItems = [
+    { id: 'notifications', label: 'Notifications', icon: 'bell', screen: 'Notifications' as any },
+    { id: 'settings', label: 'Settings', icon: 'settings', screen: 'Settings' as any },
+    { id: 'privacy', label: 'Privacy & Security', icon: 'shield', screen: 'Privacy' as any },
+    { id: 'help', label: 'Help & Support', icon: 'life-buoy', screen: 'Help' as any },
+  ];
+
+  const handleMenuPress = (item: any) => {
+    try {
+      navigation.navigate(item.screen);
+    } catch (error) {
+      Alert.alert('Coming Soon', `${item.label} will be available soon.`);
     }
   };
 
   const handleLogout = () => {
     logout();
     Alert.alert('Logged out', 'Logged out successfully.');
-    // Reset navigation to the tabs
     navigation.reset({
       index: 0,
       routes: [{ name: 'FarmerTabs' }],
@@ -59,60 +46,52 @@ export default function FarmerProfileScreen() {
 
   return (
     <SafeAreaView style={styles.safeContainer}>
-      <ScrollView 
-        style={styles.container} 
-        contentContainerStyle={styles.content}
-        showsVerticalScrollIndicator={false}
-      >
+      <ScrollView style={styles.container} contentContainerStyle={styles.content}>
         <Text style={styles.title}>Profile</Text>
 
-        <Card style={styles.card}>
-          <Text style={styles.name}>{user?.name || 'Farmer User'}</Text>
-          <Text style={styles.email}>{user?.email || 'farmer@example.com'}</Text>
-          <Button 
-            title="Edit" 
-            variant="outline" 
-            onPress={() => Alert.alert('Edit profile', 'Coming soon.')} 
-          />
+        {/* Profile Card */}
+        <Card style={styles.profileCard}>
+          <Text style={styles.name}>{user?.name || 'John Farmer'}</Text>
+          <Text style={styles.email}>{user?.email || 'john@farm.com'}</Text>
+          <View style={styles.badgesRow}>
+            <TouchableOpacity onPress={() => navigation.navigate('EditProfile' as any)}>
+              <Text style={styles.editBadge}>Edit Profile</Text>
+            </TouchableOpacity>
+          </View>
         </Card>
 
+        {/* Stats Row */}
         <View style={styles.statsRow}>
           <View style={styles.statBox}>
-            <Text style={styles.statValue}>{diagnoses?.length || 0}</Text>
+            <Text style={styles.statValue}>{totalScans}</Text>
             <Text style={styles.statLabel}>Total Scans</Text>
           </View>
           <View style={styles.statBox}>
-            <Text style={styles.statValue}>{diagnoses?.filter(d => d.status === 'APPROVED').length || 0}</Text>
+            <Text style={styles.statValue}>{treatedCount}</Text>
             <Text style={styles.statLabel}>Treated</Text>
           </View>
           <View style={styles.statBox}>
-            <Text style={styles.statValue}>92%</Text>
+            <Text style={styles.statValue}>{accuracy}%</Text>
             <Text style={styles.statLabel}>Accuracy</Text>
           </View>
         </View>
 
+        {/* Menu Items Card */}
         <Card style={styles.card}>
           {menuItems.map((item, index) => (
-            <View key={item.label}>
-              <TouchableOpacity 
-                style={styles.menuRow} 
-                onPress={() => handleMenuClick(item)} 
-                activeOpacity={0.7}
-              >
-                <Text style={styles.menuIcon}>{item.icon}</Text>
-                <Text style={styles.menuLabel}>{item.label}</Text>
-                <Text style={styles.menuChevron}>›</Text>
-              </TouchableOpacity>
-              {index < menuItems.length - 1 && <View style={styles.menuDivider} />}
-            </View>
+            <TouchableOpacity
+              key={item.id}
+              style={[styles.menuItem, index === menuItems.length - 1 && styles.menuItemLast]}
+              onPress={() => handleMenuPress(item)}
+            >
+              <Feather name={item.icon as any} size={20} color={colors.primary} />
+              <Text style={styles.menuItemText}>{item.label}</Text>
+              <Feather name="chevron-right" size={20} color={colors.border} />
+            </TouchableOpacity>
           ))}
         </Card>
 
-        <Button 
-          title="Log Out" 
-          variant="outline" 
-          onPress={handleLogout} 
-        />
+        <Button title="Log Out" variant="outline" onPress={handleLogout} />
 
         <Text style={styles.footer}>AgriScan v1.0.0 · Made with 🌱 for farmers</Text>
       </ScrollView>
@@ -123,11 +102,10 @@ export default function FarmerProfileScreen() {
 const styles = StyleSheet.create({
   safeContainer: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.background || '#f9f9f9',
   },
   container: {
     flex: 1,
-    backgroundColor: colors.background,
   },
   content: {
     padding: 16,
@@ -139,8 +117,8 @@ const styles = StyleSheet.create({
     color: colors.text,
     marginBottom: 12,
   },
-  card: {
-    marginBottom: 16,
+  profileCard: {
+    marginBottom: 12,
   },
   name: {
     fontSize: 18,
@@ -150,20 +128,33 @@ const styles = StyleSheet.create({
   },
   email: {
     fontSize: 13,
-    color: colors.textSecondary,
-    marginBottom: 12,
+    color: colors.textSecondary || '#999',
+    marginBottom: 10,
+  },
+  badgesRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+  editBadge: {
+    backgroundColor: '#E0F2FE',
+    color: colors.primary,
+    paddingVertical: 4,
+    paddingHorizontal: 12,
+    borderRadius: 999,
+    fontSize: 12,
+    fontWeight: '500',
   },
   statsRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 16,
-    gap: 8,
+    marginBottom: 12,
   },
   statBox: {
     flex: 1,
     backgroundColor: colors.surface,
     borderRadius: 12,
     padding: 12,
+    marginHorizontal: 4,
     alignItems: 'center',
     borderWidth: 1,
     borderColor: colors.border,
@@ -171,38 +162,36 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 18,
     fontWeight: '700',
-    color: colors.primary,
+    color: colors.accent || colors.primary,
   },
   statLabel: {
     fontSize: 11,
-    color: colors.textSecondary,
+    color: colors.textSecondary || '#999',
   },
-  menuRow: {
+  card: {
+    marginBottom: 12,
+  },
+  menuItem: {
+    paddingVertical: 14,
+    paddingHorizontal: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 14,
-    paddingHorizontal: 4,
+    gap: 12,
   },
-  menuIcon: {
-    fontSize: 16,
-    marginRight: 12,
+  menuItemLast: {
+    borderBottomWidth: 0,
   },
-  menuLabel: {
+  menuItemText: {
     flex: 1,
     fontSize: 14,
+    fontWeight: '500',
     color: colors.text,
-  },
-  menuChevron: {
-    fontSize: 20,
-    color: colors.textSecondary,
-  },
-  menuDivider: {
-    height: 1,
-    backgroundColor: colors.border,
   },
   footer: {
     textAlign: 'center',
-    color: colors.textSecondary,
+    color: colors.textSecondary || '#999',
     fontSize: 12,
     marginTop: 16,
   },

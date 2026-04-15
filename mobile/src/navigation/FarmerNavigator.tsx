@@ -6,7 +6,7 @@ import DiagnosisDetailScreen from '../screens/farmer/DiagnosisDetailScreen';
 import ArticleDetailScreen from '../screens/farmer/ArticleDetailScreen';
 import SettingsScreen from '../screens/farmer/SettingsScreen';
 import PrivacyScreen from '../screens/farmer/PrivacyScreen';
-import HelpScreen from '../screens/farmer/HelpScreen';
+import HelpAndSupportScreen from '../screens/farmer/HelpAndSupportScreen';
 
 const Stack = createNativeStackNavigator<FarmerStackParamList>();
 
@@ -48,7 +48,7 @@ export default function FarmerNavigator() {
       />
       <Stack.Screen
         name="Help"
-        component={HelpScreen}
+        component={HelpAndSupportScreen}
         options={{ title: 'Help & Support' }}
       />
     </Stack.Navigator>

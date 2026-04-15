@@ -22,10 +22,13 @@
     "noImplicitAny": false,
     "noFallthroughCasesInSwitch": false,
 
+    /* Fix deprecation warning */
+    "ignoreDeprecations": "6.0",
+    
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src", "mobile/src/services/axiosInstance.ts"]
+  "include": ["src"]
 }
