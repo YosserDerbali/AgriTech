@@ -31,4 +31,8 @@ export type AgronomistStackParamList = {
   AgronomistTabs: undefined;
   DiagnosisReview: { id: string };
   ArticleEditor: { id?: string };
+  Notifications: undefined;
+  Settings: undefined;
+  EditProfile: undefined;
+  HelpAndSupport: undefined;
 };
