@@ -6,7 +6,7 @@ import { FarmerStackParamList } from '../../navigation/types';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { useAppStore } from '../../stores/appStore';
-import { colors } from '../../theme/colors';
+import { useTheme } from '../../hooks/useTheme';
 import { useDiagnosisStore } from '../../stores/diagnosisStore';
 
 type MenuItem = {
@@ -23,6 +23,7 @@ const menuItems: MenuItem[] = [
 ];
 
 export default function FarmerProfileScreen() {
+  const { colors, shadows } = useTheme();
   const navigation = useNavigation<NativeStackNavigationProp<FarmerStackParamList>>();
   const { user, logout } = useAppStore();
   const { diagnoses } = useDiagnosisStore();
@@ -56,6 +57,94 @@ export default function FarmerProfileScreen() {
       routes: [{ name: 'FarmerTabs' }],
     });
   };
+
+  const styles = StyleSheet.create({
+    safeContainer: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    content: {
+      padding: 16,
+      paddingBottom: 30,
+    },
+    title: {
+      fontSize: 22,
+      fontWeight: '700',
+      color: colors.text,
+      marginBottom: 12,
+    },
+    card: {
+      marginBottom: 16,
+    },
+    name: {
+      fontSize: 18,
+      fontWeight: '700',
+      color: colors.text,
+      marginBottom: 6,
+    },
+    email: {
+      fontSize: 13,
+      color: colors.textSecondary,
+      marginBottom: 12,
+    },
+    statsRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      marginBottom: 16,
+      gap: 8,
+    },
+    statBox: {
+      flex: 1,
+      backgroundColor: colors.surface,
+      borderRadius: 12,
+      padding: 12,
+      alignItems: 'center',
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    statValue: {
+      fontSize: 18,
+      fontWeight: '700',
+      color: colors.primary,
+    },
+    statLabel: {
+      fontSize: 11,
+      color: colors.textSecondary,
+    },
+    menuRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingVertical: 14,
+      paddingHorizontal: 4,
+    },
+    menuIcon: {
+      fontSize: 16,
+      marginRight: 12,
+    },
+    menuLabel: {
+      flex: 1,
+      fontSize: 14,
+      color: colors.text,
+    },
+    menuChevron: {
+      fontSize: 20,
+      color: colors.textSecondary,
+    },
+    menuDivider: {
+      height: 1,
+      backgroundColor: colors.border,
+    },
+    footer: {
+      textAlign: 'center',
+      color: colors.textSecondary,
+      fontSize: 12,
+      marginTop: 16,
+    },
+  });
 
   return (
     <SafeAreaView style={styles.safeContainer}>
@@ -119,91 +208,3 @@ export default function FarmerProfileScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  safeContainer: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  content: {
-    padding: 16,
-    paddingBottom: 30,
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: colors.text,
-    marginBottom: 12,
-  },
-  card: {
-    marginBottom: 16,
-  },
-  name: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: colors.text,
-    marginBottom: 6,
-  },
-  email: {
-    fontSize: 13,
-    color: colors.textSecondary,
-    marginBottom: 12,
-  },
-  statsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 16,
-    gap: 8,
-  },
-  statBox: {
-    flex: 1,
-    backgroundColor: colors.surface,
-    borderRadius: 12,
-    padding: 12,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  statValue: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: colors.primary,
-  },
-  statLabel: {
-    fontSize: 11,
-    color: colors.textSecondary,
-  },
-  menuRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 14,
-    paddingHorizontal: 4,
-  },
-  menuIcon: {
-    fontSize: 16,
-    marginRight: 12,
-  },
-  menuLabel: {
-    flex: 1,
-    fontSize: 14,
-    color: colors.text,
-  },
-  menuChevron: {
-    fontSize: 20,
-    color: colors.textSecondary,
-  },
-  menuDivider: {
-    height: 1,
-    backgroundColor: colors.border,
-  },
-  footer: {
-    textAlign: 'center',
-    color: colors.textSecondary,
-    fontSize: 12,
-    marginTop: 16,
-  },
-});

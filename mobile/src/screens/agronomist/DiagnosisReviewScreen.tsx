@@ -20,9 +20,10 @@ import { Input } from '../../components/ui/Input';
 import { Textarea } from '../../components/ui/Textarea';
 import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
-import { colors } from '../../theme/colors';
+import { useTheme } from '../../hooks/useTheme';
 
 export default function DiagnosisReviewScreen() {
+  const { colors } = useTheme();
   const navigation = useNavigation<NativeStackNavigationProp<AgronomistStackParamList>>();
   const route = useRoute<RouteProp<AgronomistStackParamList, 'DiagnosisReview'>>();
   const { getDiagnosis, approveDiagnosis, rejectDiagnosis, updateDiagnosis } = useDiagnosisStore();
@@ -38,9 +39,9 @@ export default function DiagnosisReviewScreen() {
 
   if (!diagnosis) {
     return (
-      <SafeAreaView style={styles.safeContainer}>
+      <SafeAreaView style={[styles.keyboardAvoid, { backgroundColor: colors.background }]}>
         <View style={styles.centered}>
-          <Text style={styles.title}>Diagnosis not found</Text>
+          <Text style={{ fontSize: 22, fontWeight: '700', color: colors.text, marginBottom: 12 }}>Diagnosis not found</Text>
         </View>
       </SafeAreaView>
     );
@@ -82,20 +83,70 @@ export default function DiagnosisReviewScreen() {
     Alert.alert('Updated', 'Diagnosis updated.');
   };
 
+  const dynamicStyles = StyleSheet.create({
+    safeContainer: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    content: {
+      padding: 16,
+      paddingBottom: 30,
+    },
+    title: {
+      fontSize: 22,
+      fontWeight: '700',
+      color: colors.text,
+      marginBottom: 12,
+    },
+    cardTitle: {
+      fontSize: 16,
+      fontWeight: '700',
+      color: colors.text,
+      marginBottom: 12,
+    },
+    label: {
+      fontSize: 13,
+      fontWeight: '600',
+      color: colors.text,
+      marginTop: 12,
+      marginBottom: 6,
+    },
+    value: {
+      fontSize: 15,
+      color: colors.text,
+      marginBottom: 8,
+    },
+    warning: {
+      fontSize: 13,
+      color: colors.warning,
+      marginBottom: 12,
+      fontWeight: '600',
+    },
+    metaText: {
+      fontSize: 12,
+      color: colors.muted,
+      marginTop: 4,
+    },
+  });
+
   return (
-    <SafeAreaView style={styles.safeContainer}>
+    <SafeAreaView style={dynamicStyles.safeContainer}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardAvoid}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
       >
         <ScrollView
-          style={styles.container}
-          contentContainerStyle={styles.content}
+          style={dynamicStyles.container}
+          contentContainerStyle={dynamicStyles.content}
           scrollEnabled={true}
           keyboardShouldPersistTaps="handled"
         >
-          <Text style={styles.title}>Review Diagnosis</Text>
+          <Text style={dynamicStyles.title}>Review Diagnosis</Text>
           <StatusBadge status={diagnosis.status} />
 
       <Card style={styles.card}>
@@ -208,31 +259,13 @@ export default function DiagnosisReviewScreen() {
 }
 
 const styles = StyleSheet.create({
-  safeContainer: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
   keyboardAvoid: {
     flex: 1,
-  },
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  content: {
-    padding: 16,
-    paddingBottom: 30,
   },
   centered: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: colors.text,
-    marginBottom: 12,
   },
   card: {
     marginBottom: 14,
@@ -246,28 +279,28 @@ const styles = StyleSheet.create({
   plantName: {
     fontSize: 16,
     fontWeight: '600',
-    color: colors.text,
   },
   cardTitle: {
     fontSize: 14,
     fontWeight: '700',
-    color: colors.text,
     marginBottom: 8,
   },
   label: {
     fontSize: 12,
-    color: colors.muted,
     marginTop: 8,
   },
   value: {
     fontSize: 14,
-    color: colors.text,
     marginBottom: 8,
   },
   warning: {
-    color: colors.warning,
     fontSize: 12,
-    marginBottom: 6,
+    marginBottom: 12,
+    fontWeight: '600',
+  },
+  metaText: {
+    fontSize: 11,
+    marginTop: 4,
   },
   lowConfidence: {
     borderColor: '#FCD34D',
@@ -293,10 +326,6 @@ const styles = StyleSheet.create({
   progressFill: {
     height: 8,
   },
-  metaText: {
-    fontSize: 11,
-    color: colors.muted,
-  },
   textarea: {
     minHeight: 90,
     marginTop: 8,
@@ -307,12 +336,14 @@ const styles = StyleSheet.create({
   actionRow: {
     flexDirection: 'row',
     marginTop: 6,
+    gap: 8,
   },
   actionButton: {
     flex: 1,
-    marginRight: 10,
   },
   actionButtonLast: {
     flex: 1,
   },
 });
+
+

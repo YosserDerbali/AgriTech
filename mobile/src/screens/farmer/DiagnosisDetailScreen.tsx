@@ -8,9 +8,10 @@ import { useDiagnosisStore } from '../../stores/diagnosisStore';
 import { StatusBadge } from '../../components/ui/StatusBadge';
 import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
-import { colors } from '../../theme/colors';
+import { useTheme } from '../../hooks/useTheme';
 import { Diagnosis } from '../../types/diagnosis';
 export default function DiagnosisDetailScreen() {
+  const { colors, shadows } = useTheme();
   const navigation = useNavigation<NativeStackNavigationProp<FarmerStackParamList>>();
   const route = useRoute<RouteProp<FarmerStackParamList, 'DiagnosisDetail'>>();
   const {getDiagnosis} = useDiagnosisStore();
@@ -27,6 +28,94 @@ export default function DiagnosisDetailScreen() {
 
   //   fetchDiagnosis();
   // }, [route.params.id]);
+
+  const styles = StyleSheet.create({
+    safeContainer: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    content: {
+      padding: 16,
+      paddingBottom: 30,
+    },
+    centered: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: 20,
+      backgroundColor: colors.background,
+    },
+    image: {
+      width: '100%',
+      height: 220,
+      borderRadius: 16,
+      marginBottom: 12,
+    },
+    statusWrap: {
+      marginBottom: 12,
+      alignItems: 'flex-start',
+    },
+    section: {
+      marginBottom: 16,
+    },
+    heading: {
+      fontSize: 22,
+      fontWeight: '700',
+      color: colors.text,
+    },
+    subheading: {
+      fontSize: 14,
+      color: colors.muted,
+      marginTop: 6,
+    },
+    metaText: {
+      fontSize: 12,
+      color: colors.muted,
+      marginTop: 6,
+    },
+    card: {
+      marginBottom: 14,
+    },
+    cardTitle: {
+      fontSize: 14,
+      fontWeight: '700',
+      color: colors.text,
+      marginBottom: 8,
+    },
+    cardText: {
+      fontSize: 13,
+      color: colors.muted,
+    },
+    progressTrack: {
+      height: 10,
+      backgroundColor: '#E2E8F0',
+      borderRadius: 999,
+      overflow: 'hidden',
+    },
+    progressFill: {
+      height: 10,
+      backgroundColor: colors.primary,
+    },
+    progressValue: {
+      marginTop: 6,
+      fontSize: 14,
+      fontWeight: '700',
+      color: colors.text,
+    },
+    rejected: {
+      borderColor: '#FCA5A5',
+    },
+    title: {
+      fontSize: 18,
+      fontWeight: '700',
+      color: colors.text,
+      marginBottom: 12,
+    },
+  });
 
   if (!diagnosis) {
     return (
@@ -104,91 +193,3 @@ export default function DiagnosisDetailScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  safeContainer: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  content: {
-    padding: 16,
-    paddingBottom: 30,
-  },
-  centered: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
-    backgroundColor: colors.background,
-  },
-  image: {
-    width: '100%',
-    height: 220,
-    borderRadius: 16,
-    marginBottom: 12,
-  },
-  statusWrap: {
-    marginBottom: 12,
-    alignItems: 'flex-start',
-  },
-  section: {
-    marginBottom: 16,
-  },
-  heading: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: colors.text,
-  },
-  subheading: {
-    fontSize: 14,
-    color: colors.muted,
-    marginTop: 6,
-  },
-  metaText: {
-    fontSize: 12,
-    color: colors.muted,
-    marginTop: 6,
-  },
-  card: {
-    marginBottom: 14,
-  },
-  cardTitle: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: colors.text,
-    marginBottom: 8,
-  },
-  cardText: {
-    fontSize: 13,
-    color: colors.muted,
-  },
-  progressTrack: {
-    height: 10,
-    backgroundColor: '#E2E8F0',
-    borderRadius: 999,
-    overflow: 'hidden',
-  },
-  progressFill: {
-    height: 10,
-    backgroundColor: colors.primary,
-  },
-  progressValue: {
-    marginTop: 6,
-    fontSize: 14,
-    fontWeight: '700',
-    color: colors.text,
-  },
-  rejected: {
-    borderColor: '#FCA5A5',
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: colors.text,
-    marginBottom: 12,
-  },
-});

@@ -6,7 +6,7 @@ import React from 'react';
 import { Pressable, StyleSheet, Text, Platform, View } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
-import { colors } from '../../theme/colors';
+import { useTheme } from '../../hooks/useTheme';
 import { typography, fontFamilies } from '../../theme/typography';
 import { spacing, radius } from '../../theme/spacing';
 
@@ -24,13 +24,18 @@ type GradientButtonProps = {
 export function GradientButton({
   title,
   onPress,
-  gradientColors = [colors.primary, colors.primaryLight],
+  gradientColors,
   disabled = false,
   size = 'medium',
   icon,
   full = false,
   haptics = true,
 }: GradientButtonProps) {
+  const { colors } = useTheme();
+  
+  // Use provided gradientColors or default to theme colors
+  const finalGradientColors = gradientColors || [colors.primary, colors.primaryLight];
+
   const handlePress = () => {
     if (!disabled) {
       if (haptics && Platform.OS !== 'web') {
@@ -44,7 +49,7 @@ export function GradientButton({
 
   return (
     <LinearGradient
-      colors={disabled ? [colors.textMuted, colors.textMuted] : gradientColors}
+      colors={disabled ? [colors.textMuted, colors.textMuted] : finalGradientColors}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
       style={[

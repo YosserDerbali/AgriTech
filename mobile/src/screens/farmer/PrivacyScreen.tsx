@@ -1,11 +1,43 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import { colors } from '../../theme/colors';
+import { useTheme } from '../../hooks/useTheme';
 
 export default function PrivacyScreen() {
+  const { colors } = useTheme();
+
   const handlePress = (action: string) => {
     Alert.alert(action, 'This feature will be available in the next update.');
   };
+
+  const styles = StyleSheet.create({
+    container: { 
+      flex: 1, 
+      padding: 16, 
+      backgroundColor: colors.background 
+    },
+    title: { 
+      fontSize: 22, 
+      fontWeight: '700', 
+      marginBottom: 20,
+      color: colors.text 
+    },
+    item: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingVertical: 16,
+      borderBottomWidth: 1,
+      borderColor: colors.border,
+    },
+    text: { 
+      fontSize: 16, 
+      color: colors.text 
+    },
+    chevron: { 
+      fontSize: 20, 
+      color: colors.textMuted 
+    },
+  });
 
   return (
     <View style={styles.container}>
@@ -33,33 +65,3 @@ export default function PrivacyScreen() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { 
-    flex: 1, 
-    padding: 16, 
-    backgroundColor: colors.background 
-  },
-  title: { 
-    fontSize: 22, 
-    fontWeight: '700', 
-    marginBottom: 20,
-    color: colors.text 
-  },
-  item: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderColor: colors.border,
-  },
-  text: { 
-    fontSize: 16, 
-    color: colors.text 
-  },
-  chevron: { 
-    fontSize: 20, 
-    color: colors.textMuted 
-  },
-});

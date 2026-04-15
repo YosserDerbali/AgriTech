@@ -5,11 +5,93 @@ import { formatDistanceToNow } from 'date-fns';
 import { FarmerStackParamList } from '../../navigation/types';
 import { useArticleStore } from '../../stores/articleStore';
 import { Badge } from '../../components/ui/Badge';
-import { colors } from '../../theme/colors';
+import { useTheme } from '../../hooks/useTheme';
 
 export default function ArticleDetailScreen() {
+  const { colors, shadows } = useTheme();
   const route = useRoute<RouteProp<FarmerStackParamList, 'ArticleDetail'>>();
   const article = useArticleStore((state) => state.getArticle(route.params.id));
+
+  const styles = StyleSheet.create({
+    safeContainer: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    content: {
+      padding: 16,
+      paddingBottom: 30,
+    },
+    centered: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: 20,
+    },
+    title: {
+      fontSize: 22,
+      fontWeight: '700',
+      color: colors.text,
+      marginBottom: 10,
+    },
+    metaRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      marginBottom: 10,
+    },
+    meta: {
+      fontSize: 12,
+      color: colors.muted,
+    },
+    badge: {
+      marginBottom: 10,
+    },
+    tagsRow: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      marginBottom: 10,
+    },
+    tag: {
+      marginRight: 8,
+      marginBottom: 6,
+    },
+    link: {
+      color: colors.primary,
+      marginBottom: 12,
+      fontWeight: '600',
+    },
+    contentBlock: {
+      marginTop: 6,
+    },
+    h1: {
+      fontSize: 20,
+      fontWeight: '700',
+      color: colors.text,
+      marginVertical: 10,
+    },
+    h2: {
+      fontSize: 18,
+      fontWeight: '700',
+      color: colors.text,
+      marginVertical: 8,
+    },
+    paragraph: {
+      fontSize: 14,
+      color: colors.muted,
+      marginBottom: 10,
+      lineHeight: 20,
+    },
+    list: {
+      marginBottom: 10,
+    },
+    listItem: {
+      marginLeft: 16,
+      marginBottom: 6,
+    },
+  });
 
   if (!article) {
     return (
@@ -98,85 +180,3 @@ export default function ArticleDetailScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  safeContainer: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  content: {
-    padding: 16,
-    paddingBottom: 30,
-  },
-  centered: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: colors.text,
-    marginBottom: 10,
-  },
-  metaRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 10,
-  },
-  meta: {
-    fontSize: 12,
-    color: colors.muted,
-  },
-  badge: {
-    marginBottom: 10,
-  },
-  tagsRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginBottom: 10,
-  },
-  tag: {
-    marginRight: 8,
-    marginBottom: 6,
-  },
-  link: {
-    color: colors.primary,
-    marginBottom: 12,
-    fontWeight: '600',
-  },
-  contentBlock: {
-    marginTop: 6,
-  },
-  h1: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: colors.text,
-    marginVertical: 10,
-  },
-  h2: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: colors.text,
-    marginVertical: 8,
-  },
-  paragraph: {
-    fontSize: 14,
-    color: colors.muted,
-    marginBottom: 10,
-    lineHeight: 20,
-  },
-  list: {
-    marginBottom: 10,
-  },
-  listItem: {
-    fontSize: 14,
-    color: colors.muted,
-    marginBottom: 4,
-  },
-});

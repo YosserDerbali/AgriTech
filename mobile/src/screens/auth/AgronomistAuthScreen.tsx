@@ -8,11 +8,12 @@ import { Input } from '../../components/ui/Input';
 import { Textarea } from '../../components/ui/Textarea';
 import { useAppStore } from '../../stores/appStore';
 import { authAPI } from '../../services/authAPI';
-import { colors } from '../../theme/colors';
+import { useTheme } from '../../hooks/useTheme';
 
 export default function AgronomistAuthScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<AuthStackParamList>>();
   const { setRole, setUser, setIsAuthenticated, setToken, restoreToken, isAuthenticated } = useAppStore();
+  const { colors } = useTheme();
 
   const [isSignUp, setIsSignUp] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -86,6 +87,52 @@ export default function AgronomistAuthScreen() {
       setIsLoading(false);
     }
   };
+
+  const styles = StyleSheet.create({
+    safeContainer: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    content: {
+      padding: 20,
+      paddingBottom: 30,
+    },
+    title: {
+      fontSize: 24,
+      fontWeight: '700',
+      color: colors.text,
+      marginBottom: 8,
+    },
+    subtitle: {
+      fontSize: 13,
+      color: colors.muted,
+      marginBottom: 16,
+    },
+    input: {
+      marginBottom: 12,
+    },
+    textarea: {
+      marginBottom: 12,
+      minHeight: 90,
+    },
+    toggle: {
+      marginTop: 12,
+      color: colors.accent,
+      fontWeight: '600',
+    },
+    switchRole: {
+      marginTop: 20,
+    },
+    switchText: {
+      fontSize: 12,
+      color: colors.muted,
+      marginBottom: 10,
+    },
+  });
 
   return (
     <SafeAreaView style={styles.safeContainer}>
@@ -164,48 +211,3 @@ export default function AgronomistAuthScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safeContainer: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  content: {
-    padding: 20,
-    paddingBottom: 30,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: colors.text,
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 13,
-    color: colors.muted,
-    marginBottom: 16,
-  },
-  input: {
-    marginBottom: 12,
-  },
-  textarea: {
-    marginBottom: 12,
-    minHeight: 90,
-  },
-  toggle: {
-    marginTop: 12,
-    color: colors.accent,
-    fontWeight: '600',
-  },
-  switchRole: {
-    marginTop: 20,
-  },
-  switchText: {
-    fontSize: 12,
-    color: colors.muted,
-    marginBottom: 10,
-  },
-});

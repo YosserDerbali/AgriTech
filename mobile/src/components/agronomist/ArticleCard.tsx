@@ -2,7 +2,7 @@ import React from 'react';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { formatDistanceToNow } from 'date-fns';
 import { Article } from '../../types/article';
-import { colors, shadows } from '../../theme/colors';
+import { useTheme } from '../../hooks/useTheme';
 
 interface ArticleCardProps {
   article: Article;
@@ -10,15 +10,44 @@ interface ArticleCardProps {
 }
 
 export function ArticleCard({ article, onPress }: ArticleCardProps) {
+  const { colors, shadows } = useTheme();
+
+  const styles = StyleSheet.create({
+    card: {
+      backgroundColor: colors.surface,
+      borderRadius: 16,
+      overflow: 'hidden',
+      borderWidth: 1,
+      borderColor: colors.border,
+      marginBottom: 12,
+      ...shadows.soft,
+    },
+    title: {
+      fontSize: 15,
+      fontWeight: '600',
+      color: colors.text,
+      marginBottom: 6,
+    },
+    excerpt: {
+      fontSize: 13,
+      color: colors.textSecondary,
+      marginBottom: 8,
+    },
+    metaText: {
+      fontSize: 12,
+      color: colors.textSecondary,
+    },
+  });
+
   return (
     <Pressable onPress={onPress} style={styles.card}>
       {article.coverImageUrl ? (
-        <Image source={{ uri: article.coverImageUrl }} style={styles.image} />
+        <Image source={{ uri: article.coverImageUrl }} style={staticStyles.image} />
       ) : null}
-      <View style={styles.content}>
+      <View style={staticStyles.content}>
         <Text style={styles.title} numberOfLines={2}>{article.title}</Text>
         <Text style={styles.excerpt} numberOfLines={2}>{article.excerpt}</Text>
-        <View style={styles.metaRow}>
+        <View style={staticStyles.metaRow}>
           <Text style={styles.metaText}>
             {formatDistanceToNow(article.createdAt, { addSuffix: true })}
           </Text>
@@ -29,16 +58,8 @@ export function ArticleCard({ article, onPress }: ArticleCardProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: colors.card,
-    borderRadius: 16,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: colors.border,
-    marginBottom: 12,
-    ...shadows.soft,
-  },
+const staticStyles = StyleSheet.create({
+
   image: {
     width: '100%',
     height: 160,
@@ -46,23 +67,8 @@ const styles = StyleSheet.create({
   content: {
     padding: 12,
   },
-  title: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: colors.text,
-    marginBottom: 6,
-  },
-  excerpt: {
-    fontSize: 13,
-    color: colors.muted,
-    marginBottom: 8,
-  },
   metaRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-  },
-  metaText: {
-    fontSize: 12,
-    color: colors.muted,
   },
 });

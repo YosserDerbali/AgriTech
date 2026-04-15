@@ -6,18 +6,20 @@ import AgronomistDashboardScreen from '../screens/agronomist/AgronomistDashboard
 import PendingQueueScreen from '../screens/agronomist/PendingQueueScreen';
 import AgronomistArticlesScreen from '../screens/agronomist/AgronomistArticlesScreen';
 import AgronomistProfileScreen from '../screens/agronomist/AgronomistProfileScreen';
-import { colors } from '../theme/colors';
+import { useTheme } from '../hooks/useTheme';
 
 const Tab = createBottomTabNavigator<AgronomistTabsParamList>();
 
 export default function AgronomistTabs() {
+  const { colors } = useTheme();
+
   return (
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: colors.accent,
         tabBarInactiveTintColor: colors.muted,
-        tabBarStyle: { backgroundColor: colors.card, borderTopColor: colors.border },
+        tabBarStyle: { backgroundColor: colors.surface, borderTopColor: colors.border },
       }}
     >
       <Tab.Screen

@@ -5,11 +5,12 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AgronomistStackParamList } from '../../navigation/types';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
-import { colors } from '../../theme/colors';
+import { useTheme } from '../../hooks/useTheme';
 import { Feather } from '@expo/vector-icons';
 import { useAppStore } from '../../stores/appStore';
 
 export default function EditProfileScreen() {
+  const { colors, shadows } = useTheme();
   const navigation = useNavigation<NativeStackNavigationProp<AgronomistStackParamList>>();
   const { user } = useAppStore();
 
@@ -30,6 +31,104 @@ export default function EditProfileScreen() {
       navigation.goBack();
     }, 1000);
   };
+
+  const styles = StyleSheet.create({
+    safeContainer: {
+      flex: 1,
+      backgroundColor: '#f9f9f9',
+    },
+    container: {
+      flex: 1,
+    },
+    content: {
+      padding: 16,
+      paddingBottom: 32,
+    },
+    header: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: 20,
+    },
+    title: {
+      fontSize: 24,
+      fontWeight: '700',
+      color: colors.text,
+    },
+    photoCard: {
+      marginBottom: 20,
+      paddingVertical: 20,
+    },
+    photoContainer: {
+      alignItems: 'center',
+    },
+    profilePhoto: {
+      width: 100,
+      height: 100,
+      borderRadius: 50,
+      backgroundColor: colors.primarySoft,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginBottom: 16,
+      borderWidth: 2,
+      borderColor: colors.primary,
+    },
+    photoActions: {
+      flexDirection: 'row',
+      gap: 12,
+    },
+    photoButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingVertical: 8,
+      paddingHorizontal: 12,
+      borderRadius: 8,
+      backgroundColor: `${colors.primary}10`,
+      gap: 6,
+    },
+    removeButton: {
+      backgroundColor: '#f5f5f5',
+    },
+    photoButtonText: {
+      fontSize: 12,
+      fontWeight: '600',
+      color: colors.primary,
+    },
+    section: {
+      marginBottom: 16,
+      paddingVertical: 12,
+      paddingHorizontal: 12,
+    },
+    label: {
+      fontSize: 14,
+      fontWeight: '600',
+      color: colors.text,
+      marginBottom: 8,
+    },
+    helperText: {
+      fontSize: 12,
+      color: '#999',
+      marginBottom: 8,
+    },
+    input: {
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderRadius: 8,
+      paddingVertical: 12,
+      paddingHorizontal: 12,
+      fontSize: 14,
+      color: colors.text,
+      backgroundColor: '#fafafa',
+    },
+    multilineInput: {
+      textAlignVertical: 'top',
+      paddingTop: 12,
+    },
+    actions: {
+      gap: 12,
+      marginTop: 8,
+    },
+  });
 
   return (
     <SafeAreaView style={styles.safeContainer}>
@@ -148,101 +247,3 @@ export default function EditProfileScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  safeContainer: {
-    flex: 1,
-    backgroundColor: '#f9f9f9',
-  },
-  container: {
-    flex: 1,
-  },
-  content: {
-    padding: 16,
-    paddingBottom: 32,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: colors.text,
-  },
-  photoCard: {
-    marginBottom: 20,
-    paddingVertical: 20,
-  },
-  photoContainer: {
-    alignItems: 'center',
-  },
-  profilePhoto: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: colors.primarySoft,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 16,
-    borderWidth: 2,
-    borderColor: colors.primary,
-  },
-  photoActions: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  photoButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 8,
-    backgroundColor: `${colors.primary}10`,
-    gap: 6,
-  },
-  removeButton: {
-    backgroundColor: '#f5f5f5',
-  },
-  photoButtonText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: colors.primary,
-  },
-  section: {
-    marginBottom: 16,
-    paddingVertical: 12,
-    paddingHorizontal: 12,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: colors.text,
-    marginBottom: 8,
-  },
-  helperText: {
-    fontSize: 12,
-    color: '#999',
-    marginBottom: 8,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 8,
-    paddingVertical: 12,
-    paddingHorizontal: 12,
-    fontSize: 14,
-    color: colors.text,
-    backgroundColor: '#fafafa',
-  },
-  multilineInput: {
-    textAlignVertical: 'top',
-    paddingTop: 12,
-  },
-  actions: {
-    gap: 12,
-    marginTop: 8,
-  },
-});
