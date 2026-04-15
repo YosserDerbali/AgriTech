@@ -1,5 +1,5 @@
 import React from 'react';
-import { Alert, ScrollView, StyleSheet, Text, View, SafeAreaView } from 'react-native';
+import { Alert, ScrollView, StyleSheet, Text, View, SafeAreaView, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AgronomistStackParamList } from '../../navigation/types';
@@ -9,8 +9,7 @@ import { useAppStore } from '../../stores/appStore';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { colors } from '../../theme/colors';
-
-const menuItems = ['Notifications', 'Specialties', 'Settings', 'Help & Support'];
+import { Feather } from '@expo/vector-icons';
 
 export default function AgronomistProfileScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<AgronomistStackParamList>>();
@@ -20,6 +19,12 @@ export default function AgronomistProfileScreen() {
 
   const approvedByMe = diagnoses.filter((d) => d.status === 'APPROVED').length;
   const myArticles = getMyArticles();
+  // code explanation 
+  const menuItems = [
+    { id: 'notifications', label: 'Notifications', icon: 'bell', onPress: () => navigation.navigate('Notifications') },
+    { id: 'settings', label: 'Settings', icon: 'settings', onPress: () => navigation.navigate('Settings') },
+    { id: 'help', label: 'Help & Support', icon: 'life-buoy', onPress: () => navigation.navigate('HelpAndSupport') },
+  ];
 
   const handleLogout = () => {
     logout();
@@ -78,13 +83,15 @@ export default function AgronomistProfileScreen() {
 
       <Card style={styles.card}>
         {menuItems.map((item, index) => (
-          <Text
-            key={item}
+          <TouchableOpacity
+            key={item.id}
             style={[styles.menuItem, index === menuItems.length - 1 && styles.menuItemLast]}
-            onPress={() => Alert.alert(item, 'Ready for backend integration.')}
+            onPress={item.onPress}
           >
-            {item}
-          </Text>
+            <Feather name={item.icon as any} size={20} color={colors.primary} />
+            <Text style={styles.menuItemText}>{item.label}</Text>
+            <Feather name="chevron-right" size={20} color={colors.border} />
+          </TouchableOpacity>
         ))}
       </Card>
 
@@ -177,7 +184,7 @@ const styles = StyleSheet.create({
   },
   statBox: {
     flex: 1,
-    backgroundColor: colors.card,
+    backgroundColor: colors.surface,
     borderRadius: 12,
     padding: 12,
     marginHorizontal: 4,
@@ -199,13 +206,23 @@ const styles = StyleSheet.create({
     color: colors.muted,
   },
   menuItem: {
-    paddingVertical: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 12,
     fontSize: 14,
     color: colors.text,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
   },
   menuItemLast: {
     borderBottomWidth: 0,
+  },
+  menuItemText: {
+    flex: 1,
+    fontSize: 14,
+    fontWeight: '500',
+    color: colors.text,
   },
 });
