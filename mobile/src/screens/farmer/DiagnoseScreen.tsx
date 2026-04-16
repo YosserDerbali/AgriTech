@@ -377,7 +377,7 @@ const styles = StyleSheet.create({
   },
   recording: {
     marginTop: 8,
-    color: colors.destructive,
+    color: colors.error,
     fontSize: 12,
   },
   transcribingRow: {
@@ -391,7 +391,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   infoBox: {
-    backgroundColor: colors.card,
+    backgroundColor: colors.surface,
     borderRadius: 16,
     padding: 16,
     borderWidth: 1,

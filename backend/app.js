@@ -10,11 +10,21 @@ const { initializeRssSync } = require("./services/cronRescheduler.js");
 const adminRoutes = require("./routes/admin.js");
 const authRoutes = require("./routes/auth.js");
 const farmerRoutes = require("./routes/farmer.js");
+const agronomistRoutes = require("./routes/agronomist.js");
 
+
+const allowLocalhostAnyPort = (origin, callback) => {
+  if (!origin) return callback(null, true); // allow same-origin or non-browser requests (optional)
+  try {
+    const url = new URL(origin);
+    if (url.hostname === "localhost") return callback(null, true);
+  } catch (e) { /* invalid origin */ }
+  callback(new Error("Not allowed by CORS"));
+};
 
 app.use(
   cors({
-    origin: "http://localhost:8080",
+    origin: allowLocalhostAnyPort,
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -25,6 +35,7 @@ app.use(express.json());
 app.use("/auth", authRoutes);  // ADD THIS LINE
 app.use("/admin", adminRoutes);
 app.use("/farmer", farmerRoutes);
+app.use("/agronomist", agronomistRoutes);
 
 (async () => {
   try {

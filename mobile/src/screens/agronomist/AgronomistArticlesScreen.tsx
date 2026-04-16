@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { ScrollView, StyleSheet, Text, View, SafeAreaView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -10,8 +10,12 @@ import { colors } from '../../theme/colors';
 
 export default function AgronomistArticlesScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<AgronomistStackParamList>>();
-  const { getMyArticles } = useArticleStore();
+  const { getMyArticles, fetchMyArticles } = useArticleStore();
   const myArticles = getMyArticles();
+
+  useEffect(() => {
+    fetchMyArticles();
+  }, []);
 
   return (
     <SafeAreaView style={styles.safeContainer}>
@@ -72,7 +76,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     borderWidth: 1,
     borderColor: colors.border,
-    backgroundColor: colors.card,
+    backgroundColor: colors.surface,
   },
   emptyTitle: {
     fontSize: 16,

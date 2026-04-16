@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { AdminSidebar } from '@/components/layout/AdminSidebar';
 import { useAdminStore } from '@/stores/adminStore';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -285,10 +286,11 @@ export default function RssConfigurationPage() {
     }
   };
 
-  const formatNextSyncTime = (date?: Date) => {
+  const formatNextSyncTime = (date?: Date | string) => {
     if (!date) return 'Not scheduled';
     const now = new Date();
-    const diffMs = date.getTime() - now.getTime();
+    const nextSyncDate = typeof date === 'string' ? new Date(date) : date;
+    const diffMs = nextSyncDate.getTime() - now.getTime();
     const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
     const diffDays = Math.floor(diffHours / 24);
 
@@ -301,7 +303,7 @@ export default function RssConfigurationPage() {
       timeAgo = 'soon';
     }
 
-    return `${date.toLocaleString()} (${timeAgo})`;
+    return `${nextSyncDate.toLocaleString()} (${timeAgo})`;
   };
 
   if (rssConfig.isLoading) {
@@ -322,7 +324,11 @@ export default function RssConfigurationPage() {
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <div className="min-h-screen bg-background">
+      <AdminSidebar />
+
+      <main className="lg:ml-72 pt-16 lg:pt-0">
+        <div className="p-4 lg:p-8 space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">RSS Configuration</h1>
@@ -925,6 +931,8 @@ export default function RssConfigurationPage() {
           )}
         </DialogContent>
       </Dialog>
+        </div>
+      </main>
     </div>
   );
 }

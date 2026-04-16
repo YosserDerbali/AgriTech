@@ -9,8 +9,6 @@ import {
   SafeAreaView,
   KeyboardAvoidingView,
   Platform,
-  Keyboard,
-  TouchableOpacity,
 } from 'react-native';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -50,24 +48,32 @@ export default function DiagnosisReviewScreen() {
 
   const isLowConfidence = diagnosis.confidence !== null && diagnosis.confidence < 0.7;
 
-  const handleApprove = () => {
+  const handleApprove = async () => {
     if (!treatment.trim()) {
       Alert.alert('Missing treatment', 'Please provide treatment recommendations.');
       return;
     }
-    approveDiagnosis(diagnosis.id, treatment, notes);
-    Alert.alert('Approved', 'Diagnosis approved successfully.');
-    navigation.goBack();
+    try {
+      await approveDiagnosis(diagnosis.id, treatment, notes);
+      Alert.alert('Approved', 'Diagnosis approved successfully.');
+      navigation.goBack();
+    } catch (error) {
+      Alert.alert('Error', 'Failed to approve diagnosis. Please try again.');
+    }
   };
 
-  const handleReject = () => {
+  const handleReject = async () => {
     if (!rejectionReason.trim()) {
       Alert.alert('Missing reason', 'Please provide a reason for rejection.');
       return;
     }
-    rejectDiagnosis(diagnosis.id, rejectionReason);
-    Alert.alert('Rejected', 'Diagnosis rejected.');
-    navigation.goBack();
+    try {
+      await rejectDiagnosis(diagnosis.id, rejectionReason);
+      Alert.alert('Rejected', 'Diagnosis rejected.');
+      navigation.goBack();
+    } catch (error) {
+      Alert.alert('Error', 'Failed to reject diagnosis. Please try again.');
+    }
   };
 
   const handleSaveEdits = () => {
