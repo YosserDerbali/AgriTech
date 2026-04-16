@@ -5,22 +5,68 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AuthStackParamList } from '../../navigation/types';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
+import GoogleSignInButton from '../../components/ui/GoogleSignInButton';
 import { useAppStore } from '../../stores/appStore';
 import { authAPI } from '../../services/authAPI';
 import { useTheme } from '../../hooks/useTheme';
+import { signInWithGoogle, useGoogleAuth } from '../../services/googleAuthService';
 
 export default function FarmerAuthScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<AuthStackParamList>>();
   const { setRole, setUser, setIsAuthenticated, setToken, restoreToken } = useAppStore();
   const { colors } = useTheme();
 
+  // Initialize Google Auth hook
+  const [request, response, promptAsync] = useGoogleAuth();
+
   const [isSignUp, setIsSignUp] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     password: '',
   });
+
+  const handleGoogleSignIn = async () => {
+    try {
+      setIsGoogleLoading(true);
+      
+      if (!promptAsync) {
+        Alert.alert('Error', 'Google Sign-In not initialized');
+        return;
+      }
+
+      const result = await promptAsync();
+
+      if (result?.type !== 'success') {
+        throw new Error('Google sign-in was cancelled');
+      }
+
+      const { id_token, access_token } = result.params || {};
+
+      if (!id_token) {
+        throw new Error('No authentication token received');
+      }
+
+      const googleResult = await signInWithGoogle(id_token, access_token, 'FARMER');
+      
+      await setToken(googleResult.token);
+      setUser({
+        id: googleResult.user.id,
+        name: googleResult.user.name,
+        email: googleResult.user.email,
+        role: 'farmer',
+      });
+      setRole('farmer');
+      setIsAuthenticated(true);
+      Alert.alert('Welcome', `Signed in as ${googleResult.user.name}`);
+    } catch (error) {
+      Alert.alert('Error', error instanceof Error ? error.message : 'Google sign-in failed');
+    } finally {
+      setIsGoogleLoading(false);
+    }
+  };
 
   const handleSubmit = async () => {
     Keyboard.dismiss();
@@ -106,7 +152,23 @@ export default function FarmerAuthScreen() {
     subtitle: {
       fontSize: 13,
       color: colors.muted,
-      marginBottom: 16,
+      marginBottom: 24,
+    },
+    dividerContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginVertical: 20,
+    },
+    dividerLine: {
+      flex: 1,
+      height: 1,
+      backgroundColor: colors.border,
+    },
+    dividerText: {
+      fontSize: 12,
+      color: colors.muted,
+      marginHorizontal: 12,
+      fontWeight: '500',
     },
     input: {
       marginBottom: 12,
@@ -136,6 +198,21 @@ export default function FarmerAuthScreen() {
             : 'Sign in to continue to AgriScan'}
         </Text>
 
+        {/* Google Sign-In Button */}
+        <GoogleSignInButton
+          onPress={handleGoogleSignIn}
+          loading={isGoogleLoading}
+          disabled={isLoading || isGoogleLoading}
+          size="medium"
+        />
+
+        {/* Divider */}
+        <View style={styles.dividerContainer}>
+          <View style={styles.dividerLine} />
+          <Text style={styles.dividerText}>OR</Text>
+          <View style={styles.dividerLine} />
+        </View>
+
         {isSignUp ? (
           <Input
             placeholder="Full Name"
@@ -163,7 +240,7 @@ export default function FarmerAuthScreen() {
         <Button
           title={isSignUp ? 'Create Account' : 'Sign In'}
           onPress={handleSubmit}
-          disabled={isLoading}
+          disabled={isLoading || isGoogleLoading}
         />
 
         <Text style={styles.toggle} onPress={() => setIsSignUp(!isSignUp)}>

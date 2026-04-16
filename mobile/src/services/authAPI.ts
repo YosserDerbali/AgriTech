@@ -17,6 +17,14 @@ export interface RegisterRequest {
   role: 'FARMER' | 'AGRONOMIST';
 }
 
+export interface GoogleSignInRequest {
+  email: string;
+  name: string;
+  photo?: string;
+  firebaseUid: string;
+  role: 'FARMER' | 'AGRONOMIST';
+}
+
 export interface AuthResponse {
   token: string;
   user: {
@@ -24,6 +32,7 @@ export interface AuthResponse {
     name: string;
     email: string;
     role: string;
+    photo?: string;
   };
 }
 
@@ -46,6 +55,17 @@ export const authAPI = {
     } catch (error: any) {
       throw new Error(
         error.response?.data?.message || "Registration failed"
+      );
+    }
+  },
+
+  googleSignIn: async (data: GoogleSignInRequest): Promise<AuthResponse> => {
+    try {
+      const response = await API.post("/auth/google-signin", data);
+      return response.data;
+    } catch (error: any) {
+      throw new Error(
+        error.response?.data?.message || "Google sign-in failed"
       );
     }
   },
