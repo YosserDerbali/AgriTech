@@ -1,29 +1,22 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
-import { useAppStore } from "../stores/appStore";
-const {token, restoreToken} = useAppStore.getState(); // Get token from Zustand store
-const API_URL = "http://192.168.52.128:3000/farmer";
-
-
+import { getApiBaseUrl } from "./apiConfig";
 
 // Helper to get token
 const API = axios.create({
-  baseURL: API_URL,
+  baseURL: getApiBaseUrl("farmer"),
   withCredentials: true,
 });
 
+API.interceptors.request.use(async (config) => {
+  const token = await AsyncStorage.getItem("authToken");
 
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
 
- API.interceptors.request.use(async (config) => {
-  
-    const token =   await AsyncStorage.getItem("authToken");
-    
-   if (token) {
-     config.headers.Authorization = `Bearer ${token}`;
-   }
-
-   return config;
- });
+  return config;
+});
 
 /* =========================
    ARTICLES
@@ -37,7 +30,7 @@ export const getArticles = async () => {
 
 // Get single article
 export const getArticleById = async (id: string) => {
-  const response = await API.get(`/articles/${id}`, );
+  const response = await API.get(`/articles/${id}`);
   return response.data;
 };
 
@@ -47,14 +40,14 @@ export const getArticleById = async (id: string) => {
 
 // Get farmer diagnoses
 export const getMyDiagnoses = async () => {
-  const response = await API.get(`/diagnoses`,);
+  const response = await API.get(`/diagnoses`);
 
   return response.data;
 };
 
 // Get single diagnosis
 export const getDiagnosisById = async (id: string) => {
-  const response = await API.get(`/diagnoses/${id}`, );
+  const response = await API.get(`/diagnoses/${id}`);
   return response.data;
 };
 

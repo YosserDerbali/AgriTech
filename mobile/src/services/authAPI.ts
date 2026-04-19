@@ -1,7 +1,8 @@
 import axios from "axios";
+import { getApiBaseUrl } from "./apiConfig";
 
 const API = axios.create({
-  baseURL: "http://192.168.52.128:3000",
+  baseURL: getApiBaseUrl(),
 });
 
 export interface LoginRequest {

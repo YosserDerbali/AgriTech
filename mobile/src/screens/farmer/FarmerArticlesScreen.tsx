@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Linking, Pressable, ScrollView, StyleSheet, Text, View, SafeAreaView } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View, SafeAreaView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { formatDistanceToNow } from 'date-fns';
@@ -7,6 +7,7 @@ import { FarmerStackParamList } from '../../navigation/types';
 import { useArticleStore } from '../../stores/articleStore';
 import { Article } from '../../types/article';
 import { colors, shadows } from '../../theme/colors';
+import { ArticleCard } from '../../components/agronomist/ArticleCard';
 
 type FilterTab = 'all' | 'agronomist' | 'external';
 
@@ -73,35 +74,16 @@ export default function FarmerArticlesScreen() {
             </View>
           ) : (
             filtered.map((article: Article) => (
-              <ArticleListItem
+              <ArticleCard
                 key={article.id}
                 article={article}
-                onPress={() => {
-                  if (article.source === 'EXTERNAL' && article.externalUrl) {
-                    Linking.openURL(article.externalUrl);
-                  } else {
-                    navigation.navigate('ArticleDetail', { id: article.id });
-                  }
-                }}
+                onPress={() => navigation.navigate('ArticleDetail', { id: article.id })}
               />
             ))
           )}
         </View>
       </ScrollView>
     </SafeAreaView>
-  );
-}
-
-function ArticleListItem({ article, onPress }: { article: Article; onPress: () => void }) {
-  return (
-    <Pressable onPress={onPress} style={styles.card}>
-      <Text style={styles.cardTitle}>{article.title}</Text>
-      <Text style={styles.cardExcerpt}>{article.excerpt}</Text>
-      <Text style={styles.cardMeta}>
-        {article.authorName} · {article.source === 'EXTERNAL' ? 'External' : 'Expert'} · 
-        {formatDistanceToNow(new Date(article.createdAt), { addSuffix: true })}
-      </Text>
-    </Pressable>
   );
 }
 
@@ -173,30 +155,6 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: 13,
     color: colors.textSecondary,
-  },
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: 16,
-    padding: 14,
-    borderWidth: 1,
-    borderColor: colors.border,
-    marginBottom: 12,
-    ...shadows.soft,
-  },
-  cardTitle: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: colors.text,
-    marginBottom: 6,
-  },
-  cardExcerpt: {
-    fontSize: 13,
-    color: colors.textSecondary,
-    marginBottom: 8,
-  },
-  cardMeta: {
-    fontSize: 12,
-    color: colors.textMuted,
   },
   loadingContainer: {
     flex: 1,

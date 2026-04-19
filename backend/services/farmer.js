@@ -1,13 +1,9 @@
 const { Article } = require("../models/Article");
 const { Diagnoses } = require("../models/Diagnoses");
-const { Image } = require("../models/Image");
-const { Prediction } = require("../models/Prediction");
 const { AiModel } = require("../models/AiModel");
 const { supabase } = require("../config/supabaseClient");
-const { sequelize } = require("../config/database");
 const { v4: uuidv4 } = require("uuid");
 const { detectDiseaseWithAIService } = require("./diseaseDetection");
-const { resolveDiseaseRecord, resolvePlantRecord } = require("./taxonomy");
 
 const updateAiModelUsage = async (aiResult) => {
   const modelName = (aiResult?.model_name || "").trim();
@@ -33,38 +29,6 @@ const updateAiModelUsage = async (aiResult) => {
     totalPredictions: currentTotal + 1,
     lastUpdated: new Date(),
   });
-};
-
-const collectTrainingCandidate = async ({
-  transaction,
-  userId,
-  imageUrl,
-  plantId,
-  diseaseId,
-  confidence,
-  modelVersion,
-}) => {
-  if (!userId || !imageUrl) {
-    return;
-  }
-
-  const image = await Image.create({
-    user_id: userId,
-    plant_id: plantId || null,
-    image_url: imageUrl,
-  }, { transaction });
-
-  await Prediction.create({
-    image_id: image.id,
-    disease_id: diseaseId || null,
-    confidence: confidence,
-    ai_model_version: modelVersion || null,
-    validated: false,
-    validated_by: null,
-    status: "PENDING",
-  }, { transaction });
-
-  return image;
 };
 
 const getPublishedArticles = async () => {
@@ -172,50 +136,22 @@ const createDiagnosis = async ({ userId, file, context, plantName }) => {
     ? aiPlantName
     : (userPlantName || aiPlantName || "Unknown Plant");
 
-  let resolvedPlantRecord = null;
-  let resolvedDiseaseRecord = null;
-
   // Save to DB
   try {
-    const diagnosis = await sequelize.transaction(async (transaction) => {
-      resolvedPlantRecord = await resolvePlantRecord({
-        plantName: aiPlantName || finalPlantName,
-        transaction,
-      });
-
-      resolvedDiseaseRecord = await resolveDiseaseRecord({
-        plantId: resolvedPlantRecord?.id || null,
-        diseaseName: aiDiseaseName,
-        symptoms: aiResult?.symptoms || null,
-        treatment: aiResult?.treatment || null,
-        transaction,
-      });
-
-      const image = await collectTrainingCandidate({
-        transaction,
-        userId,
-        imageUrl,
-        plantId: resolvedPlantRecord?.id || null,
-        diseaseId: resolvedDiseaseRecord?.id || null,
-        confidence: aiResult.confidence,
-        modelVersion: aiResult.model_version || null,
-      });
-
-      return Diagnoses.create({
-        user_id: userId,
-        image_id: image.id,
-        image_url: imageUrl,
-        plant_id: resolvedPlantRecord?.id || null,
-        disease_id: resolvedDiseaseRecord?.id || null,
-        plant_name: finalPlantName,
-        disease_name: resolvedDiseaseRecord?.name || aiDiseaseName || null,
-        symptoms: resolvedDiseaseRecord?.symptoms || aiResult?.symptoms || null,
-        confidence: aiResult.confidence,
-        status: "PENDING",
-        treatment: resolvedDiseaseRecord?.treatment || aiResult.treatment,
-        context: context || null,
-        agronomist_notes: null,
-      }, { transaction });
+    const diagnosis = await Diagnoses.create({
+      user_id: userId,
+      image_url: imageUrl,
+      plant_name: finalPlantName,
+      disease_name: aiDiseaseName || null,
+      symptoms: aiResult?.symptoms || null,
+      confidence: aiResult.confidence,
+      status: "PENDING",
+      treatment: aiResult?.treatment || null,
+      context: context || null,
+      agronomist_notes: null,
+      ai_model_version: aiResult?.model_version || null,
+      validated: false,
+      validated_by: null,
     });
 
     // Best-effort analytics and training data capture.
@@ -235,8 +171,8 @@ const createDiagnosis = async ({ userId, file, context, plantName }) => {
         : null,
       plant_name_override_applied: canOverrideUserTitle,
       plant_name_override_threshold: plantNameOverrideThreshold,
-      plant_id: resolvedPlantRecord?.id || null,
-      disease_id: resolvedDiseaseRecord?.id || null,
+      plant_id: null,
+      disease_id: null,
     };
 
     return diagnosisPayload;

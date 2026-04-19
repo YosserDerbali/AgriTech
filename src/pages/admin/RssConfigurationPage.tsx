@@ -11,7 +11,11 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
+import type { RssPreviewResult } from '@/types/admin';
 import { Loader2, Plus, Trash2, Edit2, CheckCircle, XCircle, RefreshCw, Play, Clock, Image as ImageIcon, Settings, Rss, Tag, Type, Calendar } from 'lucide-react';
+
+type ScheduleConfigValue = boolean | number;
+type PreviewArticle = RssPreviewResult['articles'][number];
 
 export default function RssConfigurationPage() {
   const {
@@ -42,7 +46,7 @@ export default function RssConfigurationPage() {
   const [newTagKeyword, setNewTagKeyword] = useState('');
   const [newImageUrl, setNewImageUrl] = useState('');
   const [validatingUrl, setValidatingUrl] = useState(false);
-  const [previewData, setPreviewData] = useState<any>(null);
+  const [previewData, setPreviewData] = useState<RssPreviewResult | null>(null);
   const [showPreviewDialog, setShowPreviewDialog] = useState(false);
   const [editFeedIndex, setEditFeedIndex] = useState<number | null>(null);
   const [editFeedUrl, setEditFeedUrl] = useState('');
@@ -269,7 +273,7 @@ export default function RssConfigurationPage() {
     }
   };
 
-  const handleSchedulingChange = async (key: string, value: any) => {
+  const handleSchedulingChange = async (key: string, value: ScheduleConfigValue) => {
     try {
       await useAdminStore.getState().updateRssConfiguration(key, value);
       await refreshScheduleInfo();
@@ -885,7 +889,7 @@ export default function RssConfigurationPage() {
               </div>
               {previewData.articles && previewData.articles.length > 0 ? (
                 <div className="space-y-2">
-                  {previewData.articles.slice(0, 20).map((article: any, index: number) => (
+                  {previewData.articles.slice(0, 20).map((article: PreviewArticle, index: number) => (
                     <div
                       key={index}
                       className="p-3 border rounded-lg flex items-start gap-3"

@@ -1,8 +1,47 @@
 const { sequelize } = require("../config/database");
 const { Diagnoses } = require("../models/Diagnoses");
-const { Prediction } = require("../models/Prediction");
 const { Article } = require("../models/Article");
-const { resolveDiseaseRecord, resolvePlantRecord, normalizeCatalogName } = require("./taxonomy");
+const { supabase } = require("../config/supabaseClient");
+const { v4: uuidv4 } = require("uuid");
+const normalizeCatalogName = (value) => (value || "").trim().replace(/\s+/g, " ");
+const ARTICLE_COVER_BUCKET = "plant-images";
+
+const uploadArticleCover = async (file) => {
+  if (!file) {
+    return null;
+  }
+
+  if (!file.mimetype || !file.mimetype.startsWith("image/")) {
+    const error = new Error("Cover image must be an image file");
+    error.status = 422;
+    throw error;
+  }
+
+  const fileExt = (file.originalname || "cover.jpg").split(".").pop() || "jpg";
+  const fileName = `article-covers/${uuidv4()}.${fileExt}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from(ARTICLE_COVER_BUCKET)
+    .upload(fileName, file.buffer, {
+      contentType: file.mimetype,
+      upsert: false,
+    });
+
+  if (uploadError) {
+    const error = new Error(`Supabase upload failed: ${uploadError.message || "Unknown error"}`);
+    error.status = 502;
+    throw error;
+  }
+
+  const { data } = supabase.storage.from(ARTICLE_COVER_BUCKET).getPublicUrl(fileName);
+  if (!data?.publicUrl) {
+    const error = new Error("Supabase public URL generation failed");
+    error.status = 502;
+    throw error;
+  }
+
+  return data.publicUrl;
+};
 
 const getDiagnosisQueue = async () => Diagnoses.findAll({ order: [["created_at", "DESC"]] });
 
@@ -16,31 +55,6 @@ const getDiagnosisForReview = async (diagnosisId) => {
   }
 
   return diagnosis;
-};
-
-const syncPredictionStatus = async ({ diagnosis, status, reviewerId, transaction }) => {
-  if (!diagnosis?.image_id) {
-    return;
-  }
-
-  const latestPrediction = await Prediction.findOne({
-    where: { image_id: diagnosis.image_id },
-    order: [["created_at", "DESC"]],
-    transaction,
-  });
-
-  if (!latestPrediction) {
-    return;
-  }
-
-  await latestPrediction.update(
-    {
-      status,
-      validated: status === "APPROVED",
-      validated_by: reviewerId || null,
-    },
-    { transaction }
-  );
 };
 
 const normalizeReviewText = (value) => {
@@ -72,42 +86,29 @@ const updateDiagnosisReview = async ({ diagnosisId, reviewerId, status, treatmen
       throw error;
     }
 
-    const plantRecord = diagnosis.plant_id ? null : await resolvePlantRecord({ plantName: diagnosis.plant_name, transaction });
-    const resolvedPlantId = diagnosis.plant_id || plantRecord?.id || null;
     const resolvedDiseaseName = normalizeCatalogName(diseaseName) || diagnosis.disease_name || null;
     const resolvedSymptoms = normalizeReviewText(symptoms) ?? (diagnosis.symptoms || null);
     const resolvedTreatment = normalizeReviewText(treatment) ?? (diagnosis.treatment || null);
     const resolvedAgronomistNotes = normalizeReviewText(agronomistNotes);
     const nextStatus = hasStatusTransition ? normalizedStatusInput : diagnosis.status;
-
-    let diseaseRecord = null;
-    if (resolvedPlantId && resolvedDiseaseName) {
-      diseaseRecord = await resolveDiseaseRecord({
-        plantId: resolvedPlantId,
-        diseaseName: resolvedDiseaseName,
-        symptoms: resolvedSymptoms,
-        treatment: resolvedTreatment,
-        transaction,
-      });
-    }
+    const nextValidated = hasStatusTransition ? normalizedStatusInput === "APPROVED" : diagnosis.validated;
+    const nextValidatedBy = hasStatusTransition
+      ? (normalizedStatusInput === "APPROVED" ? reviewerId || null : null)
+      : diagnosis.validated_by;
 
     await diagnosis.update(
       {
         status: nextStatus,
-        disease_name: diseaseRecord?.name || resolvedDiseaseName,
-        disease_id: diseaseRecord?.id || diagnosis.disease_id || null,
-        plant_id: resolvedPlantId,
-        symptoms: diseaseRecord?.symptoms || resolvedSymptoms,
+        disease_name: resolvedDiseaseName,
+        symptoms: resolvedSymptoms,
         treatment: resolvedTreatment,
         agronomist_notes: resolvedAgronomistNotes !== undefined ? resolvedAgronomistNotes : diagnosis.agronomist_notes,
+        validated: nextValidated,
+        validated_by: nextValidatedBy,
         updated_at: new Date(),
       },
       { transaction }
     );
-
-    if (hasStatusTransition) {
-      await syncPredictionStatus({ diagnosis, status: normalizedStatusInput, reviewerId, transaction });
-    }
 
     const refreshedDiagnosis = await diagnosis.reload({ transaction });
     if (!refreshedDiagnosis) {
@@ -131,17 +132,21 @@ const getMyArticles = async (authorId) =>
   Article.findAll({ where: { author_id: authorId }, order: [["created_at", "DESC"]] });
 
 const createArticle = async (authorId, authorName, payload) =>
-  Article.create({
-    author_id: authorId,
-    author_name: authorName || "Agronomist",
-    title: payload.title,
-    content: payload.content,
-    excerpt: payload.excerpt,
-    cover_image_url: payload.coverImageUrl || null,
-    source: "AGRONOMIST",
-    tags: Array.isArray(payload.tags) ? payload.tags : [],
-    published: payload.published !== undefined ? payload.published : true,
-  });
+  (async () => {
+    const uploadedCoverImageUrl = await uploadArticleCover(payload.coverImageFile);
+
+    return Article.create({
+      author_id: authorId,
+      author_name: authorName || "Agronomist",
+      title: payload.title,
+      content: payload.content,
+      excerpt: payload.excerpt,
+      cover_image_url: uploadedCoverImageUrl || null,
+      source: "AGRONOMIST",
+      tags: Array.isArray(payload.tags) ? payload.tags : [],
+      published: payload.published !== undefined ? payload.published : true,
+    });
+  })();
 
 const updateArticle = async (authorId, articleId, payload) => {
   const article = await Article.findOne({
@@ -155,7 +160,11 @@ const updateArticle = async (authorId, articleId, payload) => {
   if (payload.title !== undefined) article.title = payload.title;
   if (payload.content !== undefined) article.content = payload.content;
   if (payload.excerpt !== undefined) article.excerpt = payload.excerpt;
-  if (payload.coverImageUrl !== undefined) article.cover_image_url = payload.coverImageUrl || null;
+  if (payload.coverImageFile) {
+    article.cover_image_url = await uploadArticleCover(payload.coverImageFile);
+  } else if (payload.removeCoverImage === true) {
+    article.cover_image_url = null;
+  }
   if (payload.tags !== undefined) article.tags = Array.isArray(payload.tags) ? payload.tags : article.tags;
   if (payload.published !== undefined) article.published = Boolean(payload.published);
   article.updated_at = new Date();

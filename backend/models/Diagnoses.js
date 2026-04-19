@@ -23,36 +23,6 @@ const Diagnoses = sequelize.define(
       allowNull: false,
     },
 
-    image_id: {
-      type: DataTypes.UUID,
-      allowNull: true,
-      references: {
-        model: "images",
-        key: "id",
-      },
-      onDelete: "SET NULL",
-    },
-
-    plant_id: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-      references: {
-        model: "plants",
-        key: "id",
-      },
-      onDelete: "SET NULL",
-    },
-
-    disease_id: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
-      references: {
-        model: "diseases",
-        key: "id",
-      },
-      onDelete: "SET NULL",
-    },
-
     plant_name: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -66,6 +36,27 @@ const Diagnoses = sequelize.define(
     confidence: {
       type: DataTypes.FLOAT,
       allowNull: true,
+    },
+
+    ai_model_version: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+
+    validated: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
+
+    validated_by: {
+      type: DataTypes.UUID,
+      allowNull: true,
+      references: {
+        model: "users",
+        key: "id",
+      },
+      onDelete: "SET NULL",
     },
 
     status: {

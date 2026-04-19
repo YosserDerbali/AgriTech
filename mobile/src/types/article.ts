@@ -20,6 +20,7 @@ export interface ArticleFormData {
   title: string;
   content: string;
   excerpt: string;
-  coverImageUrl?: string;
+  coverImage?: string;
+  removeCoverImage?: boolean;
   tags: string[];
 }

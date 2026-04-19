@@ -1,5 +1,31 @@
 const agronomistService = require("../services/agronomist");
 
+const parseTags = (rawTags) => {
+  if (rawTags === undefined) {
+    return undefined;
+  }
+
+  if (Array.isArray(rawTags)) {
+    return rawTags;
+  }
+
+  if (typeof rawTags === "string") {
+    const trimmed = rawTags.trim();
+    if (!trimmed) {
+      return [];
+    }
+
+    try {
+      const parsed = JSON.parse(trimmed);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return trimmed.split(",").map((tag) => tag.trim()).filter(Boolean);
+    }
+  }
+
+  return [];
+};
+
 const getDiagnoses = async (req, res) => {
   try {
     const diagnoses = await agronomistService.getDiagnosisQueue();
@@ -78,7 +104,18 @@ const createArticle = async (req, res) => {
       return res.status(400).json({ message: "title, content, and excerpt are required" });
     }
 
-    const article = await agronomistService.createArticle(req.user.id, req.user.name, req.body);
+    if (req.body.coverImageUrl) {
+      return res.status(400).json({ message: "External image URLs are not allowed. Please upload from your device." });
+    }
+
+    const payload = {
+      ...req.body,
+      tags: parseTags(req.body.tags),
+      coverImageFile: req.file,
+      removeCoverImage: req.body.removeCoverImage === "true" || req.body.removeCoverImage === true,
+    };
+
+    const article = await agronomistService.createArticle(req.user.id, req.user.name, payload);
     return res.status(201).json(article);
   } catch (error) {
     return res.status(500).json({ message: error.message });
@@ -87,7 +124,18 @@ const createArticle = async (req, res) => {
 
 const updateArticle = async (req, res) => {
   try {
-    const article = await agronomistService.updateArticle(req.user.id, req.params.id, req.body);
+    if (req.body.coverImageUrl) {
+      return res.status(400).json({ message: "External image URLs are not allowed. Please upload from your device." });
+    }
+
+    const payload = {
+      ...req.body,
+      tags: req.body.tags !== undefined ? parseTags(req.body.tags) : undefined,
+      coverImageFile: req.file,
+      removeCoverImage: req.body.removeCoverImage === "true" || req.body.removeCoverImage === true,
+    };
+
+    const article = await agronomistService.updateArticle(req.user.id, req.params.id, payload);
     return res.status(200).json(article);
   } catch (error) {
     if (error.message === "Article not found") {

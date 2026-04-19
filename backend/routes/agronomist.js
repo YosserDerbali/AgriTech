@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const agronomistController = require("../controllers/agronomist");
+const upload = require("../middleware/multer");
 const { authenticate } = require("../middleware/auth");
 const { requireAgronomist } = require("../middleware/roles");
 
@@ -14,8 +15,8 @@ router.patch("/diagnoses/:id/approve", agronomistController.approveDiagnosis);
 router.patch("/diagnoses/:id/reject", agronomistController.rejectDiagnosis);
 
 router.get("/articles", agronomistController.getMyArticles);
-router.post("/articles", agronomistController.createArticle);
-router.patch("/articles/:id", agronomistController.updateArticle);
+router.post("/articles", upload.single("coverImage"), agronomistController.createArticle);
+router.patch("/articles/:id", upload.single("coverImage"), agronomistController.updateArticle);
 router.delete("/articles/:id", agronomistController.deleteArticle);
 
 module.exports = router;

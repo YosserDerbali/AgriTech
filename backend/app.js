@@ -13,20 +13,50 @@ const farmerRoutes = require("./routes/farmer.js");
 const agronomistRoutes = require("./routes/agronomist.js");
 
 
-const allowLocalhostAnyPort = (origin, callback) => {
+const isPrivateNetworkHost = (hostname) => {
+  if (!hostname) return false;
+
+  if (hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1") {
+    return true;
+  }
+
+  if (hostname.startsWith("192.168.")) {
+    return true;
+  }
+
+  if (hostname.startsWith("10.")) {
+    return true;
+  }
+
+  if (hostname.startsWith("172.")) {
+    const octets = hostname.split(".");
+    const secondOctet = Number(octets[1]);
+    return Number.isInteger(secondOctet) && secondOctet >= 16 && secondOctet <= 31;
+  }
+
+  return false;
+};
+
+const allowLocalDevOrigins = (origin, callback) => {
   if (!origin) return callback(null, true); // allow same-origin or non-browser requests (optional)
+
   try {
     const url = new URL(origin);
-    if (url.hostname === "localhost") return callback(null, true);
-  } catch (e) { /* invalid origin */ }
-  callback(new Error("Not allowed by CORS"));
+    if (isPrivateNetworkHost(url.hostname)) {
+      return callback(null, true);
+    }
+  } catch (e) {
+    // invalid origin
+  }
+
+  return callback(new Error("Not allowed by CORS"));
 };
 
 app.use(
   cors({
-    origin: allowLocalhostAnyPort,
+    origin: allowLocalDevOrigins,
     credentials: true,
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );

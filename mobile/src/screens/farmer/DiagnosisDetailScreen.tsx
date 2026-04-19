@@ -74,7 +74,7 @@ export default function DiagnosisDetailScreen() {
           </Card>
         ) : null}
 
-        {diagnosis.status === 'APPROVED' && diagnosis.treatment && (
+        {diagnosis.treatment && diagnosis.status !== 'REJECTED' && (
           <Card style={styles.card}>
             <Text style={styles.cardTitle}>Treatment Recommendation</Text>
             <Text style={styles.cardText}>{diagnosis.treatment}</Text>
@@ -89,11 +89,9 @@ export default function DiagnosisDetailScreen() {
         )}
 
         {diagnosis.status === 'PENDING' && (
-          <Card style={styles.card}>
-            <Text style={styles.cardTitle}>Awaiting Expert Review</Text>
-            <Text style={styles.cardText}>
-              An agronomist will review your submission and provide treatment recommendations soon.
-            </Text>
+          <Card style={[styles.card, styles.reviewStatusCard]}>
+            <Text style={styles.cardTitle}>Review Status</Text>
+            <Text style={styles.cardText}>diagnosis not yet reviewed by an agronomist.</Text>
           </Card>
         )}
 
@@ -191,6 +189,10 @@ const styles = StyleSheet.create({
   },
   rejected: {
     borderColor: '#FCA5A5',
+  },
+  reviewStatusCard: {
+    backgroundColor: colors.pendingLight,
+    borderColor: colors.pending,
   },
   title: {
     fontSize: 18,
