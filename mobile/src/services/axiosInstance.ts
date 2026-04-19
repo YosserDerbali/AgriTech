@@ -2,7 +2,7 @@ import axios from "axios";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const axiosInstance = axios.create({
-  baseURL: "http://172.20.10.11:3000", // replace with your PC IP
+  baseURL: "http://172.20.10.8:3000", // replace with your PC IP
 });
 
 // Request interceptor
