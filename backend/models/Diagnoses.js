@@ -38,6 +38,27 @@ const Diagnoses = sequelize.define(
       allowNull: true,
     },
 
+    ai_model_version: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+
+    validated: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
+
+    validated_by: {
+      type: DataTypes.UUID,
+      allowNull: true,
+      references: {
+        model: "users",
+        key: "id",
+      },
+      onDelete: "SET NULL",
+    },
+
     status: {
       type: DataTypes.ENUM(
         "APPROVED",
@@ -51,6 +72,11 @@ const Diagnoses = sequelize.define(
     },
 
     treatment: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+
+    symptoms: {
       type: DataTypes.TEXT,
       allowNull: true,
     },

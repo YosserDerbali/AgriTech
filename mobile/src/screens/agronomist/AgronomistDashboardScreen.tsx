@@ -13,8 +13,12 @@ import { colors } from '../../theme/colors';
 
 export default function AgronomistDashboardScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<AgronomistStackParamList>>();
-  const { diagnoses, getPendingDiagnoses, fetchPendingDiagnoses } = useDiagnosisStore();
+  const { diagnoses, getPendingDiagnoses, fetchReviewQueue } = useDiagnosisStore();
   const { getMyArticles, fetchMyArticles } = useArticleStore();
+
+  useEffect(() => {
+    fetchReviewQueue().catch(() => null);
+  }, [fetchReviewQueue]);
 
   const pendingDiagnoses = getPendingDiagnoses();
   const approvedCount = diagnoses.filter((d) => d.status === 'APPROVED').length;
@@ -22,9 +26,9 @@ export default function AgronomistDashboardScreen() {
   const myArticles = getMyArticles();
 
   useEffect(() => {
-    fetchPendingDiagnoses();
-    fetchMyArticles();
-  }, []);
+    fetchReviewQueue().catch(() => null);
+    fetchMyArticles().catch(() => null);
+  }, [fetchReviewQueue, fetchMyArticles]);
 
   return (
     <SafeAreaView style={styles.safeContainer}>

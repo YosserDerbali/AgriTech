@@ -3,13 +3,11 @@ import axios from "axios";
 
 const API_URL = "http://192.168.100.66:3000";
 
-// Create axios instance for farmer endpoints
 const API = axios.create({
   baseURL: API_URL,
   withCredentials: true,
 });
 
-// Request interceptor to add token
 API.interceptors.request.use(async (config) => {
   const token = await AsyncStorage.getItem("authToken");
   
@@ -17,61 +15,41 @@ API.interceptors.request.use(async (config) => {
     config.headers.Authorization = `Bearer ${token}`;
   }
   
-  console.log(`[API Request] ${config.method?.toUpperCase()} ${config.url}`);
-  
   return config;
 }, (error) => {
   return Promise.reject(error);
 });
 
-// Response interceptor for handling 401 errors
 API.interceptors.response.use(
   (response) => response,
   async (error) => {
     if (error.response?.status === 401) {
       console.log('401 Unauthorized - Clearing token');
       await AsyncStorage.removeItem('authToken');
-      // You can add navigation to login screen here if needed
     }
     return Promise.reject(error);
   }
 );
 
-/* =========================
-   ARTICLES
-========================= */
-
-// Get all articles
 export const getArticles = async () => {
   const response = await API.get(`/farmer/articles`);
   return response.data;
 };
 
-// Get single article
 export const getArticleById = async (id: string) => {
   const response = await API.get(`/farmer/articles/${id}`);
   return response.data;
 };
 
-/* =========================
-   DIAGNOSES
-========================= */
-
-// Get farmer diagnoses
 export const getMyDiagnoses = async () => {
   const response = await API.get(`/farmer/diagnoses`);
   return response.data;
 };
 
-// Get single diagnosis
 export const getDiagnosisById = async (id: string) => {
   const response = await API.get(`/farmer/diagnoses/${id}`);
   return response.data;
 };
-
-/* =========================
-   CREATE DIAGNOSIS
-========================= */
 
 export const createDiagnosis = async (
   image: any,
@@ -100,10 +78,6 @@ export const createDiagnosis = async (
 
   return response.data;
 };
-
-/* =========================
-   VOICE TRANSCRIPTION
-========================= */
 
 export const transcribeVoiceNote = async (audioUri: string) => {
   const normalizedUri = audioUri?.trim();

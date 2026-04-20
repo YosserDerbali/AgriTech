@@ -3,34 +3,44 @@ import { Diagnosis } from '../types/diagnosis';
 import { createDiagnosis, getMyDiagnoses } from '../services/farmerAPI';
 import {
   approveDiagnosis as approveDiagnosisAPI,
+  getDiagnosisQueue,
   getPendingDiagnoses as getPendingDiagnosesAPI,
   rejectDiagnosis as rejectDiagnosisAPI,
+  reviewDiagnosis,
 } from '../services/agronomistAPI';
 
 const mapDiagnosis = (d: any): Diagnosis => ({
   id: d.id,
+  imageId: d.image_id ?? null,
+  plantId: d.plant_id ?? null,
+  diseaseId: d.disease_id ?? null,
   imageUrl: d.image_url,
   plantName: d.plant_name,
   diseaseName: d.disease_name,
+  symptoms: d.symptoms ?? null,
   confidence: d.confidence,
   status: d.status,
-  treatment: d.treatment,
-  agronomistNotes: d.agronomist_notes,
+  treatment: d.treatment ?? null,
+  agronomistNotes: d.agronomist_notes ?? null,
   createdAt: new Date(d.created_at),
-  updatedAt: new Date(d.updated_at),
+  updatedAt: new Date(d.updated_at || d.created_at),
 });
+
+const mergeDiagnosis = (diagnoses: Diagnosis[], nextDiagnosis: Diagnosis) =>
+  diagnoses.map((diagnosis) => (diagnosis.id === nextDiagnosis.id ? nextDiagnosis : diagnosis));
 
 interface DiagnosisStore {
   diagnoses: Diagnosis[];
   isLoading: boolean;
   fetchDiagnoses: () => Promise<void>;
   fetchPendingDiagnoses: () => Promise<void>;
-  addDiagnosis: (payload: { imageUrl: string; plantName: string; context?: string }) => Promise<void>;
+  fetchReviewQueue: () => Promise<void>;
+  addDiagnosis: (payload: { imageUrl: string; plantName?: string; context?: string }) => Promise<void>;
   getDiagnosis: (id: string) => Diagnosis | undefined;
   getPendingDiagnoses: () => Diagnosis[];
   approveDiagnosis: (id: string, treatment: string, notes?: string) => Promise<void>;
   rejectDiagnosis: (id: string, notes: string) => Promise<void>;
-  updateDiagnosis: (id: string, updates: Partial<Diagnosis>) => void;
+  updateDiagnosis: (id: string, updates: Partial<Diagnosis>) => Promise<void>;
   setLoading: (loading: boolean) => void;
 }
 
@@ -61,94 +71,92 @@ export const useDiagnosisStore = create<DiagnosisStore>((set, get) => ({
       setLoading(false);
     }
   },
+  fetchReviewQueue: async () => {
+    const setLoading = get().setLoading;
+    try {
+      setLoading(true);
+      const data = await getDiagnosisQueue();
+      set({ diagnoses: data.map(mapDiagnosis) });
+    } catch (err) {
+      console.error('Failed to fetch diagnoses:', err);
+    } finally {
+      setLoading(false);
+    }
+  },
   addDiagnosis: async ({ imageUrl, plantName, context }) => {
-  try {
-    set({ isLoading: true });
+    try {
+      set({ isLoading: true });
 
-    const data = await createDiagnosis(imageUrl, plantName, context);
-    const newDiagnosis: Diagnosis = {
-      id: data.diagnosis.id,
-      imageUrl: data.diagnosis.image_url,
-      plantName: data.diagnosis.plant_name,
-      diseaseName: data.diagnosis.disease_name,
-      confidence: data.diagnosis.confidence,
-      status: data.diagnosis.status,
-      treatment: data.diagnosis.treatment,
-      agronomistNotes: data.diagnosis.agronomist_notes,
-      createdAt: new Date(data.diagnosis.created_at),
-      updatedAt: new Date(data.diagnosis.updated_at),
-    };
+      const data = await createDiagnosis(imageUrl, plantName, context);
+      const newDiagnosis = mapDiagnosis(data.diagnosis);
 
-    set((state) => ({
-      diagnoses: [newDiagnosis, ...state.diagnoses],
-      isLoading: false,
-    }));
+      set((state) => ({
+        diagnoses: [newDiagnosis, ...state.diagnoses],
+        isLoading: false,
+      }));
+    } catch (error) {
+      const responseData = (error as any)?.response?.data;
+      const backendMessage = responseData?.message || (error as Error)?.message || 'Failed to create diagnosis';
 
-  } catch (error) {
-    console.error("Error creating diagnosis:", error);
-    set({ isLoading: false });
-  }
-},
-//   getDiagnosis:  async (id) => {
-//   try {
-//     set({ isLoading: true });
+      console.error('Error creating diagnosis:', {
+        message: backendMessage,
+        code: responseData?.code || (error as any)?.code,
+        status: (error as any)?.response?.status,
+        responseData,
+      });
 
-//     const data = await getDiagnosisById(id);
-
-//     const diagnosis: Diagnosis = {
-//       id: data.id,
-//       imageUrl: data.image_url,
-//       plantName: data.plant_name,
-//       diseaseName: data.disease_name,
-//       confidence: data.confidence,
-//       status: data.status,
-//       treatment: data.treatment,
-//       agronomistNotes: data.agronomist_notes,
-//       createdAt: new Date(data.created_at),
-//       updatedAt: new Date(data.updated_at),
-//     };
-
-//     set({ isLoading: false });
-
-//     return diagnosis;
-
-//   } catch (error) {
-//     console.error("Error fetching diagnosis:", error);
-//     set({ isLoading: false });
-//   }
-// },
+      set({ isLoading: false });
+      throw new Error(backendMessage);
+    }
+  },
   getDiagnosis: (id) => get().diagnoses.find((d) => d.id === id),
   getPendingDiagnoses: () => get().diagnoses.filter((d) => d.status === 'PENDING'),
   approveDiagnosis: async (id, treatment, notes) => {
-    const setLoading = get().setLoading;
     try {
-      setLoading(true);
-      const updated = await approveDiagnosisAPI(id, treatment, notes);
+      set({ isLoading: true });
+      const data = await approveDiagnosisAPI(id, treatment, notes);
+      const updatedDiagnosis = mapDiagnosis(data.diagnosis || data);
       set((state) => ({
-        diagnoses: state.diagnoses.map((d) => (d.id === id ? mapDiagnosis(updated) : d)),
+        diagnoses: mergeDiagnosis(state.diagnoses, updatedDiagnosis),
+        isLoading: false,
       }));
-    } finally {
-      setLoading(false);
+    } catch (error) {
+      set({ isLoading: false });
+      throw error;
     }
   },
   rejectDiagnosis: async (id, notes) => {
-    const setLoading = get().setLoading;
     try {
-      setLoading(true);
-      const updated = await rejectDiagnosisAPI(id, notes);
+      set({ isLoading: true });
+      const data = await rejectDiagnosisAPI(id, notes);
+      const updatedDiagnosis = mapDiagnosis(data.diagnosis || data);
       set((state) => ({
-        diagnoses: state.diagnoses.map((d) => (d.id === id ? mapDiagnosis(updated) : d)),
+        diagnoses: mergeDiagnosis(state.diagnoses, updatedDiagnosis),
+        isLoading: false,
       }));
-    } finally {
-      setLoading(false);
+    } catch (error) {
+      set({ isLoading: false });
+      throw error;
     }
   },
-  updateDiagnosis: (id, updates) => {
-    set((state) => ({
-      diagnoses: state.diagnoses.map((d) =>
-        d.id === id ? { ...d, ...updates, updatedAt: new Date() } : d
-      ),
-    }));
+  updateDiagnosis: async (id, updates) => {
+    try {
+      set({ isLoading: true });
+      const data = await reviewDiagnosis(id, {
+        diseaseName: updates.diseaseName ?? undefined,
+        symptoms: updates.symptoms ?? undefined,
+        treatment: updates.treatment ?? undefined,
+        agronomistNotes: updates.agronomistNotes ?? undefined,
+      });
+      const updatedDiagnosis = mapDiagnosis(data.diagnosis || data);
+      set((state) => ({
+        diagnoses: mergeDiagnosis(state.diagnoses, updatedDiagnosis),
+        isLoading: false,
+      }));
+    } catch (error) {
+      set({ isLoading: false });
+      throw error;
+    }
   },
   setLoading: (loading) => set({ isLoading: loading }),
 }));

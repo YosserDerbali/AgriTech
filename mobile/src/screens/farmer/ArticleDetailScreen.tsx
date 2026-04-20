@@ -1,5 +1,5 @@
 import React from 'react';
-import { Linking, ScrollView, StyleSheet, Text, View, SafeAreaView } from 'react-native';
+import { Image, Linking, ScrollView, StyleSheet, Text, View, SafeAreaView } from 'react-native';
 import { RouteProp, useRoute } from '@react-navigation/native';
 import { formatDistanceToNow } from 'date-fns';
 import { FarmerStackParamList } from '../../navigation/types';
@@ -68,6 +68,9 @@ export default function ArticleDetailScreen() {
   return (
     <SafeAreaView style={styles.safeContainer}>
       <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+        {article.coverImageUrl ? (
+          <Image source={{ uri: article.coverImageUrl }} style={styles.heroImage} />
+        ) : null}
         <Text style={styles.title}>{article.title}</Text>
         <View style={styles.metaRow}>
           <Text style={styles.meta}>{article.authorName}</Text>
@@ -111,6 +114,13 @@ const styles = StyleSheet.create({
   content: {
     padding: 16,
     paddingBottom: 30,
+  },
+  heroImage: {
+    width: '100%',
+    height: 240,
+    borderRadius: 18,
+    marginBottom: 16,
+    backgroundColor: colors.surfaceAlt,
   },
   centered: {
     flex: 1,
