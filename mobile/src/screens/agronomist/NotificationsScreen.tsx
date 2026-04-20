@@ -49,7 +49,7 @@ export default function NotificationsScreen() {
   const styles = StyleSheet.create({
     safeContainer: {
       flex: 1,
-      backgroundColor: '#f9f9f9',
+      backgroundColor: colors.background,
     },
     container: {
       flex: 1,
@@ -94,12 +94,12 @@ export default function NotificationsScreen() {
     },
     notificationDescription: {
       fontSize: 14,
-      color: '#666',
+      color: colors.textSecondary,
       marginBottom: 6,
     },
     timestamp: {
       fontSize: 12,
-      color: '#999',
+      color: colors.textMuted,
     },
     emptyContainer: {
       flex: 1,
@@ -109,7 +109,7 @@ export default function NotificationsScreen() {
     },
     emptyText: {
       fontSize: 16,
-      color: '#999',
+      color: colors.textMuted,
       marginTop: 12,
     },
   });

@@ -35,7 +35,7 @@ export default function EditProfileScreen() {
   const styles = StyleSheet.create({
     safeContainer: {
       flex: 1,
-      backgroundColor: '#f9f9f9',
+      backgroundColor: colors.background,
     },
     container: {
       flex: 1,
@@ -87,7 +87,7 @@ export default function EditProfileScreen() {
       gap: 6,
     },
     removeButton: {
-      backgroundColor: '#f5f5f5',
+      backgroundColor: colors.surfaceAlt,
     },
     photoButtonText: {
       fontSize: 12,
@@ -107,7 +107,7 @@ export default function EditProfileScreen() {
     },
     helperText: {
       fontSize: 12,
-      color: '#999',
+      color: colors.textMuted,
       marginBottom: 8,
     },
     input: {
@@ -118,7 +118,7 @@ export default function EditProfileScreen() {
       paddingHorizontal: 12,
       fontSize: 14,
       color: colors.text,
-      backgroundColor: '#fafafa',
+      backgroundColor: colors.surfaceAlt,
     },
     multilineInput: {
       textAlignVertical: 'top',
@@ -153,8 +153,8 @@ export default function EditProfileScreen() {
                 <Text style={styles.photoButtonText}>Change Photo</Text>
               </TouchableOpacity>
               <TouchableOpacity style={[styles.photoButton, styles.removeButton]}>
-                <Feather name="trash-2" size={16} color="#999" />
-                <Text style={[styles.photoButtonText, { color: '#999' }]}>Remove</Text>
+                <Feather name="trash-2" size={16} color={colors.textMuted} />
+                <Text style={[styles.photoButtonText, { color: colors.textMuted }]}>Remove</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -168,7 +168,7 @@ export default function EditProfileScreen() {
             placeholder="Enter your full name"
             value={name}
             onChangeText={setName}
-            placeholderTextColor="#ccc"
+            placeholderTextColor={colors.textMuted}
           />
         </Card>
 
@@ -181,7 +181,7 @@ export default function EditProfileScreen() {
             value={email}
             onChangeText={setEmail}
             editable={false}
-            placeholderTextColor="#ccc"
+            placeholderTextColor={colors.textMuted}
           />
           <Text style={styles.helperText}>Email cannot be changed</Text>
         </Card>
@@ -195,7 +195,7 @@ export default function EditProfileScreen() {
             value={experience}
             onChangeText={setExperience}
             keyboardType="numeric"
-            placeholderTextColor="#ccc"
+            placeholderTextColor={colors.textMuted}
           />
         </Card>
 
@@ -210,7 +210,7 @@ export default function EditProfileScreen() {
             onChangeText={setSpecialties}
             multiline
             numberOfLines={2}
-            placeholderTextColor="#ccc"
+            placeholderTextColor={colors.textMuted}
           />
         </Card>
 
@@ -225,7 +225,7 @@ export default function EditProfileScreen() {
             onChangeText={setBio}
             multiline
             numberOfLines={4}
-            placeholderTextColor="#ccc"
+            placeholderTextColor={colors.textMuted}
           />
         </Card>
 

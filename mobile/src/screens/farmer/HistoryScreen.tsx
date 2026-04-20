@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View, SafeAreaView, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -21,7 +21,12 @@ export default function HistoryScreen() {
   const { colors, shadows } = useTheme();
   const navigation = useNavigation<NativeStackNavigationProp<FarmerStackParamList>>();
   const diagnoses = useDiagnosisStore((s) => s.diagnoses);
+  const { fetchDiagnoses } = useDiagnosisStore();
   const [filter, setFilter] = useState<FilterType>('ALL');
+
+  useEffect(() => {
+    fetchDiagnoses().catch(() => null);
+  }, [fetchDiagnoses]);
 
   const filteredDiagnoses = filter === 'ALL'
     ? diagnoses

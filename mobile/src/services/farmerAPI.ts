@@ -1,66 +1,55 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
-import { useAppStore } from "../stores/appStore";
-const {token, restoreToken} = useAppStore.getState(); // Get token from Zustand store
-const API_URL = "http://192.168.100.164:3000/farmer";
 
+const API_URL = "http://192.168.100.66:3000";
 
-
-// Helper to get token
 const API = axios.create({
   baseURL: API_URL,
   withCredentials: true,
 });
 
-
-
- API.interceptors.request.use(async (config) => {
+API.interceptors.request.use(async (config) => {
+  const token = await AsyncStorage.getItem("authToken");
   
-    const token =   await AsyncStorage.getItem("authToken");
-    
-   if (token) {
-     config.headers.Authorization = `Bearer ${token}`;
-   }
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  
+  return config;
+}, (error) => {
+  return Promise.reject(error);
+});
 
-   return config;
- });
+API.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    if (error.response?.status === 401) {
+      console.log('401 Unauthorized - Clearing token');
+      await AsyncStorage.removeItem('authToken');
+    }
+    return Promise.reject(error);
+  }
+);
 
-/* =========================
-   ARTICLES
-========================= */
-
-// Get all articles
 export const getArticles = async () => {
-  const response = await API.get(`/articles`);
+  const response = await API.get(`/farmer/articles`);
   return response.data;
 };
 
-// Get single article
 export const getArticleById = async (id: string) => {
-  const response = await API.get(`/articles/${id}`, );
+  const response = await API.get(`/farmer/articles/${id}`);
   return response.data;
 };
 
-/* =========================
-   DIAGNOSES
-========================= */
-
-// Get farmer diagnoses
 export const getMyDiagnoses = async () => {
-  const response = await API.get(`/diagnoses`,);
-
+  const response = await API.get(`/farmer/diagnoses`);
   return response.data;
 };
 
-// Get single diagnosis
 export const getDiagnosisById = async (id: string) => {
-  const response = await API.get(`/diagnoses/${id}`, );
+  const response = await API.get(`/farmer/diagnoses/${id}`);
   return response.data;
 };
-
-/* =========================
-   CREATE DIAGNOSIS
-========================= */
 
 export const createDiagnosis = async (
   image: any,
@@ -81,15 +70,11 @@ export const createDiagnosis = async (
 
   formData.append("plantName", plantName);
 
-  const response = await API.post(
-    "/diagnose",
-    formData,
-    {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    }
-  );
+  const response = await API.post("/farmer/diagnose", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
 
   return response.data;
 };
@@ -118,9 +103,7 @@ export const transcribeVoiceNote = async (audioUri: string) => {
   } as any);
 
   try {
-    // Let axios/react-native set multipart boundary automatically.
-    const response = await API.post("/transcribe", formData);
-
+    const response = await API.post("/farmer/transcribe", formData);
     return response.data?.text || "";
   } catch (error) {
     const responseData = (error as any)?.response?.data;
@@ -131,8 +114,6 @@ export const transcribeVoiceNote = async (audioUri: string) => {
       code,
       message,
       status: (error as any)?.response?.status,
-      responseData,
-      requestUrl: (error as any)?.config?.url,
     });
 
     const transcriptionError = new Error(message);

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Alert, Image, ScrollView, StyleSheet, Text, View, SafeAreaView } from 'react-native';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -92,7 +92,7 @@ export default function DiagnosisDetailScreen() {
     },
     progressTrack: {
       height: 10,
-      backgroundColor: '#E2E8F0',
+      backgroundColor: colors.borderLight,
       borderRadius: 999,
       overflow: 'hidden',
     },
@@ -107,7 +107,7 @@ export default function DiagnosisDetailScreen() {
       color: colors.text,
     },
     rejected: {
-      borderColor: '#FCA5A5',
+      borderColor: colors.errorLight,
     },
     title: {
       fontSize: 18,
@@ -156,7 +156,14 @@ export default function DiagnosisDetailScreen() {
           </Card>
         )}
 
-        {diagnosis.status === 'APPROVED' && diagnosis.treatment && (
+        {diagnosis.symptoms ? (
+          <Card style={styles.card}>
+            <Text style={styles.cardTitle}>Symptoms</Text>
+            <Text style={styles.cardText}>{diagnosis.symptoms}</Text>
+          </Card>
+        ) : null}
+
+        {diagnosis.treatment && diagnosis.status !== 'REJECTED' && (
           <Card style={styles.card}>
             <Text style={styles.cardTitle}>Treatment Recommendation</Text>
             <Text style={styles.cardText}>{diagnosis.treatment}</Text>
@@ -171,11 +178,9 @@ export default function DiagnosisDetailScreen() {
         )}
 
         {diagnosis.status === 'PENDING' && (
-          <Card style={styles.card}>
-            <Text style={styles.cardTitle}>Awaiting Expert Review</Text>
-            <Text style={styles.cardText}>
-              An agronomist will review your submission and provide treatment recommendations soon.
-            </Text>
+          <Card style={[styles.card, styles.reviewStatusCard]}>
+            <Text style={styles.cardTitle}>Review Status</Text>
+            <Text style={styles.cardText}>diagnosis not yet reviewed by an agronomist.</Text>
           </Card>
         )}
 

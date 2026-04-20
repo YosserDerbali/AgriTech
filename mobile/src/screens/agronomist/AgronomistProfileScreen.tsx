@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Alert, ScrollView, StyleSheet, Text, View, SafeAreaView, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -14,9 +14,13 @@ import { Feather } from '@expo/vector-icons';
 export default function AgronomistProfileScreen() {
   const { colors } = useTheme();
   const navigation = useNavigation<NativeStackNavigationProp<AgronomistStackParamList>>();
-  const { diagnoses } = useDiagnosisStore();
+  const { diagnoses, fetchReviewQueue } = useDiagnosisStore();
   const { getMyArticles } = useArticleStore();
   const { user, logout } = useAppStore();
+
+  useEffect(() => {
+    fetchReviewQueue().catch(() => null);
+  }, [fetchReviewQueue]);
 
   const approvedByMe = diagnoses.filter((d) => d.status === 'APPROVED').length;
   const myArticles = getMyArticles();

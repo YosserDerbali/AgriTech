@@ -8,7 +8,11 @@ const Stack = createNativeStackNavigator<AuthStackParamList>();
 
 export default function AuthStack() {
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false,
+      }}
+    >
       <Stack.Screen name="FarmerAuth" component={FarmerAuthScreen} />
       <Stack.Screen name="AgronomistAuth" component={AgronomistAuthScreen} />
     </Stack.Navigator>
