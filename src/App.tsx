@@ -30,6 +30,7 @@ import AgronomistProfilePage from "./pages/agronomist/AgronomistProfilePage";
 import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
 import UserManagementPage from "./pages/admin/UserManagementPage";
 import AIModelsPage from "./pages/admin/AIModelsPage";
+import RssConfigurationPage from "./pages/admin/RssConfigurationPage";
 import SettingsPage from "./pages/admin/SettingsPage";
 
 const queryClient = new QueryClient();
@@ -176,6 +177,11 @@ function AppContent() {
         <Route path="/admin/ai-models" element={
           <ProtectedRoute allowedRoles={['admin']}>
             <AIModelsPage />
+          </ProtectedRoute>
+        } />
+        <Route path="/admin/rss-configuration" element={
+          <ProtectedRoute allowedRoles={['admin']}>
+            <RssConfigurationPage />
           </ProtectedRoute>
         } />
         <Route path="/admin/settings" element={

@@ -1,17 +1,22 @@
 const express = require("express");
 const router = express.Router();
 const agronomistController = require("../controllers/agronomist");
+const upload = require("../middleware/multer");
 const { authenticate } = require("../middleware/auth");
 const { requireAgronomist } = require("../middleware/roles");
 
-router.get("/diagnoses/pending", authenticate, requireAgronomist, agronomistController.getPendingDiagnoses);
-router.get("/diagnoses/:id", authenticate, requireAgronomist, agronomistController.getDiagnosisById);
-router.patch("/diagnoses/:id/approve", authenticate, requireAgronomist, agronomistController.approveDiagnosis);
-router.patch("/diagnoses/:id/reject", authenticate, requireAgronomist, agronomistController.rejectDiagnosis);
+router.use(authenticate, requireAgronomist);
 
-router.get("/articles", authenticate, requireAgronomist, agronomistController.getMyArticles);
-router.post("/articles", authenticate, requireAgronomist, agronomistController.createArticle);
-router.patch("/articles/:id", authenticate, requireAgronomist, agronomistController.updateArticle);
-router.delete("/articles/:id", authenticate, requireAgronomist, agronomistController.deleteArticle);
+router.get("/diagnoses", agronomistController.getDiagnoses);
+router.get("/diagnoses/pending", agronomistController.getPendingDiagnoses);
+router.get("/diagnoses/:id", agronomistController.getDiagnosis);
+router.patch("/diagnoses/:id", agronomistController.updateDiagnosis);
+router.patch("/diagnoses/:id/approve", agronomistController.approveDiagnosis);
+router.patch("/diagnoses/:id/reject", agronomistController.rejectDiagnosis);
+
+router.get("/articles", agronomistController.getMyArticles);
+router.post("/articles", upload.single("coverImage"), agronomistController.createArticle);
+router.patch("/articles/:id", upload.single("coverImage"), agronomistController.updateArticle);
+router.delete("/articles/:id", agronomistController.deleteArticle);
 
 module.exports = router;

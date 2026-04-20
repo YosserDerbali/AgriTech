@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "WebFetch(domain:cropwatch.unl.edu)",
+      "WebFetch(domain:www.usda.gov)",
+      "WebFetch(domain:nifa.usda.gov)",
+      "WebFetch(domain:ipm.ucanr.edu)",
+      "WebFetch(domain:www.canr.msu.edu)",
+      "Bash(npx sequelize-cli:*)"
+    ]
+  }
+}
