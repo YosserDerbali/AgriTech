@@ -15,6 +15,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { format, formatDistanceToNow } from 'date-fns';
 import { AgronomistStackParamList } from '../../navigation/types';
 import { useDiagnosisStore } from '../../stores/diagnosisStore';
+import { useAppStore } from '../../stores/appStore';
 import { StatusBadge } from '../../components/ui/StatusBadge';
 import { Input } from '../../components/ui/Input';
 import { Textarea } from '../../components/ui/Textarea';
@@ -26,6 +27,7 @@ export default function DiagnosisReviewScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<AgronomistStackParamList>>();
   const route = useRoute<RouteProp<AgronomistStackParamList, 'DiagnosisReview'>>();
   const { getDiagnosis, fetchReviewQueue, approveDiagnosis, rejectDiagnosis, updateDiagnosis } = useDiagnosisStore();
+  const { isAuthenticated } = useAppStore();
 
   const diagnosis = getDiagnosis(route.params.id);
 
@@ -37,10 +39,10 @@ export default function DiagnosisReviewScreen() {
   const [showRejectForm, setShowRejectForm] = useState(false);
 
   useEffect(() => {
-    if (!diagnosis) {
+    if (!diagnosis && isAuthenticated) {
       fetchReviewQueue().catch(() => null);
     }
-  }, [diagnosis, fetchReviewQueue]);
+  }, [diagnosis, fetchReviewQueue, isAuthenticated]);
 
   if (!diagnosis) {
     return (

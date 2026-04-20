@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Diagnosis } from '../types/diagnosis';
 import { createDiagnosis, getMyDiagnoses } from '../services/farmerAPI';
 import {
@@ -50,11 +51,20 @@ export const useDiagnosisStore = create<DiagnosisStore>((set, get) => ({
   fetchDiagnoses: async () => {
     const setLoading = get().setLoading;
     try {
+      const token = await AsyncStorage.getItem("authToken");
+      if (!token) {
+        // User is not authenticated, skip fetch
+        setLoading(false);
+        return;
+      }
       setLoading(true);
       const data = await getMyDiagnoses();
       set({ diagnoses: data.map(mapDiagnosis) });
-    } catch (err) {
-      console.error('Failed to fetch diagnoses:', err);
+    } catch (err: any) {
+      // Skip 401 errors silently (user logged out)
+      if (err?.response?.status !== 401) {
+        console.error('Failed to fetch diagnoses:', err);
+      }
     } finally {
       setLoading(false);
     }
@@ -62,11 +72,18 @@ export const useDiagnosisStore = create<DiagnosisStore>((set, get) => ({
   fetchPendingDiagnoses: async () => {
     const setLoading = get().setLoading;
     try {
+      const token = await AsyncStorage.getItem("authToken");
+      if (!token) {
+        setLoading(false);
+        return;
+      }
       setLoading(true);
       const data = await getPendingDiagnosesAPI();
       set({ diagnoses: data.map(mapDiagnosis) });
-    } catch (err) {
-      console.error('Failed to fetch pending diagnoses:', err);
+    } catch (err: any) {
+      if (err?.response?.status !== 401) {
+        console.error('Failed to fetch pending diagnoses:', err);
+      }
     } finally {
       setLoading(false);
     }
@@ -74,11 +91,18 @@ export const useDiagnosisStore = create<DiagnosisStore>((set, get) => ({
   fetchReviewQueue: async () => {
     const setLoading = get().setLoading;
     try {
+      const token = await AsyncStorage.getItem("authToken");
+      if (!token) {
+        setLoading(false);
+        return;
+      }
       setLoading(true);
       const data = await getDiagnosisQueue();
       set({ diagnoses: data.map(mapDiagnosis) });
-    } catch (err) {
-      console.error('Failed to fetch diagnoses:', err);
+    } catch (err: any) {
+      if (err?.response?.status !== 401) {
+        console.error('Failed to fetch diagnoses:', err);
+      }
     } finally {
       setLoading(false);
     }

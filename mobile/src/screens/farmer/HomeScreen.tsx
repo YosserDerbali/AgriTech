@@ -8,6 +8,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FarmerStackParamList } from '../../navigation/types';
 import { useDiagnosisStore } from '../../stores/diagnosisStore';
+import { useAppStore } from '../../stores/appStore';
 import { DiagnosisCard } from '../../components/diagnosis/DiagnosisCard';
 import { Button } from '../../components/ui/Button';
 import { colors, shadows } from '../../theme/colors';
@@ -18,6 +19,7 @@ export default function HomeScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<FarmerStackParamList>>();
   const insets = useSafeAreaInsets();
   const { diagnoses, fetchDiagnoses } = useDiagnosisStore();
+  const { isAuthenticated } = useAppStore();
   const recentDiagnoses = diagnoses.slice(0, 3);
 
   const handleHaptics = () => {
@@ -30,8 +32,10 @@ export default function HomeScreen() {
   const approvedCount = diagnoses.filter((d) => d.status === 'APPROVED').length;
 
   useEffect(() => {
-    fetchDiagnoses();
-  }, []);
+    if (isAuthenticated) {
+      fetchDiagnoses();
+    }
+  }, [isAuthenticated]);
 
   return (
     <SafeAreaView style={styles.safeContainer}>

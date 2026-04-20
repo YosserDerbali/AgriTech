@@ -5,6 +5,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { FarmerStackParamList } from '../../navigation/types';
 import { DiagnosisCard } from '../../components/diagnosis/DiagnosisCard';
 import { useDiagnosisStore } from '../../stores/diagnosisStore';
+import { useAppStore } from '../../stores/appStore';
 import { DiagnosisStatus } from '../../types/diagnosis';
 import { colors } from '../../theme/colors';
 
@@ -21,11 +22,14 @@ export default function HistoryScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<FarmerStackParamList>>();
   const diagnoses = useDiagnosisStore((s) => s.diagnoses);
   const { fetchDiagnoses } = useDiagnosisStore();
+  const { isAuthenticated } = useAppStore();
   const [filter, setFilter] = useState<FilterType>('ALL');
 
   useEffect(() => {
-    fetchDiagnoses().catch(() => null);
-  }, [fetchDiagnoses]);
+    if (isAuthenticated) {
+      fetchDiagnoses().catch(() => null);
+    }
+  }, [fetchDiagnoses, isAuthenticated]);
 
   const filteredDiagnoses = filter === 'ALL'
     ? diagnoses

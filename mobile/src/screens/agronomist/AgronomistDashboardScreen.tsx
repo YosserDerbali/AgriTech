@@ -6,6 +6,7 @@ import { Feather } from '@expo/vector-icons';
 import { AgronomistStackParamList } from '../../navigation/types';
 import { useDiagnosisStore } from '../../stores/diagnosisStore';
 import { useArticleStore } from '../../stores/articleStore';
+import { useAppStore } from '../../stores/appStore';
 import { AgronomistStatCard } from '../../components/agronomist/AgronomistStatCard';
 import { PendingDiagnosisCard } from '../../components/agronomist/PendingDiagnosisCard';
 import { Button } from '../../components/ui/Button';
@@ -15,10 +16,13 @@ export default function AgronomistDashboardScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<AgronomistStackParamList>>();
   const { diagnoses, getPendingDiagnoses, fetchReviewQueue } = useDiagnosisStore();
   const { getMyArticles, fetchMyArticles } = useArticleStore();
+  const { isAuthenticated } = useAppStore();
 
   useEffect(() => {
-    fetchReviewQueue().catch(() => null);
-  }, [fetchReviewQueue]);
+    if (isAuthenticated) {
+      fetchReviewQueue().catch(() => null);
+    }
+  }, [fetchReviewQueue, isAuthenticated]);
 
   const pendingDiagnoses = getPendingDiagnoses();
   const approvedCount = diagnoses.filter((d) => d.status === 'APPROVED').length;
@@ -26,9 +30,11 @@ export default function AgronomistDashboardScreen() {
   const myArticles = getMyArticles();
 
   useEffect(() => {
-    fetchReviewQueue().catch(() => null);
-    fetchMyArticles().catch(() => null);
-  }, [fetchReviewQueue, fetchMyArticles]);
+    if (isAuthenticated) {
+      fetchReviewQueue().catch(() => null);
+      fetchMyArticles().catch(() => null);
+    }
+  }, [fetchReviewQueue, fetchMyArticles, isAuthenticated]);
 
   return (
     <SafeAreaView style={styles.safeContainer}>

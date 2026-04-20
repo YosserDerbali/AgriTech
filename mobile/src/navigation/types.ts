@@ -18,6 +18,7 @@ export type FarmerStackParamList = {
   Settings: undefined;
   Privacy: undefined;
   Help: undefined;
+  Notifications: undefined;
 };
 
 export type AgronomistTabsParamList = {

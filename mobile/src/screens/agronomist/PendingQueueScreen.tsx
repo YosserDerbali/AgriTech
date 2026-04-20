@@ -4,6 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AgronomistStackParamList } from '../../navigation/types';
 import { useDiagnosisStore } from '../../stores/diagnosisStore';
+import { useAppStore } from '../../stores/appStore';
 import { PendingDiagnosisCard } from '../../components/agronomist/PendingDiagnosisCard';
 import { colors } from '../../theme/colors';
 
@@ -12,12 +13,15 @@ type SortOption = 'newest' | 'oldest' | 'confidence';
 export default function PendingQueueScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<AgronomistStackParamList>>();
   const { getPendingDiagnoses, fetchReviewQueue } = useDiagnosisStore();
+  const { isAuthenticated } = useAppStore();
   const [sortBy, setSortBy] = useState<SortOption>('newest');
   const [showLowConfidenceOnly, setShowLowConfidenceOnly] = useState(false);
 
   useEffect(() => {
-    fetchReviewQueue().catch(() => null);
-  }, [fetchReviewQueue]);
+    if (isAuthenticated) {
+      fetchReviewQueue().catch(() => null);
+    }
+  }, [fetchReviewQueue, isAuthenticated]);
 
   const pendingDiagnoses = getPendingDiagnoses();
   const filteredDiagnoses = pendingDiagnoses

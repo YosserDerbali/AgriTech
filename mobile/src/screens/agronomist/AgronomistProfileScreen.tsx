@@ -15,11 +15,13 @@ export default function AgronomistProfileScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<AgronomistStackParamList>>();
   const { diagnoses, fetchReviewQueue } = useDiagnosisStore();
   const { getMyArticles } = useArticleStore();
-  const { user, logout } = useAppStore();
+  const { user, logout, isAuthenticated } = useAppStore();
 
   useEffect(() => {
-    fetchReviewQueue().catch(() => null);
-  }, [fetchReviewQueue]);
+    if (isAuthenticated) {
+      fetchReviewQueue().catch(() => null);
+    }
+  }, [fetchReviewQueue, isAuthenticated]);
 
   const approvedByMe = diagnoses.filter((d) => d.status === 'APPROVED').length;
   const myArticles = getMyArticles();

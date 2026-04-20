@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Article, ArticleFormData } from '../types/article';
 import { getArticles } from '../services/farmerAPI';
 import {
@@ -44,6 +45,11 @@ export const useArticleStore = create<ArticleStore>((set, get) => ({
   isLoading: false,
  getAllArticles: async () => {
   try {
+    const token = await AsyncStorage.getItem("authToken");
+    if (!token) {
+      set({ isLoading: false });
+      return;
+    }
     set({ isLoading: true });
 
     const articles = await getArticles();
@@ -53,18 +59,27 @@ export const useArticleStore = create<ArticleStore>((set, get) => ({
       articles: formattedArticles,
       isLoading: false,
     });
-  } catch (error) {
-    console.error("Failed to fetch articles", error);
+  } catch (error: any) {
+    if (error?.response?.status !== 401) {
+      console.error("Failed to fetch articles", error);
+    }
     set({ isLoading: false });
   }
 },
   fetchMyArticles: async () => {
     try {
+      const token = await AsyncStorage.getItem("authToken");
+      if (!token) {
+        set({ isLoading: false });
+        return;
+      }
       set({ isLoading: true });
       const articles = await getAgronomistArticles();
       set({ myArticles: articles.map(mapArticle), isLoading: false });
-    } catch (error) {
-      console.error('Failed to fetch agronomist articles', error);
+    } catch (error: any) {
+      if (error?.response?.status !== 401) {
+        console.error('Failed to fetch agronomist articles', error);
+      }
       set({ isLoading: false });
     }
   },
