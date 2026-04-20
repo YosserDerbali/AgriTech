@@ -72,7 +72,7 @@ export default function HelpAndSupportScreen() {
   const styles = StyleSheet.create({
     safeContainer: {
       flex: 1,
-      backgroundColor: '#f9f9f9',
+      backgroundColor: colors.background,
     },
     container: {
       flex: 1,
@@ -152,12 +152,12 @@ export default function HelpAndSupportScreen() {
       paddingHorizontal: 12,
       paddingBottom: 16,
       borderTopWidth: 1,
-      borderTopColor: '#eee',
+      borderTopColor: colors.border,
       paddingTop: 12,
     },
     faqAnswer: {
       fontSize: 14,
-      color: '#555',
+      color: colors.textSecondary,
       lineHeight: 20,
     },
     resourceItem: {
@@ -168,7 +168,7 @@ export default function HelpAndSupportScreen() {
     },
     divider: {
       height: 1,
-      backgroundColor: '#eee',
+      backgroundColor: colors.borderLight,
       marginHorizontal: 12,
     },
     resourceText: {
@@ -184,7 +184,7 @@ export default function HelpAndSupportScreen() {
     },
     footerText: {
       fontSize: 12,
-      color: '#999',
+      color: colors.textMuted,
       marginBottom: 4,
     },
   });
@@ -216,7 +216,7 @@ export default function HelpAndSupportScreen() {
                   <Text style={styles.contactType}>{method.type}</Text>
                   <Text style={styles.contactValue}>{method.value}</Text>
                 </View>
-                <Feather name="chevron-right" size={20} color="#ccc" />
+                <Feather name="chevron-right" size={20} color={colors.textMuted} />
               </TouchableOpacity>
             </Card>
           ))}
@@ -259,7 +259,7 @@ export default function HelpAndSupportScreen() {
             >
               <Feather name="book" size={20} color={colors.primary} />
               <Text style={styles.resourceText}>Documentation & Guides</Text>
-              <Feather name="arrow-right" size={16} color="#ccc" />
+              <Feather name="arrow-right" size={16} color={colors.textMuted} />
             </TouchableOpacity>
             <View style={styles.divider} />
             <TouchableOpacity
@@ -268,7 +268,7 @@ export default function HelpAndSupportScreen() {
             >
               <Feather name="file-text" size={20} color={colors.primary} />
               <Text style={styles.resourceText}>Blog & Articles</Text>
-              <Feather name="arrow-right" size={16} color="#ccc" />
+              <Feather name="arrow-right" size={16} color={colors.textMuted} />
             </TouchableOpacity>
             <View style={styles.divider} />
             <TouchableOpacity
@@ -277,7 +277,7 @@ export default function HelpAndSupportScreen() {
             >
               <Feather name="users" size={20} color={colors.primary} />
               <Text style={styles.resourceText}>Community Forum</Text>
-              <Feather name="arrow-right" size={16} color="#ccc" />
+              <Feather name="arrow-right" size={16} color={colors.textMuted} />
             </TouchableOpacity>
           </Card>
         </View>

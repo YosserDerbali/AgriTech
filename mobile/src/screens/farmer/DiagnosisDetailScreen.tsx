@@ -92,7 +92,7 @@ export default function DiagnosisDetailScreen() {
     },
     progressTrack: {
       height: 10,
-      backgroundColor: '#E2E8F0',
+      backgroundColor: colors.borderLight,
       borderRadius: 999,
       overflow: 'hidden',
     },
@@ -107,7 +107,7 @@ export default function DiagnosisDetailScreen() {
       color: colors.text,
     },
     rejected: {
-      borderColor: '#FCA5A5',
+      borderColor: colors.errorLight,
     },
     title: {
       fontSize: 18,

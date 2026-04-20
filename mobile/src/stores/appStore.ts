@@ -71,7 +71,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
         set({ token, isAuthenticated: true });
       }
     } catch (e) {
-      console.error('Failed to restore token');
+      console.error('Failed to restore token:', e);
     }
   },
   
@@ -98,7 +98,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
         set({ theme: savedTheme });
       }
     } catch (e) {
-      console.error('Failed to restore theme');
+      console.error('Failed to restore theme:', e);
     }
   },
 }));
