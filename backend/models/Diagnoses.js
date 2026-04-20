@@ -38,9 +38,14 @@ const Diagnoses = sequelize.define(
       allowNull: true,
     },
 
-    ai_model_version: {
-      type: DataTypes.STRING,
+    ai_model_id: {
+      type: DataTypes.UUID,
       allowNull: true,
+      references: {
+        model: "ai_models",
+        key: "id",
+      },
+      onDelete: "SET NULL",
     },
 
     validated: {
