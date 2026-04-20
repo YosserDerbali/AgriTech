@@ -1,11 +1,12 @@
 import React from 'react';
-import { Alert, ScrollView, StyleSheet, Text, View, SafeAreaView, TouchableOpacity } from 'react-native';
+import { ScrollView, StyleSheet, Text, View, SafeAreaView, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { Feather } from '@expo/vector-icons';
 import { AgronomistStackParamList } from '../../navigation/types';
 import { Card } from '../../components/ui/Card';
 import { useTheme } from '../../hooks/useTheme';
-import { Feather } from '@expo/vector-icons';
+import { spacing, radius } from '../../theme/spacing';
 
 export default function NotificationsScreen() {
   const { colors, shadows } = useTheme();
@@ -18,7 +19,8 @@ export default function NotificationsScreen() {
       description: 'John Farmer submitted a new tomato plant diagnosis',
       timestamp: '2 hours ago',
       icon: 'alert-circle',
-      color: '#FF6B6B',
+      color: colors.error,
+      bgColor: colors.errorLight,
     },
     {
       id: '2',
@@ -26,7 +28,8 @@ export default function NotificationsScreen() {
       description: 'Your article "Fungal Disease Management" was published',
       timestamp: '1 day ago',
       icon: 'check-circle',
-      color: '#51CF66',
+      color: colors.success,
+      bgColor: colors.successLight,
     },
     {
       id: '3',
@@ -34,7 +37,8 @@ export default function NotificationsScreen() {
       description: 'Maria Fields rated your diagnosis 5 stars',
       timestamp: '2 days ago',
       icon: 'star',
-      color: '#FFD93D',
+      color: colors.warning,
+      bgColor: colors.warningLight,
     },
     {
       id: '4',
@@ -42,7 +46,8 @@ export default function NotificationsScreen() {
       description: '3 new pending diagnoses are waiting for review',
       timestamp: '3 days ago',
       icon: 'inbox',
-      color: '#4299E1',
+      color: colors.pending,
+      bgColor: colors.pendingLight,
     },
   ];
 
@@ -55,62 +60,99 @@ export default function NotificationsScreen() {
       flex: 1,
     },
     content: {
-      padding: 16,
+      padding: spacing.lg,
+      paddingBottom: spacing['3xl'],
     },
     header: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      marginBottom: 20,
+      marginBottom: spacing.xl,
+      gap: spacing.lg,
+    },
+    backButton: {
+      width: 40,
+      height: 40,
+      borderRadius: radius.lg,
+      backgroundColor: colors.surface,
+      borderWidth: 1,
+      borderColor: colors.border,
+      justifyContent: 'center',
+      alignItems: 'center',
     },
     title: {
-      fontSize: 24,
-      fontWeight: '700',
+      fontSize: 28,
+      fontWeight: '800',
+      letterSpacing: 0.5,
       color: colors.text,
+      flex: 1,
+    },
+    spacer: {
+      width: 40,
     },
     notificationCard: {
-      marginBottom: 12,
+      marginBottom: spacing.lg,
     },
     notificationContent: {
       flexDirection: 'row',
       alignItems: 'flex-start',
+      gap: spacing.lg,
     },
     iconContainer: {
-      width: 48,
-      height: 48,
-      borderRadius: 24,
+      width: 52,
+      height: 52,
+      borderRadius: radius.lg,
       justifyContent: 'center',
       alignItems: 'center',
-      marginRight: 12,
+      flexShrink: 0,
+      borderWidth: 1.5,
+      borderColor: colors.border,
     },
     textContent: {
       flex: 1,
+      justifyContent: 'center',
     },
     notificationTitle: {
       fontSize: 16,
-      fontWeight: '600',
+      fontWeight: '700',
+      lineHeight: 22,
       color: colors.text,
-      marginBottom: 4,
+      marginBottom: spacing.xs,
     },
     notificationDescription: {
       fontSize: 14,
+      lineHeight: 21,
       color: colors.textSecondary,
-      marginBottom: 6,
+      marginBottom: spacing.sm,
     },
     timestamp: {
       fontSize: 12,
+      lineHeight: 16,
       color: colors.textMuted,
+      fontWeight: '500',
     },
     emptyContainer: {
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
-      paddingVertical: 80,
+      paddingVertical: spacing['5xl'],
+    },
+    emptyIcon: {
+      marginBottom: spacing.lg,
+      opacity: 0.5,
     },
     emptyText: {
-      fontSize: 16,
+      fontSize: 18,
+      fontWeight: '600',
+      lineHeight: 24,
+      color: colors.textSecondary,
+    },
+    emptySubtext: {
+      fontSize: 14,
+      lineHeight: 20,
       color: colors.textMuted,
-      marginTop: 12,
+      marginTop: spacing.sm,
+      textAlign: 'center',
     },
   });
 
@@ -118,11 +160,15 @@ export default function NotificationsScreen() {
     <SafeAreaView style={styles.safeContainer}>
       <ScrollView style={styles.container} contentContainerStyle={styles.content}>
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
+          <TouchableOpacity 
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}
+            activeOpacity={0.6}
+          >
             <Feather name="arrow-left" size={24} color={colors.text} />
           </TouchableOpacity>
           <Text style={styles.title}>Notifications</Text>
-          <View style={{ width: 24 }} />
+          <View style={styles.spacer} />
         </View>
 
         {notifications.length > 0 ? (
@@ -132,7 +178,10 @@ export default function NotificationsScreen() {
                 <View
                   style={[
                     styles.iconContainer,
-                    { backgroundColor: `${notification.color}20` },
+                    { 
+                      backgroundColor: notification.bgColor,
+                      borderColor: notification.color,
+                    },
                   ]}
                 >
                   <Feather name={notification.icon as any} size={24} color={notification.color} />
@@ -147,8 +196,11 @@ export default function NotificationsScreen() {
           ))
         ) : (
           <View style={styles.emptyContainer}>
-            <Feather name="inbox" size={48} color={colors.border} />
-            <Text style={styles.emptyText}>No notifications</Text>
+            <View style={styles.emptyIcon}>
+              <Feather name="inbox" size={56} color={colors.border} />
+            </View>
+            <Text style={styles.emptyText}>No notifications yet</Text>
+            <Text style={styles.emptySubtext}>Your notifications will appear here</Text>
           </View>
         )}
       </ScrollView>

@@ -2,7 +2,7 @@ import axios from "axios";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const API = axios.create({
-  baseURL: "http://192.168.100.66:3000",
+  baseURL: process.env.EXPO_PUBLIC_API_URL || "http://192.168.100.66:3000",
 });
 
 export interface LoginRequest {
@@ -18,6 +18,14 @@ export interface RegisterRequest {
   role: 'FARMER' | 'AGRONOMIST';
 }
 
+export interface GoogleSignInRequest {
+  email: string;
+  name: string;
+  photo?: string;
+  firebaseUid: string;
+  role: 'FARMER' | 'AGRONOMIST';
+}
+
 export interface AuthResponse {
   token: string;
   user: {
@@ -25,6 +33,7 @@ export interface AuthResponse {
     name: string;
     email: string;
     role: string;
+    photo?: string;
   };
 }
 
@@ -62,7 +71,24 @@ export const authAPI = {
       );
     }
   },
-  
+
+  googleSignIn: async (data: GoogleSignInRequest): Promise<AuthResponse> => {
+    try {
+      const response = await API.post("/auth/google-signin", data);
+      const { token, user } = response.data;
+      
+      if (token) {
+        await AsyncStorage.setItem('authToken', token);
+      }
+      
+      return response.data;
+    } catch (error: any) {
+      throw new Error(
+        error.response?.data?.message || "Google sign-in failed"
+      );
+    }
+  },
+
   logout: async () => {
     await AsyncStorage.removeItem('authToken');
   },

@@ -443,16 +443,71 @@ Check that:
 
 ---
 
-## Summary
+## 10. **Agronomist UI Updates** 🌾
 
-The mobile application now features:
+Made the agronomist screens look more modern and polished with a warm orange theme and better typography.
 
-- 🎨 Professional, cohesive design system
-- ⚡ Improved user experience with haptics
-- 📱 Consistent component library
-- 🎯 Better visual hierarchy
-- ✨ Premium feel with gradients and shadows
-- 🎭 Beautiful typography with Inter font
-- 🔧 Comprehensive theme utilities
+### Color Changes
+Updated the color palette to use warmer, more sophisticated shades of orange instead of the bright ones:
+- Primary: #D97706 (deep orange)
+- Text colors changed to warm neutrals instead of green-tinted colors
+- Added proper text hierarchy (text, textSecondary, textTertiary)
 
-This creates a solid foundation for a professional, scalable mobile application that matches the quality of the Smart-Farm-Data implementation while maintaining React Native compatibility.
+### Typography Improvements
+- Dashboard title is now 32px with better letter-spacing
+- Reduced font weights on stat cards (was too bold before)
+- Better spacing and hierarchy throughout
+- Stat values: 32px, weight 600 (was 800)
+- Borders: 1px instead of 1.5px (looks more refined)
+
+### Screen Updates
+
+**Dashboard**: Title refined, better card styling, improved stat display
+
+**Profile**: Added icons to stat boxes, better badges, cleaner layout
+
+**Notifications**: Better header, improved cards with icons
+
+**Queue**: This got a major upgrade:
+- Title made bigger (32px to match dashboard)
+- Filter and sort buttons look way better
+- Empty state now has an icon and better text
+- Better spacing and organization overall
+
+**Cards**: Better shadows, spacing, and icons throughout
+
+### Files Changed
+- src/theme/colors.ts
+- src/screens/agronomist/AgronomistDashboardScreen.tsx
+- src/screens/agronomist/AgronomistProfileScreen.tsx
+- src/screens/agronomist/NotificationsScreen.tsx
+- src/screens/agronomist/PendingQueueScreen.tsx
+- src/components/agronomist/AgronomistStatCard.tsx
+- src/components/agronomist/PendingDiagnosisCard.tsx
+- src/components/agronomist/ArticleCard.tsx
+
+Basically made the agronomist role look polished and modern with consistent warm colors and better-looking text throughout.
+
+## 11. **Sign-In/Auth Screen Polish** 🔐
+
+Made both Farmer and Agronomist auth screens look more professional with better visual feedback and interaction.
+
+### Improvements
+- **Input field icons**: Added mail, lock, user, and briefcase icons inside input fields for better visual guidance
+- **Password visibility toggle**: Eye icon to show/hide password - users can verify what they typed before submitting
+- **Focus states**: Input fields change color (border becomes primary orange) when focused to show which field is active
+- **Better input styling**: Rounded borders, subtle shadows, better spacing and alignment
+- **Professional touch**: Consistent icons, proper spacing, and better overall visual hierarchy
+
+### What Changed
+- Both screens now use custom input containers with icons
+- Password toggle is interactive (tap to show/hide)
+- Added focus/blur tracking for visual feedback
+- Better touch targets (48px height on inputs)
+- Icons and styling consistent between farmer and agronomist roles
+
+### Files Updated
+- src/screens/auth/AgronomistAuthScreen.tsx
+- src/screens/auth/FarmerAuthScreen.tsx
+
+The sign-in screens went from basic to looking like a professional app with good UX feedback.

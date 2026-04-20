@@ -143,6 +143,8 @@ export default function DiagnosisReviewScreen() {
     },
   });
 
+  const styles = createStyles(colors);
+
   return (
     <SafeAreaView style={dynamicStyles.safeContainer}>
       <KeyboardAvoidingView
@@ -275,7 +277,7 @@ export default function DiagnosisReviewScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any) => StyleSheet.create({
   keyboardAvoid: {
     flex: 1,
   },
@@ -320,7 +322,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   lowConfidence: {
-    borderColor: '#FCD34D',
+    borderColor: colors.warning,
   },
   row: {
     flexDirection: 'row',
@@ -335,7 +337,7 @@ const styles = StyleSheet.create({
   },
   progressTrack: {
     height: 8,
-    backgroundColor: '#E2E8F0',
+    backgroundColor: colors.borderLight,
     borderRadius: 999,
     overflow: 'hidden',
     marginTop: 6,
@@ -348,7 +350,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   rejectCard: {
-    borderColor: '#FCA5A5',
+    borderColor: colors.error,
   },
   actionRow: {
     flexDirection: 'row',

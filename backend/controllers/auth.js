@@ -90,6 +90,67 @@ exports.login = async (req, res) => {
   }
 };
 
+// 🔹 Google Sign-In (Firebase OAuth)
+exports.googleSignIn = async (req, res) => {
+  try {
+    const { email, name, photo, firebaseUid, role } = req.body;
+
+    if (!email || !firebaseUid || !role) {
+      return res.status(400).json({ message: "Email, Firebase UID, and role are required" });
+    }
+
+    if (!["FARMER", "AGRONOMIST"].includes(role)) {
+      return res.status(400).json({ message: "Invalid role selection" });
+    }
+
+    // Check if user exists
+    let user = await User.findOne({ where: { email } });
+
+    if (!user) {
+      // Create new user from Google data
+      // Generate a random password since Google users don't have passwords
+      const randomPassword = require('crypto').randomBytes(16).toString('hex');
+      const password_hash = await bcrypt.hash(randomPassword, 10);
+      
+      const now = new Date();
+      user = await User.create({
+        name: name || 'Google User',
+        email,
+        password_hash,
+        role,
+        firebaseUid,
+        profilePhoto: photo || null,
+        lastLoginAt: now,
+        isActive: true,
+      });
+    } else {
+      // Update existing user with Google data
+      user.firebaseUid = firebaseUid;
+      if (photo) {
+        user.profilePhoto = photo;
+      }
+      user.lastLoginAt = new Date();
+      
+      // Update role if different (in case user is accessing as different role)
+      if (user.role !== role) {
+        user.role = role;
+      }
+      
+      await user.save();
+    }
+
+    // Generate JWT for backend
+    const token = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, {
+      expiresIn: JWT_EXPIRES_IN,
+    });
+
+    res.json({ token, user: sanitizeUser(user) });
+  } catch (error) {
+    console.error("Google Sign-In error:", error);
+    res.status(500).json({ message: "Google sign-in failed" });
+  }
+};
+
 // 🔹 Admin-only login endpoint
 exports.adminLogin = async (req, res) => {
   try {

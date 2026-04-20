@@ -141,14 +141,16 @@ export default function SettingsScreen() {
       flex: 1,
     },
     editProfileTitle: {
-      fontSize: 16,
-      fontWeight: '600',
+      fontSize: 17,
+      fontWeight: '700',
+      lineHeight: 23,
       color: colors.text,
-      marginBottom: 2,
+      marginBottom: 4,
     },
     editProfileSubtitle: {
-      fontSize: 12,
-      color: colors.textMuted,
+      fontSize: 13,
+      lineHeight: 18,
+      color: colors.textSecondary,
     },
   });
 
@@ -197,8 +199,8 @@ export default function SettingsScreen() {
                   <Switch
                     value={item.value}
                     onValueChange={item.onToggle}
-                    trackColor={{ false: '#ccc', true: colors.primary + '40' }}
-                    thumbColor={item.value ? colors.primary : '#999'}
+                    trackColor={{ false: colors.borderLight, true: colors.primary + '40' }}
+                    thumbColor={item.value ? colors.primary : colors.border}
                   />
                 </View>
               ))}
