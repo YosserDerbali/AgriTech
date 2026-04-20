@@ -16,6 +16,7 @@ import { useArticleStore } from '../../stores/articleStore';
 import { Input } from '../../components/ui/Input';
 import { Textarea } from '../../components/ui/Textarea';
 import { Button } from '../../components/ui/Button';
+import { ArticleCoverUploader } from '../../components/agronomist/ArticleCoverUploader';
 import { colors } from '../../theme/colors';
 
 export default function ArticleEditorScreen() {
@@ -29,7 +30,8 @@ export default function ArticleEditorScreen() {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [excerpt, setExcerpt] = useState('');
-  const [coverImageUrl, setCoverImageUrl] = useState('');
+  const [coverImageUri, setCoverImageUri] = useState<string | null>(null);
+  const [removeCoverImage, setRemoveCoverImage] = useState(false);
   const [tags, setTags] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -38,7 +40,8 @@ export default function ArticleEditorScreen() {
       setTitle(existingArticle.title);
       setContent(existingArticle.content);
       setExcerpt(existingArticle.excerpt);
-      setCoverImageUrl(existingArticle.coverImageUrl || '');
+      setCoverImageUri(existingArticle.coverImageUrl || null);
+      setRemoveCoverImage(false);
       setTags(existingArticle.tags.join(', '));
     }
   }, [existingArticle]);
@@ -55,7 +58,8 @@ export default function ArticleEditorScreen() {
       title: title.trim(),
       content: content.trim(),
       excerpt: excerpt.trim(),
-      coverImageUrl: coverImageUrl.trim() || undefined,
+      coverImage: coverImageUri || undefined,
+      removeCoverImage,
       tags: tags.split(',').map((t) => t.trim()).filter(Boolean),
     };
 
@@ -115,8 +119,20 @@ export default function ArticleEditorScreen() {
             <Button title="Delete" variant="destructive" onPress={handleDelete} style={styles.deleteButton} />
           ) : null}
 
-          <Text style={styles.label}>Cover Image URL (Optional)</Text>
-          <Input placeholder="https://example.com/image.jpg" value={coverImageUrl} onChangeText={setCoverImageUrl} style={styles.input} />
+          <Text style={styles.label}>Cover Image (Optional)</Text>
+          <View style={styles.coverSection}>
+            <ArticleCoverUploader
+              selectedImage={coverImageUri}
+              onImageSelect={(uri) => {
+                setCoverImageUri(uri);
+                setRemoveCoverImage(false);
+              }}
+              onClear={() => {
+                setCoverImageUri(null);
+                setRemoveCoverImage(true);
+              }}
+            />
+          </View>
 
           <Text style={styles.label}>Title *</Text>
           <Input placeholder="Enter article title..." value={title} onChangeText={setTitle} style={styles.input} />
@@ -170,6 +186,9 @@ const styles = StyleSheet.create({
   },
   input: {
     marginBottom: 8,
+  },
+  coverSection: {
+    marginBottom: 10,
   },
   textarea: {
     minHeight: 80,
