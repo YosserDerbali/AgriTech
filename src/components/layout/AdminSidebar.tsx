@@ -1,9 +1,10 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  Users, 
-  Brain, 
-  Settings, 
+import {
+  LayoutDashboard,
+  Users,
+  Brain,
+  Rss,
+  Settings,
   LogOut,
   Menu,
   X
@@ -18,6 +19,7 @@ const navItems = [
   { path: '/admin', icon: LayoutDashboard, label: 'Dashboard' },
   { path: '/admin/users', icon: Users, label: 'User Management' },
   { path: '/admin/ai-models', icon: Brain, label: 'AI Performance' },
+  { path: '/admin/rss-configuration', icon: Rss, label: 'RSS Configuration' },
   { path: '/admin/settings', icon: Settings, label: 'Settings' },
 ];
 

@@ -29,3 +29,8 @@ backend/.env.env~
 .expo/
 *.env~
 *.env.backup
+
+backend/.env
+
+# Claude Code
+CLAUDE.md

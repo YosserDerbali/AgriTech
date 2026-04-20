@@ -21,6 +21,7 @@ export const colors = {
   background: '#F5F5F0',
   surfaceBackground: '#FAFAF7',
   surface: '#FFFFFF',
+  card: '#FFFFFF',
   surfaceElevated: '#FAFAF7',
   surfaceAlt: '#F9F9F6',
 
@@ -43,6 +44,7 @@ export const colors = {
   warning: '#F57F17',
   warningLight: '#FFF8E1',
   error: '#C62828',
+  destructive: '#C62828',
   errorLight: '#FFEBEE',
   pending: '#1565C0',
   pendingLight: '#E3F2FD',
