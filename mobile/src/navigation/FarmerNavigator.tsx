@@ -7,10 +7,13 @@ import ArticleDetailScreen from '../screens/farmer/ArticleDetailScreen';
 import SettingsScreen from '../screens/farmer/SettingsScreen';
 import PrivacyScreen from '../screens/farmer/PrivacyScreen';
 import HelpAndSupportScreen from '../screens/farmer/HelpAndSupportScreen';
+import { useTheme } from '../hooks/useTheme';
 
 const Stack = createNativeStackNavigator<FarmerStackParamList>();
 
 export default function FarmerNavigator() {
+  const { colors } = useTheme();
+
   return (
     <Stack.Navigator
       screenOptions={{
@@ -19,6 +22,10 @@ export default function FarmerNavigator() {
         headerTitleStyle: {
           fontWeight: '600',
         },
+        headerStyle: {
+          backgroundColor: colors.background,
+        },
+        headerTintColor: colors.text,
       }}
     >
       <Stack.Screen

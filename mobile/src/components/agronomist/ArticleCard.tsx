@@ -2,7 +2,7 @@ import React from 'react';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { formatDistanceToNow } from 'date-fns';
 import { Article } from '../../types/article';
-import { colors, shadows } from '../../theme/colors';
+import { useTheme } from '../../hooks/useTheme';
 import { Badge } from '../ui/Badge';
 
 interface ArticleCardProps {
@@ -11,31 +11,67 @@ interface ArticleCardProps {
 }
 
 export function ArticleCard({ article, onPress }: ArticleCardProps) {
+  const { colors, shadows } = useTheme();
+
+  const styles = StyleSheet.create({
+    card: {
+      backgroundColor: colors.surface,
+      borderRadius: 16,
+      overflow: 'hidden',
+      borderWidth: 1,
+      borderColor: colors.border,
+      marginBottom: 12,
+      ...shadows.soft,
+    },
+    title: {
+      fontSize: 16,
+      fontWeight: '700',
+      color: colors.text,
+      marginBottom: 6,
+    },
+    excerpt: {
+      fontSize: 13,
+      color: colors.textSecondary,
+      marginBottom: 8,
+      lineHeight: 18,
+    },
+    metaText: {
+      fontSize: 12,
+      color: colors.textMuted,
+      lineHeight: 16,
+    },
+    placeholderText: {
+      fontSize: 12,
+      color: colors.textMuted,
+      fontWeight: '600',
+    },
+  });
+
   return (
     <Pressable onPress={onPress} style={styles.card}>
-      <View style={styles.row}>
+      <View style={staticStyles.row}>
         {article.coverImageUrl ? (
-          <Image source={{ uri: article.coverImageUrl }} style={styles.image} />
+          <Image source={{ uri: article.coverImageUrl }} style={staticStyles.image} />
         ) : (
-          <View style={[styles.image, styles.imagePlaceholder]}>
+          <View style={[staticStyles.image, staticStyles.imagePlaceholder]}>
             <Text style={styles.placeholderText}>No image</Text>
           </View>
         )}
-        <View style={styles.content}>
-          <View style={styles.topRow}>
+        <View style={staticStyles.content}>
+          <View style={staticStyles.topRow}>
             <Badge
               label={article.source === 'EXTERNAL' ? 'External' : 'Expert'}
               variant={article.source === 'EXTERNAL' ? 'outline' : 'secondary'}
-              style={styles.badge}
+              style={staticStyles.badge}
             />
           </View>
           <Text style={styles.title} numberOfLines={2}>{article.title}</Text>
           <Text style={styles.excerpt} numberOfLines={3}>{article.excerpt}</Text>
-          <View style={styles.metaRow}>
-            <Text style={[styles.metaText, styles.metaSource]} numberOfLines={2}>
+          <View style={staticStyles.metaRow}>
+            <Text style={[styles.metaText, staticStyles.metaSource]} numberOfLines={2}>
               {article.authorName}
             </Text>
-            <Text style={[styles.metaText, styles.metaDate]}>
+            <Text style={[styles.metaText, staticStyles.metaDate]}>
               {formatDistanceToNow(article.createdAt, { addSuffix: true })}
             </Text>
           </View>
@@ -45,15 +81,7 @@ export function ArticleCard({ article, onPress }: ArticleCardProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: colors.card,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: colors.border,
-    marginBottom: 12,
-    ...shadows.soft,
-  },
+const staticStyles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'stretch',
@@ -65,14 +93,9 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 16,
   },
   imagePlaceholder: {
-    backgroundColor: colors.surfaceAlt,
+    backgroundColor: '#e5e7eb',
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  placeholderText: {
-    fontSize: 12,
-    color: colors.textMuted,
-    fontWeight: '600',
   },
   content: {
     flex: 1,
@@ -87,27 +110,10 @@ const styles = StyleSheet.create({
   badge: {
     alignSelf: 'flex-start',
   },
-  title: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: colors.text,
-    marginBottom: 6,
-  },
-  excerpt: {
-    fontSize: 13,
-    color: colors.textSecondary,
-    marginBottom: 8,
-    lineHeight: 18,
-  },
   metaRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     alignItems: 'flex-start',
-  },
-  metaText: {
-    fontSize: 12,
-    color: colors.textMuted,
-    lineHeight: 16,
   },
   metaSource: {
     flexShrink: 1,

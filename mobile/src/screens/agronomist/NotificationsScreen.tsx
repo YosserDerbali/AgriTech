@@ -4,10 +4,11 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AgronomistStackParamList } from '../../navigation/types';
 import { Card } from '../../components/ui/Card';
-import { colors } from '../../theme/colors';
+import { useTheme } from '../../hooks/useTheme';
 import { Feather } from '@expo/vector-icons';
 
 export default function NotificationsScreen() {
+  const { colors, shadows } = useTheme();
   const navigation = useNavigation<NativeStackNavigationProp<AgronomistStackParamList>>();
 
   const notifications = [
@@ -44,6 +45,74 @@ export default function NotificationsScreen() {
       color: '#4299E1',
     },
   ];
+
+  const styles = StyleSheet.create({
+    safeContainer: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    container: {
+      flex: 1,
+    },
+    content: {
+      padding: 16,
+    },
+    header: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: 20,
+    },
+    title: {
+      fontSize: 24,
+      fontWeight: '700',
+      color: colors.text,
+    },
+    notificationCard: {
+      marginBottom: 12,
+    },
+    notificationContent: {
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+    },
+    iconContainer: {
+      width: 48,
+      height: 48,
+      borderRadius: 24,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginRight: 12,
+    },
+    textContent: {
+      flex: 1,
+    },
+    notificationTitle: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.text,
+      marginBottom: 4,
+    },
+    notificationDescription: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      marginBottom: 6,
+    },
+    timestamp: {
+      fontSize: 12,
+      color: colors.textMuted,
+    },
+    emptyContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingVertical: 80,
+    },
+    emptyText: {
+      fontSize: 16,
+      color: colors.textMuted,
+      marginTop: 12,
+    },
+  });
 
   return (
     <SafeAreaView style={styles.safeContainer}>
@@ -86,71 +155,3 @@ export default function NotificationsScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  safeContainer: {
-    flex: 1,
-    backgroundColor: '#f9f9f9',
-  },
-  container: {
-    flex: 1,
-  },
-  content: {
-    padding: 16,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: colors.text,
-  },
-  notificationCard: {
-    marginBottom: 12,
-  },
-  notificationContent: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-  },
-  iconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-  },
-  textContent: {
-    flex: 1,
-  },
-  notificationTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.text,
-    marginBottom: 4,
-  },
-  notificationDescription: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 6,
-  },
-  timestamp: {
-    fontSize: 12,
-    color: '#999',
-  },
-  emptyContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: 80,
-  },
-  emptyText: {
-    fontSize: 16,
-    color: '#999',
-    marginTop: 12,
-  },
-});

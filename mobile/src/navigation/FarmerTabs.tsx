@@ -7,19 +7,21 @@ import DiagnoseScreen from '../screens/farmer/DiagnoseScreen';
 import HistoryScreen from '../screens/farmer/HistoryScreen';
 import FarmerArticlesScreen from '../screens/farmer/FarmerArticlesScreen';
 import FarmerProfileScreen from '../screens/farmer/FarmerProfileScreen';
-import { colors } from '../theme/colors';
+import { useTheme } from '../hooks/useTheme';
 
 const Tab = createBottomTabNavigator<FarmerTabsParamList>();
 
 export default function FarmerTabs() {
+  const { colors } = useTheme();
+
   return (
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: colors.textMuted, // Changed from colors.muted to colors.textMuted
+        tabBarInactiveTintColor: colors.textMuted,
         tabBarStyle: { 
-          backgroundColor: colors.surface, // Changed from colors.card to colors.surface
+          backgroundColor: colors.surface,
           borderTopColor: colors.border 
         },
       }}

@@ -1,11 +1,12 @@
 import React from 'react';
 import { StyleSheet, Text, SafeAreaView, ScrollView, TouchableOpacity, Alert, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { colors } from '../../theme/colors';
+import { useTheme } from '../../hooks/useTheme';
 import { Card } from '../../components/ui/Card';
 import { Feather } from '@expo/vector-icons';
 
 export default function PrivacyScreen() {
+  const { colors } = useTheme();
   const navigation = useNavigation();
 
   const privacyItems = [
@@ -18,6 +19,54 @@ export default function PrivacyScreen() {
   const handlePress = (action: string) => {
     Alert.alert(action, 'This feature will be available in the next update.');
   };
+
+  const styles = StyleSheet.create({
+    safeContainer: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    container: {
+      flex: 1,
+    },
+    content: {
+      padding: 16,
+    },
+    header: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: 20,
+    },
+    title: {
+      fontSize: 24,
+      fontWeight: '700',
+      color: colors.text,
+    },
+    card: {
+      paddingVertical: 8,
+    },
+    item: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingVertical: 16,
+      paddingHorizontal: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
+    itemLast: {
+      borderBottomWidth: 0,
+    },
+    itemLeft: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+    },
+    text: {
+      fontSize: 15,
+      color: colors.text,
+    },
+  });
 
   return (
     <SafeAreaView style={styles.safeContainer}>
@@ -49,51 +98,3 @@ export default function PrivacyScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  safeContainer: {
-    flex: 1,
-    backgroundColor: '#f9f9f9',
-  },
-  container: {
-    flex: 1,
-  },
-  content: {
-    padding: 16,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: colors.text,
-  },
-  card: {
-    paddingVertical: 8,
-  },
-  item: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 16,
-    paddingHorizontal: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  itemLast: {
-    borderBottomWidth: 0,
-  },
-  itemLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  text: {
-    fontSize: 15,
-    color: colors.text,
-  },
-});

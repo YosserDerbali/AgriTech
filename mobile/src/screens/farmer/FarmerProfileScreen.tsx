@@ -7,10 +7,11 @@ import { useDiagnosisStore } from '../../stores/diagnosisStore';
 import { useAppStore } from '../../stores/appStore';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
-import { colors } from '../../theme/colors';
+import { useTheme } from '../../hooks/useTheme';
 import { Feather } from '@expo/vector-icons';
 
 export default function FarmerProfileScreen() {
+  const { colors, shadows } = useTheme();
   const navigation = useNavigation<NativeStackNavigationProp<FarmerStackParamList>>();
   const { diagnoses } = useDiagnosisStore();
   const { user, logout } = useAppStore();
@@ -43,6 +44,105 @@ export default function FarmerProfileScreen() {
       routes: [{ name: 'FarmerTabs' }],
     });
   };
+
+  const styles = StyleSheet.create({
+    safeContainer: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    content: {
+      padding: 16,
+      paddingBottom: 30,
+    },
+    title: {
+      fontSize: 22,
+      fontWeight: '700',
+      color: colors.text,
+      marginBottom: 12,
+    },
+    card: {
+      marginBottom: 16,
+    },
+    name: {
+      fontSize: 18,
+      fontWeight: '700',
+      color: colors.text,
+      marginBottom: 6,
+    },
+    email: {
+      fontSize: 13,
+      color: colors.textSecondary,
+      marginBottom: 12,
+    },
+    statsRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      marginBottom: 16,
+      gap: 8,
+    },
+    statBox: {
+      flex: 1,
+      backgroundColor: colors.surface,
+      borderRadius: 12,
+      padding: 12,
+      alignItems: 'center',
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    statValue: {
+      fontSize: 18,
+      fontWeight: '700',
+      color: colors.primary,
+    },
+    statLabel: {
+      fontSize: 11,
+      color: colors.textSecondary,
+    },
+    profileCard: {
+      marginBottom: 12,
+    },
+    badgesRow: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+    },
+    editBadge: {
+      backgroundColor: colors.primarySoft,
+      color: colors.primary,
+      paddingVertical: 4,
+      paddingHorizontal: 12,
+      borderRadius: 999,
+      fontSize: 12,
+      fontWeight: '500',
+    },
+    menuItem: {
+      paddingVertical: 14,
+      paddingHorizontal: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+    },
+    menuItemLast: {
+      borderBottomWidth: 0,
+    },
+    menuItemText: {
+      flex: 1,
+      fontSize: 14,
+      fontWeight: '500',
+      color: colors.text,
+    },
+    footer: {
+      textAlign: 'center',
+      color: colors.textSecondary,
+      fontSize: 12,
+      marginTop: 16,
+    },
+  });
 
   return (
     <SafeAreaView style={styles.safeContainer}>
@@ -98,101 +198,3 @@ export default function FarmerProfileScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  safeContainer: {
-    flex: 1,
-    backgroundColor: colors.background || '#f9f9f9',
-  },
-  container: {
-    flex: 1,
-  },
-  content: {
-    padding: 16,
-    paddingBottom: 30,
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: colors.text,
-    marginBottom: 12,
-  },
-  profileCard: {
-    marginBottom: 12,
-  },
-  name: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: colors.text,
-    marginBottom: 6,
-  },
-  email: {
-    fontSize: 13,
-    color: colors.textSecondary || '#999',
-    marginBottom: 10,
-  },
-  badgesRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
-  editBadge: {
-    backgroundColor: '#E0F2FE',
-    color: colors.primary,
-    paddingVertical: 4,
-    paddingHorizontal: 12,
-    borderRadius: 999,
-    fontSize: 12,
-    fontWeight: '500',
-  },
-  statsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 12,
-  },
-  statBox: {
-    flex: 1,
-    backgroundColor: colors.surface,
-    borderRadius: 12,
-    padding: 12,
-    marginHorizontal: 4,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  statValue: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: colors.accent || colors.primary,
-  },
-  statLabel: {
-    fontSize: 11,
-    color: colors.textSecondary || '#999',
-  },
-  card: {
-    marginBottom: 12,
-  },
-  menuItem: {
-    paddingVertical: 14,
-    paddingHorizontal: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  menuItemLast: {
-    borderBottomWidth: 0,
-  },
-  menuItemText: {
-    flex: 1,
-    fontSize: 14,
-    fontWeight: '500',
-    color: colors.text,
-  },
-  footer: {
-    textAlign: 'center',
-    color: colors.textSecondary || '#999',
-    fontSize: 12,
-    marginTop: 16,
-  },
-});

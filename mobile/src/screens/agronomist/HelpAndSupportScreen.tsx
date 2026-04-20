@@ -5,10 +5,11 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AgronomistStackParamList } from '../../navigation/types';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
-import { colors } from '../../theme/colors';
+import { useTheme } from '../../hooks/useTheme';
 import { Feather } from '@expo/vector-icons';
 
 export default function HelpAndSupportScreen() {
+  const { colors, shadows } = useTheme();
   const navigation = useNavigation<NativeStackNavigationProp<AgronomistStackParamList>>();
   const [expandedFaqId, setExpandedFaqId] = useState<string | null>(null);
 
@@ -68,6 +69,126 @@ export default function HelpAndSupportScreen() {
     },
   ];
 
+  const styles = StyleSheet.create({
+    safeContainer: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    container: {
+      flex: 1,
+    },
+    content: {
+      padding: 16,
+    },
+    header: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: 20,
+    },
+    title: {
+      fontSize: 24,
+      fontWeight: '700',
+      color: colors.text,
+    },
+    section: {
+      marginBottom: 24,
+    },
+    sectionTitle: {
+      fontSize: 18,
+      fontWeight: '600',
+      color: colors.text,
+      marginBottom: 12,
+    },
+    contactCard: {
+      marginBottom: 12,
+    },
+    contactItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingVertical: 12,
+      paddingHorizontal: 8,
+    },
+    contactIcon: {
+      width: 48,
+      height: 48,
+      borderRadius: 24,
+      backgroundColor: `${colors.primary}10`,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginRight: 12,
+    },
+    contactContent: {
+      flex: 1,
+    },
+    contactType: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.text,
+      marginBottom: 4,
+    },
+    contactValue: {
+      fontSize: 14,
+      color: colors.primary,
+    },
+    faqCard: {
+      marginBottom: 12,
+    },
+    faqHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingVertical: 16,
+      paddingHorizontal: 12,
+    },
+    faqQuestion: {
+      fontSize: 15,
+      fontWeight: '600',
+      color: colors.text,
+      flex: 1,
+      marginRight: 12,
+    },
+    faqContent: {
+      paddingHorizontal: 12,
+      paddingBottom: 16,
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+      paddingTop: 12,
+    },
+    faqAnswer: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      lineHeight: 20,
+    },
+    resourceItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingVertical: 14,
+      paddingHorizontal: 12,
+    },
+    divider: {
+      height: 1,
+      backgroundColor: colors.borderLight,
+      marginHorizontal: 12,
+    },
+    resourceText: {
+      flex: 1,
+      fontSize: 15,
+      fontWeight: '500',
+      color: colors.text,
+      marginLeft: 12,
+    },
+    footerSection: {
+      alignItems: 'center',
+      paddingVertical: 32,
+    },
+    footerText: {
+      fontSize: 12,
+      color: colors.textMuted,
+      marginBottom: 4,
+    },
+  });
+
   return (
     <SafeAreaView style={styles.safeContainer}>
       <ScrollView style={styles.container} contentContainerStyle={styles.content}>
@@ -95,7 +216,7 @@ export default function HelpAndSupportScreen() {
                   <Text style={styles.contactType}>{method.type}</Text>
                   <Text style={styles.contactValue}>{method.value}</Text>
                 </View>
-                <Feather name="chevron-right" size={20} color="#ccc" />
+                <Feather name="chevron-right" size={20} color={colors.textMuted} />
               </TouchableOpacity>
             </Card>
           ))}
@@ -138,7 +259,7 @@ export default function HelpAndSupportScreen() {
             >
               <Feather name="book" size={20} color={colors.primary} />
               <Text style={styles.resourceText}>Documentation & Guides</Text>
-              <Feather name="arrow-right" size={16} color="#ccc" />
+              <Feather name="arrow-right" size={16} color={colors.textMuted} />
             </TouchableOpacity>
             <View style={styles.divider} />
             <TouchableOpacity
@@ -147,7 +268,7 @@ export default function HelpAndSupportScreen() {
             >
               <Feather name="file-text" size={20} color={colors.primary} />
               <Text style={styles.resourceText}>Blog & Articles</Text>
-              <Feather name="arrow-right" size={16} color="#ccc" />
+              <Feather name="arrow-right" size={16} color={colors.textMuted} />
             </TouchableOpacity>
             <View style={styles.divider} />
             <TouchableOpacity
@@ -156,7 +277,7 @@ export default function HelpAndSupportScreen() {
             >
               <Feather name="users" size={20} color={colors.primary} />
               <Text style={styles.resourceText}>Community Forum</Text>
-              <Feather name="arrow-right" size={16} color="#ccc" />
+              <Feather name="arrow-right" size={16} color={colors.textMuted} />
             </TouchableOpacity>
           </Card>
         </View>
@@ -169,123 +290,3 @@ export default function HelpAndSupportScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  safeContainer: {
-    flex: 1,
-    backgroundColor: '#f9f9f9',
-  },
-  container: {
-    flex: 1,
-  },
-  content: {
-    padding: 16,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: colors.text,
-  },
-  section: {
-    marginBottom: 24,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: colors.text,
-    marginBottom: 12,
-  },
-  contactCard: {
-    marginBottom: 12,
-  },
-  contactItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 8,
-  },
-  contactIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: `${colors.primary}10`,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-  },
-  contactContent: {
-    flex: 1,
-  },
-  contactType: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.text,
-    marginBottom: 4,
-  },
-  contactValue: {
-    fontSize: 14,
-    color: colors.primary,
-  },
-  faqCard: {
-    marginBottom: 12,
-  },
-  faqHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 16,
-    paddingHorizontal: 12,
-  },
-  faqQuestion: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: colors.text,
-    flex: 1,
-    marginRight: 12,
-  },
-  faqContent: {
-    paddingHorizontal: 12,
-    paddingBottom: 16,
-    borderTopWidth: 1,
-    borderTopColor: '#eee',
-    paddingTop: 12,
-  },
-  faqAnswer: {
-    fontSize: 14,
-    color: '#555',
-    lineHeight: 20,
-  },
-  resourceItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 14,
-    paddingHorizontal: 12,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: '#eee',
-    marginHorizontal: 12,
-  },
-  resourceText: {
-    flex: 1,
-    fontSize: 15,
-    fontWeight: '500',
-    color: colors.text,
-    marginLeft: 12,
-  },
-  footerSection: {
-    alignItems: 'center',
-    paddingVertical: 32,
-  },
-  footerText: {
-    fontSize: 12,
-    color: '#999',
-    marginBottom: 4,
-  },
-});

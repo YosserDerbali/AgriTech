@@ -6,9 +6,10 @@ import { AgronomistStackParamList } from '../../navigation/types';
 import { useArticleStore } from '../../stores/articleStore';
 import { ArticleCard } from '../../components/agronomist/ArticleCard';
 import { Button } from '../../components/ui/Button';
-import { colors } from '../../theme/colors';
+import { useTheme } from '../../hooks/useTheme';
 
 export default function AgronomistArticlesScreen() {
+  const { colors, shadows } = useTheme();
   const navigation = useNavigation<NativeStackNavigationProp<AgronomistStackParamList>>();
   const { getMyArticles, fetchMyArticles } = useArticleStore();
   const myArticles = getMyArticles();
@@ -16,6 +17,50 @@ export default function AgronomistArticlesScreen() {
   useEffect(() => {
     fetchMyArticles();
   }, []);
+
+  const styles = StyleSheet.create({
+    safeContainer: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    content: {
+      padding: 16,
+      paddingBottom: 30,
+    },
+    headerRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: 12,
+    },
+    title: {
+      fontSize: 22,
+      fontWeight: '700',
+      color: colors.text,
+    },
+    emptyState: {
+      padding: 20,
+      borderRadius: 16,
+      borderWidth: 1,
+      borderColor: colors.border,
+      backgroundColor: colors.surface,
+    },
+    emptyTitle: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.text,
+      marginBottom: 6,
+    },
+    emptyText: {
+      fontSize: 13,
+      color: colors.muted,
+      marginBottom: 12,
+    },
+  });
 
   return (
     <SafeAreaView style={styles.safeContainer}>
@@ -46,47 +91,3 @@ export default function AgronomistArticlesScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  safeContainer: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  content: {
-    padding: 16,
-    paddingBottom: 30,
-  },
-  headerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: colors.text,
-  },
-  emptyState: {
-    padding: 20,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.surface,
-  },
-  emptyTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.text,
-    marginBottom: 6,
-  },
-  emptyText: {
-    fontSize: 13,
-    color: colors.muted,
-    marginBottom: 12,
-  },
-});

@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, View, ViewStyle, StyleProp } from 'react-native';
-import { colors, shadows } from '../../theme/colors';
+import { useTheme } from '../../hooks/useTheme';
 import { radius, spacing } from '../../theme/spacing';
 
 type CardVariant = 'default' | 'elevated' | 'outlined' | 'filled';
@@ -16,6 +16,47 @@ type CardProps = {
 };
 
 export function Card({ children, style, variant = 'default', padding = 'md', onPress, disabled }: CardProps) {
+  const { colors, shadows } = useTheme();
+
+  const cardVariants: Record<CardVariant, ViewStyle> = {
+    default: {
+      backgroundColor: colors.surface,
+      borderWidth: 1,
+      borderColor: colors.border,
+      ...shadows.sm,
+    },
+    elevated: {
+      backgroundColor: colors.surface,
+      borderRadius: radius['2xl'],
+      ...shadows.md,
+    },
+    outlined: {
+      backgroundColor: colors.surface,
+      borderWidth: 2,
+      borderColor: colors.borderLight,
+    },
+    filled: {
+      backgroundColor: colors.surfaceElevated,
+      borderRadius: radius['2xl'],
+      ...shadows.xs,
+    },
+  };
+
+  const paddingPresets: Record<CardPadding, ViewStyle> = {
+    xs: {
+      padding: spacing.sm,
+    },
+    sm: {
+      padding: spacing.md,
+    },
+    md: {
+      padding: spacing.lg,
+    },
+    lg: {
+      padding: spacing.xl,
+    },
+  };
+
   const variantStyles = cardVariants[variant];
   const paddingStyle = paddingPresets[padding];
 
@@ -65,42 +106,3 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
 });
-
-const cardVariants: Record<CardVariant, ViewStyle> = {
-  default: {
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-    ...shadows.sm,
-  },
-  elevated: {
-    backgroundColor: colors.surface,
-    borderRadius: radius['2xl'],
-    ...shadows.md,
-  },
-  outlined: {
-    backgroundColor: colors.surface,
-    borderWidth: 2,
-    borderColor: colors.borderLight,
-  },
-  filled: {
-    backgroundColor: colors.surfaceElevated,
-    borderRadius: radius['2xl'],
-    ...shadows.xs,
-  },
-};
-
-const paddingPresets: Record<CardPadding, ViewStyle> = {
-  xs: {
-    padding: spacing.sm,
-  },
-  sm: {
-    padding: spacing.md,
-  },
-  md: {
-    padding: spacing.lg,
-  },
-  lg: {
-    padding: spacing.xl,
-  },
-};
