@@ -1,0 +1,222 @@
+import React, { useState } from 'react';
+import { ScrollView, StyleSheet, Text, View, SafeAreaView, TouchableOpacity, TextInput } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { FarmerStackParamList } from '../../navigation/types';
+import { Card } from '../../components/ui/Card';
+import { Button } from '../../components/ui/Button';
+import { colors } from '../../theme/colors';
+import { Feather } from '@expo/vector-icons';
+import { useAppStore } from '../../stores/appStore';
+
+export default function EditProfileScreen() {
+  const navigation = useNavigation<NativeStackNavigationProp<FarmerStackParamList>>();
+  const { user } = useAppStore();
+
+  const [name, setName] = useState(user?.name || 'John Farmer');
+  const [email, setEmail] = useState(user?.email || 'john@farm.com');
+  const [farmName, setFarmName] = useState('Green Valley Farm');
+  const [location, setLocation] = useState('Iowa, USA');
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    // Simulate API call
+    setTimeout(() => {
+      setIsSaving(false);
+      navigation.goBack();
+    }, 1000);
+  };
+
+  return (
+    <SafeAreaView style={styles.safeContainer}>
+      <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Feather name="arrow-left" size={24} color={colors.text} />
+          </TouchableOpacity>
+          <Text style={styles.title}>Edit Profile</Text>
+          <View style={{ width: 24 }} />
+        </View>
+
+        {/* Profile Photo Section */}
+        <Card style={styles.photoCard}>
+          <View style={styles.photoContainer}>
+            <View style={styles.profilePhoto}>
+              <Feather name="user" size={48} color={colors.primary} />
+            </View>
+            <View style={styles.photoActions}>
+              <TouchableOpacity style={styles.photoButton}>
+                <Feather name="camera" size={16} color={colors.primary} />
+                <Text style={styles.photoButtonText}>Change Photo</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.photoButton, styles.removeButton]}>
+                <Feather name="trash-2" size={16} color="#999" />
+                <Text style={[styles.photoButtonText, { color: '#999' }]}>Remove</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Card>
+
+        {/* Name Section */}
+        <Card style={styles.section}>
+          <Text style={styles.label}>Full Name</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter your full name"
+            value={name}
+            onChangeText={setName}
+            placeholderTextColor="#ccc"
+          />
+        </Card>
+
+        {/* Email Section */}
+        <Card style={styles.section}>
+          <Text style={styles.label}>Email Address</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter your email"
+            value={email}
+            onChangeText={setEmail}
+            editable={false}
+            placeholderTextColor="#ccc"
+          />
+          <Text style={styles.helperText}>Email cannot be changed</Text>
+        </Card>
+
+        {/* Farm Name Section */}
+        <Card style={styles.section}>
+          <Text style={styles.label}>Farm Name</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter your farm name"
+            value={farmName}
+            onChangeText={setFarmName}
+            placeholderTextColor="#ccc"
+          />
+        </Card>
+
+        {/* Location Section */}
+        <Card style={styles.section}>
+          <Text style={styles.label}>Location</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter your location"
+            value={location}
+            onChangeText={setLocation}
+            placeholderTextColor="#ccc"
+          />
+        </Card>
+
+        {/* Action Buttons */}
+        <View style={styles.actions}>
+          <Button
+            title={isSaving ? 'Saving...' : 'Save Changes'}
+            onPress={handleSave}
+            disabled={isSaving}
+          />
+          <Button
+            title="Cancel"
+            variant="outline"
+            onPress={() => navigation.goBack()}
+            disabled={isSaving}
+          />
+        </View>
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  safeContainer: {
+    flex: 1,
+    backgroundColor: '#f9f9f9',
+  },
+  container: {
+    flex: 1,
+  },
+  content: {
+    padding: 16,
+    paddingBottom: 32,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: colors.text,
+  },
+  photoCard: {
+    marginBottom: 20,
+    paddingVertical: 20,
+  },
+  photoContainer: {
+    alignItems: 'center',
+  },
+  profilePhoto: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: `${colors.primary}20`,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 16,
+    borderWidth: 2,
+    borderColor: colors.primary,
+  },
+  photoActions: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  photoButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    backgroundColor: `${colors.primary}10`,
+    gap: 6,
+  },
+  removeButton: {
+    backgroundColor: '#f5f5f5',
+  },
+  photoButtonText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: colors.primary,
+  },
+  section: {
+    marginBottom: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 12,
+  },
+  label: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.text,
+    marginBottom: 8,
+  },
+  helperText: {
+    fontSize: 12,
+    color: '#999',
+    marginBottom: 8,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 12,
+    fontSize: 14,
+    color: colors.text,
+    backgroundColor: '#fafafa',
+  },
+  actions: {
+    gap: 12,
+    marginTop: 8,
+  },
+});

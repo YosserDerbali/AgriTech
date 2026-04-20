@@ -1,8 +1,8 @@
 import axios from "axios";
-import { getApiBaseUrl } from "./apiConfig";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const API = axios.create({
-  baseURL: getApiBaseUrl(),
+  baseURL: "http://192.168.100.66:3000",
 });
 
 export interface LoginRequest {
@@ -15,7 +15,7 @@ export interface RegisterRequest {
   name: string;
   email: string;
   password: string;
-  role: "FARMER" | "AGRONOMIST";
+  role: 'FARMER' | 'AGRONOMIST';
 }
 
 export interface AuthResponse {
@@ -32,18 +32,38 @@ export const authAPI = {
   login: async (data: LoginRequest): Promise<AuthResponse> => {
     try {
       const response = await API.post("/auth/login", data);
+      const { token, user } = response.data;
+      
+      if (token) {
+        await AsyncStorage.setItem('authToken', token);
+      }
+      
       return response.data;
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || "Login failed");
+      throw new Error(
+        error.response?.data?.message || "Login failed"
+      );
     }
   },
 
   register: async (data: RegisterRequest): Promise<AuthResponse> => {
     try {
       const response = await API.post("/auth/register", data);
+      const { token, user } = response.data;
+      
+      if (token) {
+        await AsyncStorage.setItem('authToken', token);
+      }
+      
       return response.data;
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || "Registration failed");
+      throw new Error(
+        error.response?.data?.message || "Registration failed"
+      );
     }
+  },
+  
+  logout: async () => {
+    await AsyncStorage.removeItem('authToken');
   },
 };
