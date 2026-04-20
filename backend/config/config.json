@@ -1,6 +1,6 @@
 {
   "development": {
-    "url": "postgresql://postgres:aminsaidane2020@db.ddvdrtsfwachlxdhuasf.supabase.co:5432/postgres",
+    "url": "postgresql://postgres.ddvdrtsfwachlxdhuasf:aminsaidane2020@aws-1-eu-west-1.pooler.supabase.com:5432/postgres",
     "dialect": "postgres",
     "dialectOptions": {
       "ssl": {

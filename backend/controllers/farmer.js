@@ -53,8 +53,10 @@ const createDiagnosis = async (req, res) => {
     });
 
   } catch (error) {
-    return res.status(400).json({
+    return res.status(error.status || 400).json({
       message: error.message,
+      code: error.code || 'DIAGNOSIS_ERROR',
+      status: error.status || 400,
     });
   }
 };

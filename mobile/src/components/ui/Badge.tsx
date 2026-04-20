@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View, ViewStyle, TextStyle } from 'react-native';
+import { StyleSheet, Text, View, ViewStyle, TextStyle, StyleProp } from 'react-native';
 import { useTheme } from '../../hooks/useTheme';
 import { typography, fontFamilies } from '../../theme/typography';
 import { radius, spacing } from '../../theme/spacing';
@@ -9,7 +9,7 @@ type BadgeVariant = 'default' | 'outline' | 'secondary' | 'success' | 'warning' 
 type BadgeProps = {
   label: string;
   variant?: BadgeVariant;
-  style?: ViewStyle;
+  style?: StyleProp<ViewStyle>;
   icon?: React.ReactNode;
 };
 
@@ -65,7 +65,7 @@ export function Badge({ label, variant = 'default', style, icon }: BadgeProps) {
 
   const stylesByVariant = variantStyles[variant];
   return (
-    <View style={[styles.base, stylesByVariant.container, icon ? styles.withIcon : null, style]}>
+    <View style={[styles.base, stylesByVariant.container, Boolean(icon) ? styles.withIcon : undefined, style]}>
       {icon && <View style={styles.iconContainer}>{icon}</View>}
       <Text style={[styles.text, stylesByVariant.text]}>{label}</Text>
     </View>
@@ -95,4 +95,3 @@ const styles = StyleSheet.create({
     lineHeight: 16,
   },
 });
-

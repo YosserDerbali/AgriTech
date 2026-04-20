@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Linking, Pressable, ScrollView, StyleSheet, Text, View, SafeAreaView } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View, SafeAreaView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { formatDistanceToNow } from 'date-fns';
@@ -7,6 +7,7 @@ import { FarmerStackParamList } from '../../navigation/types';
 import { useArticleStore } from '../../stores/articleStore';
 import { Article } from '../../types/article';
 import { useTheme } from '../../hooks/useTheme';
+import { ArticleCard } from '../../components/agronomist/ArticleCard';
 
 type FilterTab = 'all' | 'agronomist' | 'external';
 
@@ -181,24 +182,11 @@ export default function FarmerArticlesScreen() {
             </View>
           ) : (
             filtered.map((article: Article) => (
-              <Pressable
+              <ArticleCard
                 key={article.id}
-                onPress={() => {
-                  if (article.source === 'EXTERNAL' && article.externalUrl) {
-                    Linking.openURL(article.externalUrl);
-                  } else {
-                    navigation.navigate('ArticleDetail', { id: article.id });
-                  }
-                }}
-                style={dynamicStyles.card}
-              >
-                <Text style={dynamicStyles.cardTitle}>{article.title}</Text>
-                <Text style={dynamicStyles.cardExcerpt}>{article.excerpt}</Text>
-                <Text style={dynamicStyles.cardMeta}>
-                  {article.authorName} · {article.source === 'EXTERNAL' ? 'External' : 'Expert'} · 
-                  {formatDistanceToNow(new Date(article.createdAt), { addSuffix: true })}
-                </Text>
-              </Pressable>
+                article={article}
+                onPress={() => navigation.navigate('ArticleDetail', { id: article.id })}
+              />
             ))
           )}
         </View>

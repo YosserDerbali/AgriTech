@@ -3,6 +3,7 @@ import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { formatDistanceToNow } from 'date-fns';
 import { Article } from '../../types/article';
 import { useTheme } from '../../hooks/useTheme';
+import { Badge } from '../ui/Badge';
 
 interface ArticleCardProps {
   article: Article;
@@ -16,15 +17,47 @@ export function ArticleCard({ article, onPress }: ArticleCardProps) {
     card: {
       backgroundColor: colors.surface,
       borderRadius: 16,
-      overflow: 'hidden',
       borderWidth: 1,
       borderColor: colors.border,
       marginBottom: 12,
       ...shadows.soft,
     },
-    title: {
-      fontSize: 15,
+    row: {
+      flexDirection: 'row',
+      alignItems: 'stretch',
+    },
+    image: {
+      width: 112,
+      minHeight: 140,
+      borderTopLeftRadius: 16,
+      borderBottomLeftRadius: 16,
+    },
+    imagePlaceholder: {
+      backgroundColor: colors.surfaceAlt,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    placeholderText: {
+      fontSize: 12,
+      color: colors.textMuted,
       fontWeight: '600',
+    },
+    content: {
+      flex: 1,
+      paddingVertical: 12,
+      paddingHorizontal: 12,
+      justifyContent: 'space-between',
+    },
+    topRow: {
+      flexDirection: 'row',
+      marginBottom: 6,
+    },
+    badge: {
+      alignSelf: 'flex-start',
+    },
+    title: {
+      fontSize: 16,
+      fontWeight: '700',
       color: colors.text,
       marginBottom: 6,
     },
@@ -32,43 +65,59 @@ export function ArticleCard({ article, onPress }: ArticleCardProps) {
       fontSize: 13,
       color: colors.textSecondary,
       marginBottom: 8,
+      lineHeight: 18,
+    },
+    metaRow: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      alignItems: 'flex-start',
     },
     metaText: {
       fontSize: 12,
-      color: colors.textSecondary,
+      color: colors.textMuted,
+      lineHeight: 16,
+    },
+    metaSource: {
+      flexShrink: 1,
+      flexGrow: 1,
+      paddingRight: 8,
+      minWidth: 0,
+    },
+    metaDate: {
+      flexShrink: 0,
     },
   });
 
   return (
     <Pressable onPress={onPress} style={styles.card}>
-      {article.coverImageUrl ? (
-        <Image source={{ uri: article.coverImageUrl }} style={staticStyles.image} />
-      ) : null}
-      <View style={staticStyles.content}>
-        <Text style={styles.title} numberOfLines={2}>{article.title}</Text>
-        <Text style={styles.excerpt} numberOfLines={2}>{article.excerpt}</Text>
-        <View style={staticStyles.metaRow}>
-          <Text style={styles.metaText}>
-            {formatDistanceToNow(article.createdAt, { addSuffix: true })}
-          </Text>
-          {article.tags[0] ? <Text style={styles.metaText}>#{article.tags[0]}</Text> : null}
+      <View style={styles.row}>
+        {article.coverImageUrl ? (
+          <Image source={{ uri: article.coverImageUrl }} style={styles.image} />
+        ) : (
+          <View style={[styles.image, styles.imagePlaceholder]}>
+            <Text style={styles.placeholderText}>No image</Text>
+          </View>
+        )}
+        <View style={styles.content}>
+          <View style={styles.topRow}>
+            <Badge
+              label={article.source === 'EXTERNAL' ? 'External' : 'Expert'}
+              variant={article.source === 'EXTERNAL' ? 'outline' : 'secondary'}
+              style={styles.badge}
+            />
+          </View>
+          <Text style={styles.title} numberOfLines={2}>{article.title}</Text>
+          <Text style={styles.excerpt} numberOfLines={3}>{article.excerpt}</Text>
+          <View style={styles.metaRow}>
+            <Text style={[styles.metaText, styles.metaSource]} numberOfLines={2}>
+              {article.authorName}
+            </Text>
+            <Text style={[styles.metaText, styles.metaDate]}>
+              {formatDistanceToNow(article.createdAt, { addSuffix: true })}
+            </Text>
+          </View>
         </View>
       </View>
     </Pressable>
   );
 }
-
-const staticStyles = StyleSheet.create({
-
-  image: {
-    width: '100%',
-    height: 160,
-  },
-  content: {
-    padding: 12,
-  },
-  metaRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-});
