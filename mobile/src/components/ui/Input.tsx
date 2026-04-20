@@ -70,6 +70,8 @@ export function Input({
     },
     label: {
       ...typography.body,
+      fontFamily: fontFamilies.semibold,
+      fontWeight: '600',
       color: colors.text,
       marginBottom: spacing.sm,
     },
@@ -85,7 +87,10 @@ export function Input({
       borderColor: colors.error,
     },
     errorText: {
-      ...typography.caption,
+      fontSize: 13,
+      lineHeight: 18,
+      fontFamily: fontFamilies.semibold,
+      fontWeight: '600',
       color: colors.error,
       marginTop: spacing.xs,
     },

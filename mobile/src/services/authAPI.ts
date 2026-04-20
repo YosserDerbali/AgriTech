@@ -2,7 +2,7 @@ import axios from "axios";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const API = axios.create({
-  baseURL: "http://192.168.100.66:3000",
+  baseURL: process.env.EXPO_PUBLIC_API_URL || "http://192.168.100.66:3000",
 });
 
 export interface LoginRequest {

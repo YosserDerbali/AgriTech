@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Alert, ScrollView, StyleSheet, Text, View, SafeAreaView, Keyboard } from 'react-native';
+import { Alert, ScrollView, StyleSheet, Text, View, SafeAreaView, Keyboard, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { Feather } from '@expo/vector-icons';
 import { AuthStackParamList } from '../../navigation/types';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
@@ -11,11 +12,12 @@ import { useAppStore } from '../../stores/appStore';
 import { authAPI } from '../../services/authAPI';
 import { useTheme } from '../../hooks/useTheme';
 import { signInWithGoogle, useGoogleAuth } from '../../services/googleAuthService';
+import { spacing, radius } from '../../theme/spacing';
 
 export default function AgronomistAuthScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<AuthStackParamList>>();
   const { setRole, setUser, setIsAuthenticated, setToken, restoreToken, isAuthenticated } = useAppStore();
-  const { colors } = useTheme();
+  const { colors, shadows } = useTheme();
 
   // Initialize Google Auth hook
   const [request, response, promptAsync] = useGoogleAuth();
@@ -23,6 +25,8 @@ export default function AgronomistAuthScreen() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [focusedField, setFocusedField] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -30,6 +34,11 @@ export default function AgronomistAuthScreen() {
     specialties: '',
     experience: '',
   });
+
+  // Set agronomist role for this auth screen
+  useEffect(() => {
+    setRole('agronomist');
+  }, [setRole]);
 
   const handleGoogleSignIn = async () => {
     try {
@@ -144,24 +153,46 @@ export default function AgronomistAuthScreen() {
       backgroundColor: colors.background,
     },
     content: {
-      padding: 20,
-      paddingBottom: 30,
+      padding: spacing.lg,
+      paddingBottom: spacing['3xl'],
+    },
+    header: {
+      marginBottom: spacing['3xl'],
+      paddingBottom: spacing.xl,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
+    titleContainer: {
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+      marginBottom: spacing.lg,
+    },
+    icon: {
+      marginRight: spacing.lg,
+      marginTop: spacing.sm,
     },
     title: {
-      fontSize: 24,
+      fontSize: 32,
       fontWeight: '700',
+      letterSpacing: -0.5,
       color: colors.text,
-      marginBottom: 8,
+      flex: 1,
+      lineHeight: 40,
     },
     subtitle: {
-      fontSize: 13,
-      color: colors.muted,
-      marginBottom: 24,
+      fontSize: 14,
+      lineHeight: 22,
+      color: colors.textSecondary,
+      fontWeight: '500',
+      letterSpacing: 0.1,
+    },
+    googleButtonContainer: {
+      marginBottom: spacing['2xl'],
     },
     dividerContainer: {
       flexDirection: 'row',
       alignItems: 'center',
-      marginVertical: 20,
+      marginVertical: spacing['2xl'],
     },
     dividerLine: {
       flex: 1,
@@ -169,52 +200,114 @@ export default function AgronomistAuthScreen() {
       backgroundColor: colors.border,
     },
     dividerText: {
-      fontSize: 12,
-      color: colors.muted,
-      marginHorizontal: 12,
+      fontSize: 11,
+      fontWeight: '600',
+      letterSpacing: 0.8,
+      color: colors.textTertiary,
+      marginHorizontal: spacing.md,
+      textTransform: 'uppercase',
+    },
+    formContainer: {
+      marginBottom: spacing['2xl'],
+    },
+    inputWrapper: {
+      marginBottom: spacing.lg,
+    },
+    inputContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      borderRadius: radius.lg,
+      borderWidth: 1.5,
+      borderColor: colors.border,
+      backgroundColor: colors.surface,
+      paddingHorizontal: spacing.md,
+      height: 48,
+      ...shadows.xs,
+    },
+    inputContainerFocused: {
+      borderColor: colors.primary,
+      backgroundColor: colors.surface,
+    },
+    inputIcon: {
+      marginRight: spacing.md,
+    },
+    inputField: {
+      flex: 1,
+      fontSize: 14,
+      color: colors.text,
       fontWeight: '500',
     },
+    passwordToggle: {
+      padding: spacing.sm,
+      marginLeft: spacing.sm,
+    },
     input: {
-      marginBottom: 12,
+      marginBottom: spacing.lg,
     },
     textarea: {
-      marginBottom: 12,
+      marginBottom: spacing.lg,
       minHeight: 90,
     },
-    toggle: {
-      marginTop: 12,
-      color: colors.accent,
+    submitButton: {
+      marginBottom: spacing['2xl'],
+    },
+    toggleLink: {
+      fontSize: 13,
       fontWeight: '600',
+      color: colors.primary,
+      marginBottom: spacing.xl,
+      letterSpacing: 0.2,
     },
-    switchRole: {
-      marginTop: 20,
+    switchRoleCard: {
+      paddingVertical: spacing.xl,
+      paddingHorizontal: spacing.lg,
+      backgroundColor: colors.primarySoft,
+      borderRadius: radius['2xl'],
+      borderWidth: 1.5,
+      borderColor: colors.primary,
+      alignItems: 'center',
+      marginTop: spacing['2xl'],
+      ...shadows.md,
     },
-    switchText: {
-      fontSize: 12,
-      color: colors.muted,
-      marginBottom: 10,
+    switchRoleLabel: {
+      fontSize: 11,
+      fontWeight: '700',
+      letterSpacing: 0.8,
+      color: colors.primary,
+      textTransform: 'uppercase',
+      marginBottom: spacing.lg,
+    },
+    switchRoleButton: {
+      width: '100%',
     },
   });
 
   return (
     <SafeAreaView style={styles.safeContainer}>
       <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-        <Text style={styles.title}>
-          {isSignUp ? 'Join as Agronomist' : 'Agronomist Portal'}
-        </Text>
-        <Text style={styles.subtitle}>
-          {isSignUp
-            ? 'Help farmers protect their crops with your expertise'
-            : 'Sign in to review diagnoses and help farmers'}
-        </Text>
+        <View style={styles.header}>
+          <View style={styles.titleContainer}>
+            <Feather name="award" size={32} color={colors.primary} style={styles.icon} />
+            <Text style={styles.title}>
+              {isSignUp ? 'Join as Agronomist' : 'Agronomist Portal'}
+            </Text>
+          </View>
+          <Text style={styles.subtitle}>
+            {isSignUp
+              ? 'Help farmers protect their crops with your expertise'
+              : 'Sign in to review diagnoses and help farmers'}
+          </Text>
+        </View>
 
         {/* Google Sign-In Button */}
-        <GoogleSignInButton
-          onPress={handleGoogleSignIn}
-          loading={isGoogleLoading}
-          disabled={isLoading || isGoogleLoading}
-          size="medium"
-        />
+        <View style={styles.googleButtonContainer}>
+          <GoogleSignInButton
+            onPress={handleGoogleSignIn}
+            loading={isGoogleLoading}
+            disabled={isLoading || isGoogleLoading}
+            size="medium"
+          />
+        </View>
 
         {/* Divider */}
         <View style={styles.dividerContainer}>
@@ -223,65 +316,114 @@ export default function AgronomistAuthScreen() {
           <View style={styles.dividerLine} />
         </View>
 
-        {isSignUp ? (
-          <Input
-            placeholder="Full Name"
-            value={formData.name}
-            onChangeText={(text) => setFormData({ ...formData, name: text })}
-            style={styles.input}
-          />
-        ) : null}
-        <Input
-          placeholder="Email"
-          value={formData.email}
-          onChangeText={(text) => setFormData({ ...formData, email: text })}
-          style={styles.input}
-          autoCapitalize="none"
-          keyboardType="email-address"
-        />
-        <Input
-          placeholder="Password"
-          value={formData.password}
-          onChangeText={(text) => setFormData({ ...formData, password: text })}
-          style={styles.input}
-          secureTextEntry
-        />
+        <View style={styles.formContainer}>
+          {isSignUp ? (
+            <View style={styles.inputWrapper}>
+              <View style={[styles.inputContainer, focusedField === 'name' && styles.inputContainerFocused]}>
+                <Feather name="user" size={18} color={colors.textSecondary} style={styles.inputIcon} />
+                <Input
+                  placeholder="Full Name"
+                  value={formData.name}
+                  onChangeText={(text) => setFormData({ ...formData, name: text })}
+                  onFocus={() => setFocusedField('name')}
+                  onBlur={() => setFocusedField(null)}
+                  style={[styles.inputField, { borderWidth: 0 }]}
+                />
+              </View>
+            </View>
+          ) : null}
 
-        {isSignUp ? (
-          <>
-            <Textarea
-              placeholder="Specialties (e.g., Tomato diseases, Organic farming)"
-              value={formData.specialties}
-              onChangeText={(text) => setFormData({ ...formData, specialties: text })}
-              style={styles.textarea}
-            />
-            <Input
-              placeholder="Years of Experience"
-              value={formData.experience}
-              onChangeText={(text) => setFormData({ ...formData, experience: text })}
-              style={styles.input}
-              keyboardType="numeric"
-            />
-          </>
-        ) : null}
+          <View style={styles.inputWrapper}>
+            <View style={[styles.inputContainer, focusedField === 'email' && styles.inputContainerFocused]}>
+              <Feather name="mail" size={18} color={colors.textSecondary} style={styles.inputIcon} />
+              <Input
+                placeholder="Email"
+                value={formData.email}
+                onChangeText={(text) => setFormData({ ...formData, email: text })}
+                onFocus={() => setFocusedField('email')}
+                onBlur={() => setFocusedField(null)}
+                autoCapitalize="none"
+                keyboardType="email-address"
+                style={[styles.inputField, { borderWidth: 0 }]}
+              />
+            </View>
+          </View>
+
+          <View style={styles.inputWrapper}>
+            <View style={[styles.inputContainer, focusedField === 'password' && styles.inputContainerFocused]}>
+              <Feather name="lock" size={18} color={colors.textSecondary} style={styles.inputIcon} />
+              <Input
+                placeholder="Password"
+                value={formData.password}
+                onChangeText={(text) => setFormData({ ...formData, password: text })}
+                onFocus={() => setFocusedField('password')}
+                onBlur={() => setFocusedField(null)}
+                secureTextEntry={!showPassword}
+                style={[styles.inputField, { borderWidth: 0 }]}
+              />
+              <TouchableOpacity
+                onPress={() => setShowPassword(!showPassword)}
+                style={styles.passwordToggle}
+                activeOpacity={0.7}
+              >
+                <Feather
+                  name={showPassword ? 'eye-off' : 'eye'}
+                  size={16}
+                  color={colors.textSecondary}
+                />
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {isSignUp ? (
+            <>
+              <View style={styles.inputWrapper}>
+                <Textarea
+                  placeholder="Specialties (e.g., Tomato diseases, Organic farming)"
+                  value={formData.specialties}
+                  onChangeText={(text) => setFormData({ ...formData, specialties: text })}
+                  style={styles.textarea}
+                />
+              </View>
+              <View style={styles.inputWrapper}>
+                <View style={[styles.inputContainer, focusedField === 'experience' && styles.inputContainerFocused]}>
+                  <Feather name="briefcase" size={18} color={colors.textSecondary} style={styles.inputIcon} />
+                  <Input
+                    placeholder="Years of Experience"
+                    value={formData.experience}
+                    onChangeText={(text) => setFormData({ ...formData, experience: text })}
+                    onFocus={() => setFocusedField('experience')}
+                    onBlur={() => setFocusedField(null)}
+                    keyboardType="numeric"
+                    style={[styles.inputField, { borderWidth: 0 }]}
+                  />
+                </View>
+              </View>
+            </>
+          ) : null}
+        </View>
 
         <Button
           title={isSignUp ? 'Create Account' : 'Sign In'}
           onPress={handleSubmit}
           disabled={isLoading || isGoogleLoading}
+          style={styles.submitButton}
         />
 
-        <Text style={styles.toggle} onPress={() => setIsSignUp(!isSignUp)}>
+
+        <Text style={styles.toggleLink} onPress={() => setIsSignUp(!isSignUp)}>
           {isSignUp ? 'Already have an account? Sign In' : "Don't have an account? Sign Up"}
         </Text>
 
-        <View style={styles.switchRole}>
-          <Text style={styles.switchText}>Are you a farmer?</Text>
-          <Button
-            title="Sign in as Farmer"
-            variant="outline"
-            onPress={() => navigation.navigate('FarmerAuth')}
-          />
+        <View style={styles.switchRoleCard}>
+          <Text style={styles.switchRoleLabel}>Are you a farmer?</Text>
+          <View style={styles.switchRoleButton}>
+            <Button
+              title="Sign in as Farmer"
+              variant="outline"
+              onPress={() => navigation.navigate('FarmerAuth')}
+            />
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
