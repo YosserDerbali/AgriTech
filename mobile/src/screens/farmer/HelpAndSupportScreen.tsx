@@ -2,46 +2,35 @@ import React, { useState } from 'react';
 import { ScrollView, StyleSheet, Text, View, SafeAreaView, TouchableOpacity, Linking } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { AgronomistStackParamList } from '../../navigation/types';
+import { FarmerStackParamList } from '../../navigation/types';
 import { Card } from '../../components/ui/Card';
-import { Button } from '../../components/ui/Button';
-import { useTheme } from '../../hooks/useTheme';
+import { colors } from '../../theme/colors';
 import { Feather } from '@expo/vector-icons';
 
 export default function HelpAndSupportScreen() {
-  const { colors, shadows } = useTheme();
-  const navigation = useNavigation<NativeStackNavigationProp<AgronomistStackParamList>>();
+  const navigation = useNavigation<NativeStackNavigationProp<FarmerStackParamList>>();
   const [expandedFaqId, setExpandedFaqId] = useState<string | null>(null);
 
   const faqs = [
     {
       id: '1',
-      question: 'How do I review a diagnosis?',
-      answer:
-        'Navigate to the Pending Queue tab, select a diagnosis, review the farmer\'s plant images and symptoms, and provide your professional assessment.',
+      question: 'How do I take a plant photo for diagnosis?',
+      answer: 'Go to the Diagnose tab, point your camera at the affected plant area, and take a clear photo. Make sure the lighting is good and the affected area is visible.',
     },
     {
       id: '2',
-      question: 'Can I edit my published articles?',
-      answer:
-        'Yes, go to the Articles tab, tap the article you want to edit, and use the edit button. Your changes will be reflected immediately.',
+      question: 'How long does diagnosis take?',
+      answer: 'Basic diagnosis is instant. For complex cases requiring agronomist review, you will receive results within 24-48 hours.',
     },
     {
       id: '3',
-      question: 'How do I increase my rating?',
-      answer:
-        'Provide helpful, accurate diagnoses and engage with farmer feedback. Your rating improves as farmers rate your reviews positively.',
+      question: 'Can I track my diagnosis history?',
+      answer: 'Yes! Go to the History tab to see all your past diagnoses, treatments, and recommendations.',
     },
     {
       id: '4',
-      question: 'What file formats can I upload?',
-      answer: 'You can upload JPG, PNG, and PDF files for articles and images. Maximum file size is 10MB.',
-    },
-    {
-      id: '5',
-      question: 'How do I contact support?',
-      answer:
-        'You can reach us via email at support@agritech.com or call our help line at 1-800-AGR-TECH.',
+      question: 'What if I need more help?',
+      answer: 'You can contact our support team via email at support@agritech.com or call 1-800-247-8324.',
     },
   ];
 
@@ -68,126 +57,6 @@ export default function HelpAndSupportScreen() {
       action: () => Linking.openURL('https://www.agritech.com/help'),
     },
   ];
-
-  const styles = StyleSheet.create({
-    safeContainer: {
-      flex: 1,
-      backgroundColor: colors.background,
-    },
-    container: {
-      flex: 1,
-    },
-    content: {
-      padding: 16,
-    },
-    header: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      marginBottom: 20,
-    },
-    title: {
-      fontSize: 24,
-      fontWeight: '700',
-      color: colors.text,
-    },
-    section: {
-      marginBottom: 24,
-    },
-    sectionTitle: {
-      fontSize: 18,
-      fontWeight: '600',
-      color: colors.text,
-      marginBottom: 12,
-    },
-    contactCard: {
-      marginBottom: 12,
-    },
-    contactItem: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      paddingVertical: 12,
-      paddingHorizontal: 8,
-    },
-    contactIcon: {
-      width: 48,
-      height: 48,
-      borderRadius: 24,
-      backgroundColor: `${colors.primary}10`,
-      justifyContent: 'center',
-      alignItems: 'center',
-      marginRight: 12,
-    },
-    contactContent: {
-      flex: 1,
-    },
-    contactType: {
-      fontSize: 16,
-      fontWeight: '600',
-      color: colors.text,
-      marginBottom: 4,
-    },
-    contactValue: {
-      fontSize: 14,
-      color: colors.primary,
-    },
-    faqCard: {
-      marginBottom: 12,
-    },
-    faqHeader: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      paddingVertical: 16,
-      paddingHorizontal: 12,
-    },
-    faqQuestion: {
-      fontSize: 15,
-      fontWeight: '600',
-      color: colors.text,
-      flex: 1,
-      marginRight: 12,
-    },
-    faqContent: {
-      paddingHorizontal: 12,
-      paddingBottom: 16,
-      borderTopWidth: 1,
-      borderTopColor: colors.border,
-      paddingTop: 12,
-    },
-    faqAnswer: {
-      fontSize: 14,
-      color: colors.textSecondary,
-      lineHeight: 20,
-    },
-    resourceItem: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      paddingVertical: 14,
-      paddingHorizontal: 12,
-    },
-    divider: {
-      height: 1,
-      backgroundColor: colors.borderLight,
-      marginHorizontal: 12,
-    },
-    resourceText: {
-      flex: 1,
-      fontSize: 15,
-      fontWeight: '500',
-      color: colors.text,
-      marginLeft: 12,
-    },
-    footerSection: {
-      alignItems: 'center',
-      paddingVertical: 32,
-    },
-    footerText: {
-      fontSize: 12,
-      color: colors.textMuted,
-      marginBottom: 4,
-    },
-  });
 
   return (
     <SafeAreaView style={styles.safeContainer}>
@@ -216,7 +85,7 @@ export default function HelpAndSupportScreen() {
                   <Text style={styles.contactType}>{method.type}</Text>
                   <Text style={styles.contactValue}>{method.value}</Text>
                 </View>
-                <Feather name="chevron-right" size={20} color={colors.textMuted} />
+                <Feather name="chevron-right" size={20} color="#ccc" />
               </TouchableOpacity>
             </Card>
           ))}
@@ -229,9 +98,7 @@ export default function HelpAndSupportScreen() {
             <Card key={faq.id} style={styles.faqCard}>
               <TouchableOpacity
                 style={styles.faqHeader}
-                onPress={() =>
-                  setExpandedFaqId(expandedFaqId === faq.id ? null : faq.id)
-                }
+                onPress={() => setExpandedFaqId(expandedFaqId === faq.id ? null : faq.id)}
               >
                 <Text style={styles.faqQuestion}>{faq.question}</Text>
                 <Feather
@@ -249,7 +116,7 @@ export default function HelpAndSupportScreen() {
           ))}
         </View>
 
-        {/* Additional Resources */}
+        {/* Resources */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Resources</Text>
           <Card>
@@ -259,7 +126,7 @@ export default function HelpAndSupportScreen() {
             >
               <Feather name="book" size={20} color={colors.primary} />
               <Text style={styles.resourceText}>Documentation & Guides</Text>
-              <Feather name="arrow-right" size={16} color={colors.textMuted} />
+              <Feather name="arrow-right" size={16} color="#ccc" />
             </TouchableOpacity>
             <View style={styles.divider} />
             <TouchableOpacity
@@ -268,7 +135,7 @@ export default function HelpAndSupportScreen() {
             >
               <Feather name="file-text" size={20} color={colors.primary} />
               <Text style={styles.resourceText}>Blog & Articles</Text>
-              <Feather name="arrow-right" size={16} color={colors.textMuted} />
+              <Feather name="arrow-right" size={16} color="#ccc" />
             </TouchableOpacity>
             <View style={styles.divider} />
             <TouchableOpacity
@@ -277,7 +144,7 @@ export default function HelpAndSupportScreen() {
             >
               <Feather name="users" size={20} color={colors.primary} />
               <Text style={styles.resourceText}>Community Forum</Text>
-              <Feather name="arrow-right" size={16} color={colors.textMuted} />
+              <Feather name="arrow-right" size={16} color="#ccc" />
             </TouchableOpacity>
           </Card>
         </View>
@@ -290,3 +157,123 @@ export default function HelpAndSupportScreen() {
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  safeContainer: {
+    flex: 1,
+    backgroundColor: '#f9f9f9',
+  },
+  container: {
+    flex: 1,
+  },
+  content: {
+    padding: 16,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: colors.text,
+  },
+  section: {
+    marginBottom: 24,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: colors.text,
+    marginBottom: 12,
+  },
+  contactCard: {
+    marginBottom: 12,
+  },
+  contactItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+  },
+  contactIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: `${colors.primary}10`,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  contactContent: {
+    flex: 1,
+  },
+  contactType: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: colors.text,
+    marginBottom: 4,
+  },
+  contactValue: {
+    fontSize: 14,
+    color: colors.primary,
+  },
+  faqCard: {
+    marginBottom: 12,
+  },
+  faqHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 12,
+  },
+  faqQuestion: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: colors.text,
+    flex: 1,
+    marginRight: 12,
+  },
+  faqContent: {
+    paddingHorizontal: 12,
+    paddingBottom: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#eee',
+    paddingTop: 12,
+  },
+  faqAnswer: {
+    fontSize: 14,
+    color: '#555',
+    lineHeight: 20,
+  },
+  resourceItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 14,
+    paddingHorizontal: 12,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#eee',
+    marginHorizontal: 12,
+  },
+  resourceText: {
+    flex: 1,
+    fontSize: 15,
+    fontWeight: '500',
+    color: colors.text,
+    marginLeft: 12,
+  },
+  footerSection: {
+    alignItems: 'center',
+    paddingVertical: 32,
+  },
+  footerText: {
+    fontSize: 12,
+    color: '#999',
+    marginBottom: 4,
+  },
+});

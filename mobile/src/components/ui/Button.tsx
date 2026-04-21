@@ -1,7 +1,7 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, TextStyle, ViewStyle, View, Platform } from 'react-native';
 import * as Haptics from 'expo-haptics';
-import { colors, shadows } from '../../theme/colors';
+import { useTheme } from '../../hooks/useTheme';
 import { typography, fontFamilies } from '../../theme/typography';
 import { spacing, radius } from '../../theme/spacing';
 
@@ -36,6 +36,118 @@ export function Button({
   loading,
   haptics = true,
 }: ButtonProps) {
+  const { colors, shadows } = useTheme();
+
+  // Generate variant styles dynamically based on current theme colors
+  const variantStyles: Record<ButtonVariant, { container: ViewStyle; text: TextStyle; pressed: ViewStyle }> = {
+    default: {
+      container: {
+        backgroundColor: colors.primary,
+        ...shadows.md,
+      },
+      text: {
+        color: colors.textInverse,
+      },
+      pressed: {
+        backgroundColor: colors.primaryDark,
+        transform: [{ scale: 0.98 }],
+      },
+    },
+    secondary: {
+      container: {
+        backgroundColor: colors.primaryLight,
+        ...shadows.sm,
+      },
+      text: {
+        color: colors.textInverse,
+      },
+      pressed: {
+        backgroundColor: colors.primaryDark,
+        transform: [{ scale: 0.98 }],
+      },
+    },
+    accent: {
+      container: {
+        backgroundColor: colors.accent,
+        ...shadows.md,
+      },
+      text: {
+        color: colors.text,
+      },
+      pressed: {
+        backgroundColor: colors.accentDark,
+        transform: [{ scale: 0.98 }],
+      },
+    },
+    outline: {
+      container: {
+        backgroundColor: colors.surface,
+        borderWidth: 2,
+        borderColor: colors.primary,
+        ...shadows.xs,
+      },
+      text: {
+        color: colors.primary,
+      },
+      pressed: {
+        backgroundColor: colors.primarySoft,
+        transform: [{ scale: 0.98 }],
+      },
+    },
+    ghost: {
+      container: {
+        backgroundColor: 'transparent',
+      },
+      text: {
+        color: colors.primary,
+      },
+      pressed: {
+        backgroundColor: colors.primarySoft,
+        transform: [{ scale: 0.98 }],
+      },
+    },
+    destructive: {
+      container: {
+        backgroundColor: colors.error,
+        ...shadows.md,
+      },
+      text: {
+        color: colors.textInverse,
+      },
+      pressed: {
+        backgroundColor: colors.errorLight,
+        transform: [{ scale: 0.98 }],
+      },
+    },
+  };
+
+  const sizePresets: Record<ButtonSize, { container: ViewStyle; text: TextStyle; iconMargin: ViewStyle }> = {
+    small: {
+      container: {
+        paddingVertical: spacing.xs,
+        paddingHorizontal: spacing.md,
+      },
+      text: typography.buttonSmall,
+      iconMargin: { width: 16, height: 16 },
+    },
+    medium: {
+      container: {
+        paddingVertical: spacing.md,
+        paddingHorizontal: spacing.lg,
+      },
+      text: typography.buttonMedium,
+      iconMargin: { width: 18, height: 18 },
+    },
+    large: {
+      container: {
+        paddingVertical: spacing.lg,
+        paddingHorizontal: spacing.xl,
+      },
+      text: typography.buttonLarge,
+      iconMargin: { width: 20, height: 20 },
+    },
+  };
+
   const stylesByVariant = variantStyles[variant];
   const sizeStyles = sizePresets[size];
 
@@ -97,113 +209,3 @@ const buttonStyles = StyleSheet.create({
     opacity: 0.5,
   },
 });
-
-const sizePresets: Record<ButtonSize, { container: ViewStyle; text: TextStyle; iconMargin: ViewStyle }> = {
-  small: {
-    container: {
-      paddingVertical: spacing.xs,
-      paddingHorizontal: spacing.md,
-    },
-    text: typography.buttonSmall,
-    iconMargin: { width: 16, height: 16 },
-  },
-  medium: {
-    container: {
-      paddingVertical: spacing.md,
-      paddingHorizontal: spacing.lg,
-    },
-    text: typography.buttonMedium,
-    iconMargin: { width: 18, height: 18 },
-  },
-  large: {
-    container: {
-      paddingVertical: spacing.lg,
-      paddingHorizontal: spacing.xl,
-    },
-    text: typography.buttonLarge,
-    iconMargin: { width: 20, height: 20 },
-  },
-};
-
-const variantStyles: Record<ButtonVariant, { container: ViewStyle; text: TextStyle; pressed: ViewStyle }> = {
-  default: {
-    container: {
-      backgroundColor: colors.primary,
-      ...shadows.md,
-    },
-    text: {
-      color: colors.textInverse,
-    },
-    pressed: {
-      backgroundColor: colors.primaryDark,
-      transform: [{ scale: 0.98 }],
-    },
-  },
-  secondary: {
-    container: {
-      backgroundColor: colors.primaryLight,
-      ...shadows.sm,
-    },
-    text: {
-      color: colors.textInverse,
-    },
-    pressed: {
-      backgroundColor: colors.primaryDark,
-      transform: [{ scale: 0.98 }],
-    },
-  },
-  accent: {
-    container: {
-      backgroundColor: colors.accent,
-      ...shadows.md,
-    },
-    text: {
-      color: colors.text,
-    },
-    pressed: {
-      backgroundColor: colors.accentDark,
-      transform: [{ scale: 0.98 }],
-    },
-  },
-  outline: {
-    container: {
-      backgroundColor: colors.surface,
-      borderWidth: 2,
-      borderColor: colors.primary,
-      ...shadows.xs,
-    },
-    text: {
-      color: colors.primary,
-    },
-    pressed: {
-      backgroundColor: colors.primarySoft,
-      transform: [{ scale: 0.98 }],
-    },
-  },
-  ghost: {
-    container: {
-      backgroundColor: 'transparent',
-    },
-    text: {
-      color: colors.primary,
-    },
-    pressed: {
-      backgroundColor: colors.primarySoft,
-      transform: [{ scale: 0.98 }],
-    },
-  },
-  destructive: {
-    container: {
-      backgroundColor: colors.error,
-      ...shadows.md,
-    },
-    text: {
-      color: colors.textInverse,
-    },
-    pressed: {
-      backgroundColor: colors.error,
-      opacity: 0.9,
-      transform: [{ scale: 0.98 }],
-    },
-  },
-};

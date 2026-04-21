@@ -1,27 +1,151 @@
 import React, { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View, SafeAreaView } from 'react-native';
+import { ScrollView, StyleSheet, Text, View, SafeAreaView, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { Feather } from '@expo/vector-icons';
 import { AgronomistStackParamList } from '../../navigation/types';
 import { useDiagnosisStore } from '../../stores/diagnosisStore';
-import { useAppStore } from '../../stores/appStore';
 import { PendingDiagnosisCard } from '../../components/agronomist/PendingDiagnosisCard';
-import { colors } from '../../theme/colors';
+import { useTheme } from '../../hooks/useTheme';
+import { spacing, radius } from '../../theme/spacing';
 
 type SortOption = 'newest' | 'oldest' | 'confidence';
 
 export default function PendingQueueScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<AgronomistStackParamList>>();
   const { getPendingDiagnoses, fetchReviewQueue } = useDiagnosisStore();
-  const { isAuthenticated } = useAppStore();
+  const { colors, shadows } = useTheme();
   const [sortBy, setSortBy] = useState<SortOption>('newest');
   const [showLowConfidenceOnly, setShowLowConfidenceOnly] = useState(false);
 
+  const dynamicStyles = StyleSheet.create({
+    safeContainer: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    content: {
+      padding: spacing.lg,
+      paddingBottom: spacing['3xl'],
+    },
+    header: {
+      marginBottom: spacing.xl,
+    },
+    title: {
+      fontSize: 32,
+      fontWeight: '700',
+      letterSpacing: -0.5,
+      color: colors.text,
+      marginBottom: spacing.sm,
+    },
+    subtitle: {
+      fontSize: 14,
+      lineHeight: 21,
+      color: colors.textSecondary,
+      fontWeight: '500',
+      letterSpacing: 0.1,
+    },
+    filterSection: {
+      marginBottom: spacing.xl,
+    },
+    filterLabel: {
+      fontSize: 12,
+      fontWeight: '600',
+      letterSpacing: 0.5,
+      color: colors.textTertiary,
+      textTransform: 'uppercase',
+      marginBottom: spacing.md,
+    },
+    filterChip: {
+      alignSelf: 'flex-start',
+      paddingVertical: spacing.sm,
+      paddingHorizontal: spacing.md,
+      borderRadius: radius.full,
+      borderWidth: 1,
+      borderColor: colors.border,
+      color: colors.text,
+      fontSize: 13,
+      lineHeight: 18,
+      fontWeight: '500',
+      marginBottom: spacing.md,
+      ...shadows.xs,
+    },
+    filterChipActive: {
+      backgroundColor: colors.primary,
+      borderColor: colors.primary,
+      color: colors.textInverse,
+    },
+    sortContainer: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: spacing.sm,
+      marginTop: spacing.md,
+    },
+    sortChip: {
+      paddingVertical: spacing.sm,
+      paddingHorizontal: spacing.md,
+      borderRadius: radius.full,
+      borderWidth: 1,
+      borderColor: colors.border,
+      color: colors.textSecondary,
+      fontSize: 12,
+      lineHeight: 16,
+      fontWeight: '500',
+      letterSpacing: 0.2,
+      backgroundColor: colors.surface,
+    },
+    sortChipActive: {
+      backgroundColor: colors.primarySoft,
+      borderColor: colors.primary,
+      color: colors.primary,
+      fontWeight: '600',
+    },
+    sortLabel: {
+      fontSize: 12,
+      fontWeight: '600',
+      letterSpacing: 0.5,
+      color: colors.textTertiary,
+      textTransform: 'uppercase',
+      marginBottom: spacing.md,
+    },
+    emptyState: {
+      padding: spacing.xl,
+      borderRadius: radius['2xl'],
+      borderWidth: 1.5,
+      borderColor: colors.primary,
+      backgroundColor: colors.primarySoft,
+      marginTop: spacing.xl,
+      alignItems: 'center',
+      ...shadows.xs,
+    },
+    emptyIcon: {
+      marginBottom: spacing.lg,
+    },
+    emptyTitle: {
+      fontSize: 18,
+      fontWeight: '700',
+      letterSpacing: -0.2,
+      color: colors.text,
+      marginBottom: spacing.sm,
+    },
+    emptyText: {
+      fontSize: 14,
+      lineHeight: 21,
+      color: colors.textSecondary,
+      textAlign: 'center',
+      letterSpacing: 0.1,
+    },
+    listContainer: {
+      marginTop: spacing.lg,
+    },
+  });
+
   useEffect(() => {
-    if (isAuthenticated) {
-      fetchReviewQueue().catch(() => null);
-    }
-  }, [fetchReviewQueue, isAuthenticated]);
+    fetchReviewQueue().catch(() => null);
+  }, [fetchReviewQueue]);
 
   const pendingDiagnoses = getPendingDiagnoses();
   const filteredDiagnoses = pendingDiagnoses
@@ -43,133 +167,76 @@ export default function PendingQueueScreen() {
   ).length;
 
   return (
-    <SafeAreaView style={styles.safeContainer}>
-      <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-        <Text style={styles.title}>Pending Queue</Text>
-        <Text style={styles.subtitle}>{pendingDiagnoses.length} pending</Text>
-
-      <View style={styles.controls}>
-        <Text
-          style={[styles.filterChip, showLowConfidenceOnly && styles.filterChipActive]}
-          onPress={() => setShowLowConfidenceOnly(!showLowConfidenceOnly)}
-        >
-          Low Confidence ({lowConfidenceCount})
-        </Text>
-
-        <View style={styles.sortRow}>
-          {(['newest', 'oldest', 'confidence'] as SortOption[]).map((option) => (
-            <Text
-              key={option}
-              style={[styles.sortChip, sortBy === option && styles.sortChipActive]}
-              onPress={() => setSortBy(option)}
-            >
-              {option}
-            </Text>
-          ))}
-        </View>
-      </View>
-
-      {filteredDiagnoses.length === 0 ? (
-        <View style={styles.emptyState}>
-          <Text style={styles.emptyTitle}>All caught up!</Text>
-          <Text style={styles.emptyText}>
-            {showLowConfidenceOnly
-              ? 'No low confidence diagnoses to review.'
-              : 'No pending diagnoses in the queue.'}
+    <SafeAreaView style={dynamicStyles.safeContainer}>
+      <ScrollView style={dynamicStyles.container} contentContainerStyle={dynamicStyles.content}>
+        <View style={dynamicStyles.header}>
+          <Text style={dynamicStyles.title}>Pending Queue</Text>
+          <Text style={dynamicStyles.subtitle}>
+            {pendingDiagnoses.length} diagnosis{pendingDiagnoses.length !== 1 ? 'es' : ''} waiting for review
           </Text>
         </View>
-      ) : (
-        filteredDiagnoses.map((diagnosis) => (
-          <PendingDiagnosisCard
-            key={diagnosis.id}
-            diagnosis={diagnosis}
-            onPress={() => navigation.navigate('DiagnosisReview', { id: diagnosis.id })}
-          />
-        ))
-      )}
+
+        <View style={dynamicStyles.filterSection}>
+          <Text style={dynamicStyles.filterLabel}>Filter</Text>
+          <TouchableOpacity
+            onPress={() => setShowLowConfidenceOnly(!showLowConfidenceOnly)}
+            activeOpacity={0.7}
+          >
+            <Text style={[dynamicStyles.filterChip, showLowConfidenceOnly && dynamicStyles.filterChipActive]}>
+              ⚠ Low Confidence ({lowConfidenceCount})
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={dynamicStyles.filterSection}>
+          <Text style={dynamicStyles.sortLabel}>Sort By</Text>
+          <View style={dynamicStyles.sortContainer}>
+            {(['newest', 'oldest', 'confidence'] as SortOption[]).map((option) => (
+              <TouchableOpacity
+                key={option}
+                onPress={() => setSortBy(option)}
+                activeOpacity={0.6}
+              >
+                <Text
+                  style={[dynamicStyles.sortChip, sortBy === option && dynamicStyles.sortChipActive]}
+                >
+                  {option === 'newest' ? '🕐 Newest' : option === 'oldest' ? '📅 Oldest' : '📊 Confidence'}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+
+        {filteredDiagnoses.length === 0 ? (
+          <View style={dynamicStyles.emptyState}>
+            <View style={dynamicStyles.emptyIcon}>
+              <Feather
+                name={showLowConfidenceOnly ? 'alert-circle' : 'inbox'}
+                size={44}
+                color={colors.primary}
+              />
+            </View>
+            <Text style={dynamicStyles.emptyTitle}>
+              {showLowConfidenceOnly ? 'All good!' : 'All caught up!'}
+            </Text>
+            <Text style={dynamicStyles.emptyText}>
+              {showLowConfidenceOnly
+                ? 'No low confidence diagnoses to review.'
+                : 'No pending diagnoses in the queue.'}
+            </Text>
+          </View>
+        ) : (
+          <View style={dynamicStyles.listContainer}>
+            {filteredDiagnoses.map((diagnosis) => (
+              <PendingDiagnosisCard
+                key={diagnosis.id}
+                diagnosis={diagnosis}
+                onPress={() => navigation.navigate('DiagnosisReview', { id: diagnosis.id })}
+              />
+            ))}
+          </View>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  safeContainer: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  content: {
-    padding: 16,
-    paddingBottom: 30,
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: colors.text,
-  },
-  subtitle: {
-    fontSize: 13,
-    color: colors.muted,
-    marginBottom: 12,
-  },
-  controls: {
-    marginBottom: 12,
-  },
-  filterChip: {
-    alignSelf: 'flex-start',
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: colors.border,
-    color: colors.text,
-    fontSize: 12,
-    marginBottom: 10,
-  },
-  filterChipActive: {
-    backgroundColor: colors.accent,
-    borderColor: colors.accent,
-    color: '#FFFFFF',
-  },
-  sortRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
-  sortChip: {
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: colors.border,
-    color: colors.text,
-    fontSize: 12,
-    marginRight: 8,
-    marginBottom: 8,
-  },
-  sortChipActive: {
-    backgroundColor: colors.card,
-    borderColor: colors.text,
-  },
-  emptyState: {
-    padding: 20,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: '#BBF7D0',
-    backgroundColor: '#ECFDF5',
-    marginTop: 8,
-  },
-  emptyTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.text,
-    marginBottom: 6,
-  },
-  emptyText: {
-    fontSize: 13,
-    color: colors.muted,
-  },
-}
-);

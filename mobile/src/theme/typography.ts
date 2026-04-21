@@ -68,38 +68,38 @@ export const typography: Record<string, TextStyle> = {
   // Body sizes - For content
   bodyLarge: {
     fontSize: 16,
-    lineHeight: 24,
+    lineHeight: 25,
     fontFamily: fontFamilies.regular,
     fontWeight: '400',
   },
   bodyLargeMedium: {
     fontSize: 16,
-    lineHeight: 24,
+    lineHeight: 25,
     fontFamily: fontFamilies.medium,
     fontWeight: '500',
   },
   bodyLargeSemibold: {
     fontSize: 16,
-    lineHeight: 24,
+    lineHeight: 25,
     fontFamily: fontFamilies.semibold,
     fontWeight: '600',
   },
 
   body: {
     fontSize: 14,
-    lineHeight: 20,
+    lineHeight: 21,
     fontFamily: fontFamilies.regular,
     fontWeight: '400',
   },
   bodyMedium: {
     fontSize: 14,
-    lineHeight: 20,
+    lineHeight: 21,
     fontFamily: fontFamilies.medium,
     fontWeight: '500',
   },
   bodySemibold: {
     fontSize: 14,
-    lineHeight: 20,
+    lineHeight: 21,
     fontFamily: fontFamilies.semibold,
     fontWeight: '600',
   },
@@ -107,19 +107,19 @@ export const typography: Record<string, TextStyle> = {
   // Small body sizes
   small: {
     fontSize: 13,
-    lineHeight: 18,
+    lineHeight: 19,
     fontFamily: fontFamilies.regular,
     fontWeight: '400',
   },
   smallMedium: {
     fontSize: 13,
-    lineHeight: 18,
+    lineHeight: 19,
     fontFamily: fontFamilies.medium,
     fontWeight: '500',
   },
   smallSemibold: {
     fontSize: 13,
-    lineHeight: 18,
+    lineHeight: 19,
     fontFamily: fontFamilies.semibold,
     fontWeight: '600',
   },
@@ -156,19 +156,19 @@ export const typography: Record<string, TextStyle> = {
   // Button text - Consistent for all buttons
   buttonLarge: {
     fontSize: 16,
-    lineHeight: 20,
+    lineHeight: 22,
     fontFamily: fontFamilies.semibold,
     fontWeight: '600',
   },
   buttonMedium: {
     fontSize: 14,
-    lineHeight: 18,
+    lineHeight: 20,
     fontFamily: fontFamilies.semibold,
     fontWeight: '600',
   },
   buttonSmall: {
     fontSize: 12,
-    lineHeight: 16,
+    lineHeight: 17,
     fontFamily: fontFamilies.semibold,
     fontWeight: '600',
   },

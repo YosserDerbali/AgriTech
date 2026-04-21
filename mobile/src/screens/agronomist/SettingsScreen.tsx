@@ -1,18 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ScrollView, StyleSheet, Text, View, SafeAreaView, TouchableOpacity, Switch } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AgronomistStackParamList } from '../../navigation/types';
 import { Card } from '../../components/ui/Card';
-import { colors } from '../../theme/colors';
+import { useTheme } from '../../hooks/useTheme';
 import { Feather } from '@expo/vector-icons';
 
 export default function SettingsScreen() {
+  const { colors, shadows, isDark, toggleTheme, theme } = useTheme();
   const navigation = useNavigation<NativeStackNavigationProp<AgronomistStackParamList>>();
   const [notifications, setNotifications] = useState(true);
   const [emailUpdates, setEmailUpdates] = useState(true);
-  const [darkMode, setDarkMode] = useState(false);
   const [offlineMode, setOfflineMode] = useState(false);
+  const [backgroundColor, setBackgroundColor] = useState(colors.background);
+
+  // Update background color when theme changes
+  useEffect(() => {
+    setBackgroundColor(colors.background);
+  }, [theme, colors.background]);
+
+  // Use isDark state from theme hook instead of local state
+  const handleDarkModeToggle = () => {
+    toggleTheme();
+  };
 
   const settingGroups = [
     {
@@ -40,8 +51,8 @@ export default function SettingsScreen() {
         {
           id: 'dark',
           label: 'Dark Mode',
-          value: darkMode,
-          onToggle: setDarkMode,
+          value: isDark,
+          onToggle: handleDarkModeToggle,
           icon: 'moon',
         },
       ],
@@ -59,6 +70,89 @@ export default function SettingsScreen() {
       ],
     },
   ];
+
+  const styles = StyleSheet.create({
+    safeContainer: {
+      flex: 1,
+      backgroundColor: backgroundColor,
+    },
+    container: {
+      flex: 1,
+      backgroundColor: backgroundColor,
+    },
+    content: {
+      padding: 16,
+    },
+    header: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: 20,
+    },
+    title: {
+      fontSize: 24,
+      fontWeight: '700',
+      color: colors.text,
+    },
+    settingGroup: {
+      marginBottom: 24,
+    },
+    groupTitle: {
+      fontSize: 14,
+      fontWeight: '600',
+      color: colors.textMuted,
+      marginBottom: 12,
+      textTransform: 'uppercase',
+      letterSpacing: 0.5,
+    },
+    settingItem: {
+      flex: 1,
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingVertical: 16,
+      paddingHorizontal: 12,
+    },
+    settingItemBorder: {
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
+    settingContent: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+    },
+    settingLabel: {
+      fontSize: 16,
+      fontWeight: '500',
+      color: colors.text,
+    },
+    editProfileCard: {
+      marginBottom: 20,
+    },
+    editProfileButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingVertical: 14,
+      paddingHorizontal: 12,
+      gap: 12,
+    },
+    editProfileContent: {
+      flex: 1,
+    },
+    editProfileTitle: {
+      fontSize: 17,
+      fontWeight: '700',
+      lineHeight: 23,
+      color: colors.text,
+      marginBottom: 4,
+    },
+    editProfileSubtitle: {
+      fontSize: 13,
+      lineHeight: 18,
+      color: colors.textSecondary,
+    },
+  });
 
   return (
     <SafeAreaView style={styles.safeContainer}>
@@ -105,8 +199,8 @@ export default function SettingsScreen() {
                   <Switch
                     value={item.value}
                     onValueChange={item.onToggle}
-                    trackColor={{ false: '#ccc', true: colors.primary + '40' }}
-                    thumbColor={item.value ? colors.primary : '#999'}
+                    trackColor={{ false: colors.borderLight, true: colors.primary + '40' }}
+                    thumbColor={item.value ? colors.primary : colors.border}
                   />
                 </View>
               ))}
@@ -117,83 +211,3 @@ export default function SettingsScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  safeContainer: {
-    flex: 1,
-    backgroundColor: '#f9f9f9',
-  },
-  container: {
-    flex: 1,
-  },
-  content: {
-    padding: 16,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: colors.text,
-  },
-  settingGroup: {
-    marginBottom: 24,
-  },
-  groupTitle: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#999',
-    marginBottom: 12,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  settingItem: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 16,
-    paddingHorizontal: 12,
-  },
-  settingItemBorder: {
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-  },
-  settingContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  settingLabel: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: colors.text,
-  },
-  editProfileCard: {
-    marginBottom: 20,
-  },
-  editProfileButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 14,
-    paddingHorizontal: 12,
-    gap: 12,
-  },
-  editProfileContent: {
-    flex: 1,
-  },
-  editProfileTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.text,
-    marginBottom: 2,
-  },
-  editProfileSubtitle: {
-    fontSize: 12,
-    color: '#999',
-  },
-});

@@ -8,10 +8,9 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FarmerStackParamList } from '../../navigation/types';
 import { useDiagnosisStore } from '../../stores/diagnosisStore';
-import { useAppStore } from '../../stores/appStore';
 import { DiagnosisCard } from '../../components/diagnosis/DiagnosisCard';
 import { Button } from '../../components/ui/Button';
-import { colors, shadows } from '../../theme/colors';
+import { useTheme } from '../../hooks/useTheme';
 import { typography } from '../../theme/typography';
 import { spacing, radius } from '../../theme/spacing';
 
@@ -19,7 +18,7 @@ export default function HomeScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<FarmerStackParamList>>();
   const insets = useSafeAreaInsets();
   const { diagnoses, fetchDiagnoses } = useDiagnosisStore();
-  const { isAuthenticated } = useAppStore();
+  const { colors, shadows } = useTheme();
   const recentDiagnoses = diagnoses.slice(0, 3);
 
   const handleHaptics = () => {
@@ -31,16 +30,109 @@ export default function HomeScreen() {
   const pendingCount = diagnoses.filter((d) => d.status === 'PENDING').length;
   const approvedCount = diagnoses.filter((d) => d.status === 'APPROVED').length;
 
+  // Dynamic styles based on theme
+  const dynamicStyles = StyleSheet.create({
+    safeContainer: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    sectionTitle: {
+      fontSize: 18,
+      fontWeight: '600',
+      color: colors.text,
+    },
+    seeAll: {
+      fontSize: 14,
+      fontWeight: '600',
+      color: colors.primary,
+    },
+    actionCard: {
+      flex: 1,
+      backgroundColor: colors.surface,
+      borderRadius: radius.xl,
+      padding: spacing.lg,
+      alignItems: 'center',
+      gap: spacing.md,
+      ...shadows.sm,
+    },
+    actionCardPressed: {
+      transform: [{ scale: 0.97 }],
+      backgroundColor: colors.primaryExtraLight,
+    },
+    actionText: {
+      fontSize: 14,
+      fontWeight: '600',
+      color: colors.text,
+      textAlign: 'center',
+    },
+    emptyState: {
+      backgroundColor: colors.surface,
+      borderRadius: radius['2xl'],
+      padding: spacing['3xl'],
+      alignItems: 'center',
+      gap: spacing.md,
+      ...shadows.sm,
+    },
+    emptyTitle: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.text,
+    },
+    emptyText: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      textAlign: 'center',
+    },
+    notifBadge: {
+      position: 'absolute' as const,
+      top: -4,
+      right: -4,
+      backgroundColor: colors.accent,
+      borderRadius: radius.full,
+      minWidth: 24,
+      height: 24,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    notifText: {
+      fontSize: 10,
+      fontWeight: '700',
+      color: colors.text,
+    },
+    tipCard: {
+      flexDirection: 'row' as const,
+      backgroundColor: colors.accentSoft,
+      borderRadius: radius.xl,
+      padding: spacing.lg,
+      alignItems: 'flex-start',
+      gap: spacing.lg,
+      ...shadows.xs,
+    },
+    tipTitle: {
+      fontSize: 14,
+      fontWeight: '600',
+      color: colors.text,
+      marginBottom: spacing.xs,
+    },
+    tipText: {
+      fontSize: 12,
+      color: colors.textSecondary,
+      lineHeight: 20,
+    },
+  });
+
   useEffect(() => {
-    if (isAuthenticated) {
-      fetchDiagnoses();
-    }
-  }, [isAuthenticated]);
+    fetchDiagnoses();
+  }, []);
 
   return (
-    <SafeAreaView style={styles.safeContainer}>
+    <SafeAreaView style={dynamicStyles.safeContainer}>
       <ScrollView
-        style={styles.container}
+        style={dynamicStyles.container}
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
@@ -64,8 +156,8 @@ export default function HomeScreen() {
               }}
             >
               <Ionicons name="notifications-outline" size={24} color="#fff" />
-              <View style={styles.notifBadge}>
-                <Text style={styles.notifText}>2</Text>
+              <View style={dynamicStyles.notifBadge}>
+                <Text style={dynamicStyles.notifText}>2</Text>
               </View>
             </Pressable>
           </View>
@@ -90,12 +182,12 @@ export default function HomeScreen() {
         <View style={styles.mainContent}>
           {/* Quick Actions */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Quick Actions</Text>
+            <Text style={dynamicStyles.sectionTitle}>Quick Actions</Text>
             <View style={styles.actionsGrid}>
               <Pressable
                 style={({ pressed }) => [
-                  styles.actionCard,
-                  pressed && styles.actionCardPressed,
+                  dynamicStyles.actionCard,
+                  pressed && dynamicStyles.actionCardPressed,
                 ]}
                 onPress={() => {
                   handleHaptics();
@@ -105,13 +197,13 @@ export default function HomeScreen() {
                 <View style={[styles.actionIcon, { backgroundColor: colors.successLight }]}>
                   <Feather name="camera" size={24} color={colors.success} />
                 </View>
-                <Text style={styles.actionText}>Scan Plant</Text>
+                <Text style={dynamicStyles.actionText}>Scan Plant</Text>
               </Pressable>
 
               <Pressable
                 style={({ pressed }) => [
-                  styles.actionCard,
-                  pressed && styles.actionCardPressed,
+                  dynamicStyles.actionCard,
+                  pressed && dynamicStyles.actionCardPressed,
                 ]}
                 onPress={() => {
                   handleHaptics();
@@ -121,13 +213,13 @@ export default function HomeScreen() {
                 <View style={[styles.actionIcon, { backgroundColor: colors.primarySoft }]}>
                   <Ionicons name="time-outline" size={24} color={colors.primary} />
                 </View>
-                <Text style={styles.actionText}>History</Text>
+                <Text style={dynamicStyles.actionText}>History</Text>
               </Pressable>
 
               <Pressable
                 style={({ pressed }) => [
-                  styles.actionCard,
-                  pressed && styles.actionCardPressed,
+                  dynamicStyles.actionCard,
+                  pressed && dynamicStyles.actionCardPressed,
                 ]}
                 onPress={() => {
                   handleHaptics();
@@ -137,7 +229,7 @@ export default function HomeScreen() {
                 <View style={[styles.actionIcon, { backgroundColor: colors.accentSoft }]}>
                   <Feather name="book" size={24} color={colors.accent} />
                 </View>
-                <Text style={styles.actionText}>Articles</Text>
+                <Text style={dynamicStyles.actionText}>Articles</Text>
               </Pressable>
             </View>
           </View>
@@ -145,7 +237,7 @@ export default function HomeScreen() {
           {/* Recent Diagnoses */}
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Recent Diagnoses</Text>
+              <Text style={dynamicStyles.sectionTitle}>Recent Diagnoses</Text>
               {recentDiagnoses.length > 0 && (
                 <Pressable
                   onPress={() => {
@@ -153,7 +245,7 @@ export default function HomeScreen() {
                     navigation.navigate('FarmerTabs', { screen: 'History' } as never);
                   }}
                 >
-                  <Text style={styles.seeAll}>View all</Text>
+                  <Text style={dynamicStyles.seeAll}>View all</Text>
                 </Pressable>
               )}
             </View>
@@ -172,10 +264,10 @@ export default function HomeScreen() {
                 ))}
               </>
             ) : (
-              <View style={styles.emptyState}>
+              <View style={dynamicStyles.emptyState}>
                 <Ionicons name="leaf-outline" size={48} color={colors.textTertiary} />
-                <Text style={styles.emptyTitle}>No diagnoses yet</Text>
-                <Text style={styles.emptyText}>Start by scanning your first plant</Text>
+                <Text style={dynamicStyles.emptyTitle}>No diagnoses yet</Text>
+                <Text style={dynamicStyles.emptyText}>Start by scanning your first plant</Text>
                 <Button
                   title="Scan Plant"
                   onPress={() => {
@@ -190,14 +282,14 @@ export default function HomeScreen() {
 
           {/* Tips Section */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Pro Tips</Text>
-            <View style={styles.tipCard}>
+            <Text style={dynamicStyles.sectionTitle}>Pro Tips</Text>
+            <View style={dynamicStyles.tipCard}>
               <View style={styles.tipIcon}>
                 <Text style={styles.tipEmoji}>💡</Text>
               </View>
               <View style={styles.tipContent}>
-                <Text style={styles.tipTitle}>Better Results</Text>
-                <Text style={styles.tipText}>
+                <Text style={dynamicStyles.tipTitle}>Better Results</Text>
+                <Text style={dynamicStyles.tipText}>
                   Take photos in natural daylight and focus on the affected area for more accurate diagnoses.
                 </Text>
               </View>
@@ -210,14 +302,6 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  safeContainer: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
   content: {
     paddingBottom: spacing.xl,
   },
@@ -254,22 +338,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.2)',
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  notifBadge: {
-    position: 'absolute',
-    top: -4,
-    right: -4,
-    backgroundColor: colors.accent,
-    borderRadius: radius.full,
-    minWidth: 24,
-    height: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  notifText: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: colors.text,
   },
 
   // Stats Row
@@ -312,34 +380,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: spacing.lg,
   },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: colors.text,
-  },
-  seeAll: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: colors.primary,
-  },
 
   // Quick Actions
   actionsGrid: {
     flexDirection: 'row',
     gap: spacing.md,
-  },
-  actionCard: {
-    flex: 1,
-    backgroundColor: colors.surface,
-    borderRadius: radius.xl,
-    padding: spacing.lg,
-    alignItems: 'center',
-    gap: spacing.md,
-    ...shadows.sm,
-  },
-  actionCardPressed: {
-    transform: [{ scale: 0.97 }],
-    backgroundColor: colors.primaryExtraLight,
   },
   actionIcon: {
     width: 52,
@@ -348,47 +393,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  actionText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: colors.text,
-    textAlign: 'center',
-  },
 
   // Empty State
-  emptyState: {
-    backgroundColor: colors.surface,
-    borderRadius: radius['2xl'],
-    padding: spacing['3xl'],
-    alignItems: 'center',
-    gap: spacing.md,
-    ...shadows.sm,
-  },
-  emptyTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.text,
-  },
-  emptyText: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    textAlign: 'center',
-  },
   emptyButton: {
     marginTop: spacing.lg,
     minWidth: 160,
   },
 
   // Tips
-  tipCard: {
-    flexDirection: 'row',
-    backgroundColor: colors.accentSoft,
-    borderRadius: radius.xl,
-    padding: spacing.lg,
-    alignItems: 'flex-start',
-    gap: spacing.lg,
-    ...shadows.xs,
-  },
   tipIcon: {
     fontSize: 24,
     marginTop: spacing.sm,
@@ -398,16 +410,5 @@ const styles = StyleSheet.create({
   },
   tipContent: {
     flex: 1,
-  },
-  tipTitle: {
-    fontSize: 14,
-    fontWeight: '600', 
-    color: colors.text,
-    marginBottom: spacing.xs,
-  },
-  tipText: {
-    fontSize: 12,
-    color: colors.textSecondary,
-    lineHeight: 20,
   },
 });

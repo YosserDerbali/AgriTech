@@ -23,9 +23,10 @@ import { Button } from '../../components/ui/Button';
 import { Textarea } from '../../components/ui/Textarea';
 import { useDiagnosisStore } from '../../stores/diagnosisStore';
 import { transcribeVoiceNote } from '../../services/farmerAPI';
-import { colors } from '../../theme/colors';
+import { useTheme } from '../../hooks/useTheme';
 
 export default function DiagnoseScreen() {
+  const { colors, shadows } = useTheme();
   const minimumRecordingDurationMs = 1000;
   const navigation = useNavigation<NativeStackNavigationProp<FarmerStackParamList>>();
   const { addDiagnosis, setLoading, isLoading } = useDiagnosisStore();
@@ -223,6 +224,99 @@ export default function DiagnoseScreen() {
     await startRecording();
   };
 
+  const styles = StyleSheet.create({
+    safeContainer: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    keyboardAvoid: {
+      flex: 1,
+    },
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    content: {
+      padding: 16,
+      paddingBottom: 30,
+    },
+    title: {
+      fontSize: 22,
+      fontWeight: '700',
+      color: colors.text,
+      marginBottom: 16,
+    },
+    section: {
+      marginBottom: 18,
+    },
+    sectionTitle: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.text,
+      marginBottom: 10,
+    },
+    sectionHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    optional: {
+      fontSize: 12,
+      color: colors.muted,
+    },
+    textarea: {
+      minHeight: 110,
+    },
+    plantNameInput: {
+      height: 48,
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderRadius: 12,
+      paddingHorizontal: 12,
+      color: colors.text,
+      backgroundColor: colors.surface,
+    },
+    voiceButton: {
+      marginTop: 10,
+    },
+    recording: {
+      marginTop: 8,
+      color: colors.error,
+      fontSize: 12,
+    },
+    transcribingRow: {
+      marginTop: 8,
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    transcribingText: {
+      marginLeft: 8,
+      color: colors.primary,
+      fontSize: 12,
+    },
+    infoBox: {
+      backgroundColor: colors.surface,
+      borderRadius: 16,
+      padding: 16,
+      borderWidth: 1,
+      borderColor: colors.border,
+      marginBottom: 18,
+    },
+    infoTitle: {
+      fontSize: 14,
+      fontWeight: '700',
+      color: colors.text,
+      marginBottom: 6,
+    },
+    infoText: {
+      fontSize: 13,
+      color: colors.muted,
+    },
+    submitButton: {
+      marginTop: 6,
+    },
+  });
+
   return (
     <SafeAreaView style={styles.safeContainer}>
       <KeyboardAvoidingView
@@ -319,96 +413,3 @@ export default function DiagnoseScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  safeContainer: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  keyboardAvoid: {
-    flex: 1,
-  },
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  content: {
-    padding: 16,
-    paddingBottom: 30,
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: colors.text,
-    marginBottom: 16,
-  },
-  section: {
-    marginBottom: 18,
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.text,
-    marginBottom: 10,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  optional: {
-    fontSize: 12,
-    color: colors.muted,
-  },
-  textarea: {
-    minHeight: 110,
-  },
-  plantNameInput: {
-    height: 48,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    color: colors.text,
-    backgroundColor: colors.surface,
-  },
-  voiceButton: {
-    marginTop: 10,
-  },
-  recording: {
-    marginTop: 8,
-    color: colors.error,
-    fontSize: 12,
-  },
-  transcribingRow: {
-    marginTop: 8,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  transcribingText: {
-    marginLeft: 8,
-    color: colors.primary,
-    fontSize: 12,
-  },
-  infoBox: {
-    backgroundColor: colors.surface,
-    borderRadius: 16,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: colors.border,
-    marginBottom: 18,
-  },
-  infoTitle: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: colors.text,
-    marginBottom: 6,
-  },
-  infoText: {
-    fontSize: 13,
-    color: colors.muted,
-  },
-  submitButton: {
-    marginTop: 6,
-  },
-});

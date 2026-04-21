@@ -1,9 +1,11 @@
 import React from 'react';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { formatDistanceToNow } from 'date-fns';
+import { Feather } from '@expo/vector-icons';
 import { Article } from '../../types/article';
-import { colors, shadows } from '../../theme/colors';
+import { useTheme } from '../../hooks/useTheme';
 import { Badge } from '../ui/Badge';
+import { spacing, radius } from '../../theme/spacing';
 
 interface ArticleCardProps {
   article: Article;
@@ -11,31 +13,92 @@ interface ArticleCardProps {
 }
 
 export function ArticleCard({ article, onPress }: ArticleCardProps) {
+  const { colors, shadows } = useTheme();
+
+  const styles = StyleSheet.create({
+    card: {
+      backgroundColor: colors.surface,
+      borderRadius: radius['2xl'],
+      overflow: 'hidden',
+      borderWidth: 1,
+      borderColor: colors.border,
+      marginBottom: spacing.lg,
+      ...shadows.md,
+    },
+    cardContent: {
+      flexDirection: 'row',
+      alignItems: 'stretch',
+    },
+    title: {
+      fontSize: 16,
+      fontWeight: '800',
+      lineHeight: 22,
+      color: colors.text,
+      marginBottom: spacing.sm,
+    },
+    excerpt: {
+      fontSize: 13,
+      lineHeight: 19,
+      color: colors.textSecondary,
+      marginBottom: spacing.md,
+    },
+    metaText: {
+      fontSize: 12,
+      lineHeight: 16,
+      color: colors.textMuted,
+    },
+    placeholderText: {
+      fontSize: 12,
+      color: colors.textMuted,
+      fontWeight: '600',
+    },
+    imagePlaceholder: {
+      backgroundColor: colors.borderLight,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    badgeVariant: {
+      backgroundColor: colors.primarySoft,
+      borderColor: colors.primary,
+      borderWidth: 1,
+      borderRadius: radius.full,
+    },
+  });
+
   return (
-    <Pressable onPress={onPress} style={styles.card}>
-      <View style={styles.row}>
+    <Pressable 
+      onPress={onPress} 
+      style={({ pressed }) => [
+        styles.card,
+        pressed && { opacity: 0.7 }
+      ]}
+    >
+      <View style={styles.cardContent}>
         {article.coverImageUrl ? (
-          <Image source={{ uri: article.coverImageUrl }} style={styles.image} />
+          <Image source={{ uri: article.coverImageUrl }} style={staticStyles.image} />
         ) : (
-          <View style={[styles.image, styles.imagePlaceholder]}>
+          <View style={[staticStyles.image, styles.imagePlaceholder]}>
+            <Feather name="image" size={24} color={styles.placeholderText.color} />
             <Text style={styles.placeholderText}>No image</Text>
           </View>
         )}
-        <View style={styles.content}>
-          <View style={styles.topRow}>
+        <View style={staticStyles.content}>
+          <View style={staticStyles.topRow}>
             <Badge
               label={article.source === 'EXTERNAL' ? 'External' : 'Expert'}
               variant={article.source === 'EXTERNAL' ? 'outline' : 'secondary'}
-              style={styles.badge}
+              style={staticStyles.badge}
             />
           </View>
           <Text style={styles.title} numberOfLines={2}>{article.title}</Text>
-          <Text style={styles.excerpt} numberOfLines={3}>{article.excerpt}</Text>
-          <View style={styles.metaRow}>
-            <Text style={[styles.metaText, styles.metaSource]} numberOfLines={2}>
-              {article.authorName}
-            </Text>
-            <Text style={[styles.metaText, styles.metaDate]}>
+          <Text style={styles.excerpt} numberOfLines={2}>{article.excerpt}</Text>
+          <View style={staticStyles.metaRow}>
+            <View style={staticStyles.authorInfo}>
+              <Text style={[styles.metaText, staticStyles.metaSource]} numberOfLines={1}>
+                by {article.authorName}
+              </Text>
+            </View>
+            <Text style={[styles.metaText, staticStyles.metaDate]}>
               {formatDistanceToNow(article.createdAt, { addSuffix: true })}
             </Text>
           </View>
@@ -45,77 +108,44 @@ export function ArticleCard({ article, onPress }: ArticleCardProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: colors.card,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: colors.border,
-    marginBottom: 12,
-    ...shadows.soft,
-  },
-  row: {
+const staticStyles = StyleSheet.create({
+  cardContent: {
     flexDirection: 'row',
     alignItems: 'stretch',
   },
   image: {
-    width: 112,
+    width: 120,
     minHeight: 140,
-    borderTopLeftRadius: 16,
-    borderBottomLeftRadius: 16,
-  },
-  imagePlaceholder: {
-    backgroundColor: colors.surfaceAlt,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  placeholderText: {
-    fontSize: 12,
-    color: colors.textMuted,
-    fontWeight: '600',
+    borderTopLeftRadius: radius['2xl'],
+    borderBottomLeftRadius: radius['2xl'],
   },
   content: {
     flex: 1,
-    paddingVertical: 12,
-    paddingHorizontal: 12,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.md,
     justifyContent: 'space-between',
   },
   topRow: {
     flexDirection: 'row',
-    marginBottom: 6,
+    marginBottom: spacing.sm,
   },
   badge: {
     alignSelf: 'flex-start',
   },
-  title: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: colors.text,
-    marginBottom: 6,
-  },
-  excerpt: {
-    fontSize: 13,
-    color: colors.textSecondary,
-    marginBottom: 8,
-    lineHeight: 18,
-  },
   metaRow: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
-  metaText: {
-    fontSize: 12,
-    color: colors.textMuted,
-    lineHeight: 16,
+  authorInfo: {
+    flex: 1,
   },
   metaSource: {
-    flexShrink: 1,
-    flexGrow: 1,
-    paddingRight: 8,
-    minWidth: 0,
+    paddingRight: spacing.md,
+    fontWeight: '600',
   },
   metaDate: {
     flexShrink: 0,
+    fontWeight: '500',
   },
 });

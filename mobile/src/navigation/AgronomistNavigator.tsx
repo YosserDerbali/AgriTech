@@ -9,11 +9,13 @@ import NotificationsScreen from '../screens/agronomist/NotificationsScreen';
 import SettingsScreen from '../screens/agronomist/SettingsScreen';
 import EditProfileScreen from '../screens/agronomist/EditProfileScreen';
 import HelpAndSupportScreen from '../screens/agronomist/HelpAndSupportScreen';
-import { colors } from '../theme/colors';
+import { useTheme } from '../hooks/useTheme';
 
 const Stack = createNativeStackNavigator<AgronomistStackParamList>();
 
 export default function AgronomistNavigator() {
+  const { colors } = useTheme();
+
   return (
     <Stack.Navigator
       screenOptions={({ navigation }) => ({

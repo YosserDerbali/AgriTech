@@ -3,15 +3,17 @@
  * Common styling patterns and utilities for consistent UI across the app
  */
 
-import { ViewStyle, TextStyle } from 'react-native';
-import { colors, shadows } from './colors';
+import { ViewStyle, TextStyle, StyleSheet } from 'react-native';
+import { shadows, getColors } from './colors';
 import { spacing, radius } from './spacing';
 import { typography } from './typography';
 
 /**
  * Create consistent card container styles
+ * RUNTIME VERSION: accepts colors as parameter to avoid module-level theme access
  */
 export const createCardStyle = (
+  colors: ReturnType<typeof getColors>,
   variant: 'default' | 'elevated' | 'filled' = 'default'
 ): ViewStyle => {
   const baseStyle: ViewStyle = {
@@ -46,11 +48,22 @@ export const createGradientOverlay = (opacity: number = 0.8): ViewStyle => {
 };
 
 /**
- * Common container styles for screens
+ * Create screen container styles with colors
+ * RUNTIME VERSION: accepts colors as parameter
+ */
+export const createScreenContainerStyle = (colors: ReturnType<typeof getColors>): ViewStyle => {
+  return {
+    flex: 1,
+    backgroundColor: colors.background,
+  };
+};
+
+/**
+ * Fallback for backwards compatibility - returns a basic container
  */
 export const screenContainerStyle: ViewStyle = {
   flex: 1,
-  backgroundColor: colors.background,
+  backgroundColor: '#F5F5F0', // Fallback to light mode default
 };
 
 /**
@@ -63,20 +76,22 @@ export const contentPaddingStyle: ViewStyle = {
 
 /**
  * Create consistent badge/chip styles
+ * RUNTIME VERSION: accepts colors externally to avoid module-level access
  */
 export const createChipStyle = (
-  bgColor: string = colors.primarySoft,
-  textColor: string = colors.primary
+  colors: ReturnType<typeof getColors>,
+  bgColor?: string,
+  textColor?: string
 ): { container: ViewStyle; text: TextStyle } => {
   return {
     container: {
-      backgroundColor: bgColor,
+      backgroundColor: bgColor ?? colors.primarySoft,
       borderRadius: radius.full,
       paddingHorizontal: spacing.md,
       paddingVertical: spacing.xs,
     },
     text: {
-      color: textColor,
+      color: textColor ?? colors.primary,
       ...typography.caption,
     },
   };
@@ -124,41 +139,84 @@ export const buttonBaseStyle: ViewStyle = {
 
 /**
  * Create consistent input field outline styles
+ * RUNTIME VERSION: accepts colors as parameter
+ */
+export const createInputOutlineStyle = (colors: ReturnType<typeof getColors>): ViewStyle => {
+  return {
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: radius.lg,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    backgroundColor: colors.surface,
+  };
+};
+
+/**
+ * Fallback for backwards compatibility
  */
 export const inputOutlineStyle: ViewStyle = {
   borderWidth: 1,
-  borderColor: colors.border,
+  borderColor: '#E0E4DE',
   borderRadius: radius.lg,
   paddingHorizontal: spacing.lg,
   paddingVertical: spacing.md,
-  backgroundColor: colors.surface,
+  backgroundColor: '#FFFFFF',
 };
 
 /**
  * Create consistent list item styles
+ * RUNTIME VERSION: accepts colors as parameter
+ */
+export const createListItemStyle = (colors: ReturnType<typeof getColors>): ViewStyle => {
+  return {
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.lg,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.borderLight,
+  };
+};
+
+/**
+ * Fallback for backwards compatibility
  */
 export const listItemStyle: ViewStyle = {
   paddingVertical: spacing.md,
   paddingHorizontal: spacing.lg,
   borderBottomWidth: 1,
-  borderBottomColor: colors.borderLight,
+  borderBottomColor: '#EDEFE9',
 };
 
 /**
- * Separator/Divider style
+ * Create separator/divider style
+ * RUNTIME VERSION: accepts colors as parameter
+ */
+export const createSeparatorStyle = (colors: ReturnType<typeof getColors>): ViewStyle => {
+  return {
+    height: 1,
+    backgroundColor: colors.borderLight,
+    marginVertical: spacing.lg,
+  };
+};
+
+/**
+ * Fallback for backwards compatibility
  */
 export const separatorStyle: ViewStyle = {
   height: 1,
-  backgroundColor: colors.borderLight,
+  backgroundColor: '#EDEFE9',
   marginVertical: spacing.lg,
 };
 
 /**
- * Create consistent modal/bottom sheet backdrop
+ * Create modal/bottom sheet backdrop style
+ * RUNTIME VERSION: accepts colors as parameter
  */
-export const backdropStyle: ViewStyle = {
-  ...StyleSheet.absoluteFillObject,
-  backgroundColor: colors.overlay,
+export const createBackdropStyle = (colors: ReturnType<typeof getColors>): ViewStyle => {
+  return {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: colors.overlay,
+  };
 };
 
 /**
@@ -191,6 +249,8 @@ export const mergeStyles = (...styles: (ViewStyle | TextStyle | undefined)[]): V
 };
 
 /**
- * Import StyleSheet from react-native for absoluteFillObject
+ * Truncate text style (overline text)
  */
-import { StyleSheet } from 'react-native';
+export const truncateTextStyle: TextStyle = {
+  ...typography.overline,
+};

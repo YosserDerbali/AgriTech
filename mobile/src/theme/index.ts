@@ -3,7 +3,7 @@
  * Central export for all design tokens and utilities
  */
 
-export { colors, shadows, lightTheme } from './colors';
+export { colors, shadows, lightTheme, getColors, getTheme } from './colors';
 export { typography, fontFamilies, textPresets } from './typography';
 export { spacing, radius, padding, margin, gap } from './spacing';
 export {
@@ -20,6 +20,11 @@ export {
   inputOutlineStyle,
   listItemStyle,
   separatorStyle,
+  createScreenContainerStyle,
+  createInputOutlineStyle,
+  createListItemStyle,
+  createSeparatorStyle,
+  createBackdropStyle,
   getResponsiveSpacing,
   mergeStyles,
   truncateTextStyle,

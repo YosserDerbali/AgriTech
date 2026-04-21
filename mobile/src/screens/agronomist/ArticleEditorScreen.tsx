@@ -16,10 +16,11 @@ import { useArticleStore } from '../../stores/articleStore';
 import { Input } from '../../components/ui/Input';
 import { Textarea } from '../../components/ui/Textarea';
 import { Button } from '../../components/ui/Button';
+import { useTheme } from '../../hooks/useTheme';
 import { ArticleCoverUploader } from '../../components/agronomist/ArticleCoverUploader';
-import { colors } from '../../theme/colors';
 
 export default function ArticleEditorScreen() {
+  const { colors, shadows } = useTheme();
   const navigation = useNavigation<NativeStackNavigationProp<AgronomistStackParamList>>();
   const route = useRoute<RouteProp<AgronomistStackParamList, 'ArticleEditor'>>();
   const { addArticle, updateArticle, deleteArticle, getArticle } = useArticleStore();
@@ -100,6 +101,62 @@ export default function ArticleEditorScreen() {
     ]);
   };
 
+  const styles = StyleSheet.create({
+    safeContainer: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    keyboardAvoid: {
+      flex: 1,
+    },
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    content: {
+      padding: 16,
+      paddingBottom: 30,
+    },
+    title: {
+      fontSize: 22,
+      fontWeight: '700',
+      color: colors.text,
+      marginBottom: 12,
+    },
+    label: {
+      fontSize: 12,
+      color: colors.muted,
+      marginTop: 10,
+      marginBottom: 6,
+    },
+    input: {
+      marginBottom: 8,
+    },
+    textarea: {
+      minHeight: 80,
+      marginBottom: 8,
+    },
+    textareaLarge: {
+      minHeight: 200,
+      marginBottom: 8,
+    },
+    deleteButton: {
+      alignSelf: 'flex-start',
+      marginBottom: 10,
+    },
+    actionRow: {
+      flexDirection: 'row',
+      marginTop: 10,
+    },
+    actionButton: {
+      flex: 1,
+      marginRight: 10,
+    },
+    actionButtonLast: {
+      flex: 1,
+    },
+  });
+
   return (
     <SafeAreaView style={styles.safeContainer}>
       <KeyboardAvoidingView
@@ -155,62 +212,3 @@ export default function ArticleEditorScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  safeContainer: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  keyboardAvoid: {
-    flex: 1,
-  },
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  content: {
-    padding: 16,
-    paddingBottom: 30,
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: colors.text,
-    marginBottom: 12,
-  },
-  label: {
-    fontSize: 12,
-    color: colors.muted,
-    marginTop: 10,
-    marginBottom: 6,
-  },
-  input: {
-    marginBottom: 8,
-  },
-  coverSection: {
-    marginBottom: 10,
-  },
-  textarea: {
-    minHeight: 80,
-    marginBottom: 8,
-  },
-  textareaLarge: {
-    minHeight: 200,
-    marginBottom: 8,
-  },
-  deleteButton: {
-    alignSelf: 'flex-start',
-    marginBottom: 10,
-  },
-  actionRow: {
-    flexDirection: 'row',
-    marginTop: 10,
-  },
-  actionButton: {
-    flex: 1,
-    marginRight: 10,
-  },
-  actionButtonLast: {
-    flex: 1,
-  },
-});

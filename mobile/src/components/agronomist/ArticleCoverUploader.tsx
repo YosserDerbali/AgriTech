@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Alert, Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import * as DocumentPicker from 'expo-document-picker';
-import { colors } from '../../theme/colors';
+import { useTheme } from '../../hooks/useTheme';
 
 interface ArticleCoverUploaderProps {
   selectedImage: string | null;
@@ -11,6 +11,7 @@ interface ArticleCoverUploaderProps {
 }
 
 export function ArticleCoverUploader({ selectedImage, onImageSelect, onClear }: ArticleCoverUploaderProps) {
+  const { colors } = useTheme();
   const [isLoading, setIsLoading] = useState(false);
 
   const requestPermission = async (type: 'camera' | 'library') => {
@@ -81,6 +82,83 @@ export function ArticleCoverUploader({ selectedImage, onImageSelect, onClear }: 
     }
   };
 
+  const createStyles = (c: typeof colors) =>
+    StyleSheet.create({
+      container: {
+        borderWidth: 2,
+        borderColor: c.border,
+        borderStyle: 'dashed',
+        borderRadius: 16,
+        padding: 20,
+        alignItems: 'center',
+        backgroundColor: c.card,
+      },
+      title: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: c.text,
+        marginBottom: 6,
+      },
+      subtitle: {
+        fontSize: 13,
+        color: c.muted,
+        marginBottom: 16,
+        textAlign: 'center',
+      },
+      buttonRow: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'center',
+      },
+      actionButton: {
+        backgroundColor: c.primary,
+        paddingVertical: 10,
+        paddingHorizontal: 18,
+        borderRadius: 12,
+        marginBottom: 8,
+      },
+      withSpacing: {
+        marginRight: 8,
+      },
+      actionText: {
+        color: c.textInverse,
+        fontWeight: '600',
+      },
+      outline: {
+        backgroundColor: 'transparent',
+        borderWidth: 1,
+        borderColor: c.border,
+      },
+      outlineText: {
+        color: c.text,
+      },
+      previewWrapper: {
+        borderRadius: 16,
+        overflow: 'hidden',
+        backgroundColor: c.card,
+      },
+      previewImage: {
+        width: '100%',
+        height: 220,
+      },
+      clearButton: {
+        position: 'absolute',
+        top: 12,
+        right: 12,
+        backgroundColor: 'rgba(255,255,255,0.9)',
+        paddingHorizontal: 10,
+        paddingVertical: 6,
+        borderRadius: 999,
+      },
+      clearText: {
+        fontSize: 12,
+        fontWeight: '600',
+        color: c.text,
+      },
+    });
+
+  const styles = createStyles(colors);
+
   if (selectedImage) {
     return (
       <View style={styles.previewWrapper}>
@@ -110,77 +188,3 @@ export function ArticleCoverUploader({ selectedImage, onImageSelect, onClear }: 
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    borderWidth: 2,
-    borderColor: colors.border,
-    borderStyle: 'dashed',
-    borderRadius: 16,
-    padding: 20,
-    alignItems: 'center',
-    backgroundColor: colors.card,
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.text,
-    marginBottom: 6,
-  },
-  subtitle: {
-    fontSize: 13,
-    color: colors.muted,
-    marginBottom: 16,
-    textAlign: 'center',
-  },
-  buttonRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-  },
-  actionButton: {
-    backgroundColor: colors.primary,
-    paddingVertical: 10,
-    paddingHorizontal: 18,
-    borderRadius: 12,
-    marginBottom: 8,
-  },
-  withSpacing: {
-    marginRight: 8,
-  },
-  actionText: {
-    color: '#FFFFFF',
-    fontWeight: '600',
-  },
-  outline: {
-    backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  outlineText: {
-    color: colors.text,
-  },
-  previewWrapper: {
-    borderRadius: 16,
-    overflow: 'hidden',
-    backgroundColor: colors.card,
-  },
-  previewImage: {
-    width: '100%',
-    height: 220,
-  },
-  clearButton: {
-    position: 'absolute',
-    top: 12,
-    right: 12,
-    backgroundColor: 'rgba(255,255,255,0.9)',
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 999,
-  },
-  clearText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: colors.text,
-  },
-});
