@@ -1,99 +1,115 @@
 import React from 'react';
-import { StyleSheet, Text, SafeAreaView, ScrollView, TouchableOpacity, Alert, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { colors } from '../../theme/colors';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { FarmerStackParamList } from '../../navigation/types';
 import { Card } from '../../components/ui/Card';
+import { colors } from '../../theme/colors';
 import { Feather } from '@expo/vector-icons';
+import { useAppStore } from '../../stores/appStore';
 
 export default function PrivacyScreen() {
-  const navigation = useNavigation();
+  const navigation = useNavigation<NativeStackNavigationProp<FarmerStackParamList>>();
+  const { logout } = useAppStore();
 
-  const privacyItems = [
-    { id: 'password', label: 'Change Password', icon: 'lock', action: 'Change Password' },
-    { id: 'biometric', label: 'Enable Biometric Login', icon: 'fingerprint', action: 'Biometric Login' },
-    { id: 'data', label: 'Data Usage', icon: 'database', action: 'Data Usage' },
-    { id: 'logout', label: 'Logout from all devices', icon: 'log-out', action: 'Logout all devices' },
-  ];
-
-  const handlePress = (action: string) => {
-    Alert.alert(action, 'This feature will be available in the next update.');
+  const handleChangePassword = () => {
+    navigation.navigate('ChangePassword');
   };
 
-  return (
-    <SafeAreaView style={styles.safeContainer}>
-      <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-        <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Feather name="arrow-left" size={24} color={colors.text} />
-          </TouchableOpacity>
-          <Text style={styles.title}>Privacy & Security</Text>
-          <View style={{ width: 24 }} />
-        </View>
+  const handleBiometricLogin = () => {
+    Alert.alert('Coming Soon', 'Biometric login will be available soon.');
+  };
 
-        <Card style={styles.card}>
-          {privacyItems.map((item, index) => (
-            <TouchableOpacity
-              key={item.id}
-              style={[styles.item, index === privacyItems.length - 1 && styles.itemLast]}
-              onPress={() => handlePress(item.action)}
-            >
-              <View style={styles.itemLeft}>
-                <Feather name={item.icon as any} size={20} color={colors.primary} />
-                <Text style={styles.text}>{item.label}</Text>
-              </View>
-              <Feather name="chevron-right" size={20} color={colors.border} />
-            </TouchableOpacity>
-          ))}
-        </Card>
-      </ScrollView>
-    </SafeAreaView>
+  const handleDataUsage = () => {
+    Alert.alert('Data Usage', 'Your data usage information will appear here.');
+  };
+
+  const handleLogoutAll = () => {
+    Alert.alert(
+      'Logout from all devices',
+      'Are you sure you want to logout from all devices?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { 
+          text: 'Logout', 
+          style: 'destructive',
+          onPress: () => {
+            logout();
+            Alert.alert('Logged out', 'You have been logged out from all devices.');
+          }
+        },
+      ]
+    );
+  };
+
+  const menuItems = [
+    { id: 'changePassword', label: 'Change Password', icon: 'lock', onPress: handleChangePassword },
+    { id: 'biometric', label: 'Enable Biometric Login', icon: 'fingerprint', onPress: handleBiometricLogin },
+    { id: 'dataUsage', label: 'Data Usage', icon: 'database', onPress: handleDataUsage },
+    { id: 'logoutAll', label: 'Logout from all devices', icon: 'log-out', onPress: handleLogoutAll, destructive: true },
+  ];
+
+  return (
+    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+      <Card style={styles.card}>
+        {menuItems.map((item, index) => (
+          <TouchableOpacity
+            key={item.id}
+            style={[
+              styles.menuItem,
+              index === menuItems.length - 1 && styles.menuItemLast,
+              item.destructive && styles.destructiveItem
+            ]}
+            onPress={item.onPress}
+          >
+            <Feather name={item.icon as any} size={20} color={item.destructive ? '#FF6B6B' : colors.primary} />
+            <Text style={[styles.menuItemText, item.destructive && styles.destructiveText]}>
+              {item.label}
+            </Text>
+            <Feather name="chevron-right" size={20} color={colors.border} />
+          </TouchableOpacity>
+        ))}
+      </Card>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  safeContainer: {
+  container: {
     flex: 1,
     backgroundColor: '#f9f9f9',
   },
-  container: {
-    flex: 1,
-  },
   content: {
     padding: 16,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: colors.text,
+    paddingBottom: 30,
   },
   card: {
-    paddingVertical: 8,
+    marginBottom: 12,
   },
-  item: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 16,
+  menuItem: {
+    paddingVertical: 14,
     paddingHorizontal: 12,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  itemLast: {
-    borderBottomWidth: 0,
-  },
-  itemLeft: {
+    borderBottomColor: '#eee',
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
   },
-  text: {
-    fontSize: 15,
+  menuItemLast: {
+    borderBottomWidth: 0,
+  },
+  menuItemText: {
+    flex: 1,
+    fontSize: 14,
+    fontWeight: '500',
     color: colors.text,
+  },
+  destructiveItem: {
+    marginTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: '#eee',
+  },
+  destructiveText: {
+    color: '#FF6B6B',
   },
 });

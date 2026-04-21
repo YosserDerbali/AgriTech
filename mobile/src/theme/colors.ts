@@ -3,7 +3,7 @@
  * Based on modern design standards with enhanced visual hierarchy
  */
 
-export const colors = {
+export const lightColors = {
   // Primary Brand Colors - Enhanced Green
   primary: '#1B5E20',
   primaryLight: '#2E7D32',
@@ -33,6 +33,7 @@ export const colors = {
   textLight: '#D0D8D2',
   textInverse: '#FFFFFF',
   muted: '#9CA3AF',
+  
   // Border Colors
   border: '#E0E4DE',
   borderLight: '#EDEFE9',
@@ -59,11 +60,67 @@ export const colors = {
   gradientEnd: '#2E7D32',
 };
 
+export const darkColors = {
+  // Primary Brand Colors - Enhanced Green (adjusted for dark mode)
+  primary: '#4CAF50',
+  primaryLight: '#66BB6A',
+  primaryDark: '#2E7D32',
+  primarySoft: '#1B5E20',
+  primaryExtraLight: '#0D3B12',
+
+  // Accent Colors - Premium Gold/Amber
+  accent: '#F9A825',
+  accentLight: '#FDD835',
+  accentDark: '#F57C00',
+  accentSoft: '#332A1A',
+
+  // Neutral Colors - Professional Grays (dark mode)
+  background: '#121212',
+  surfaceBackground: '#1E1E1E',
+  surface: '#2C2C2C',
+  card: '#2C2C2C',
+  surfaceElevated: '#383838',
+  surfaceAlt: '#252525',
+
+  // Text Colors - Semantic (dark mode)
+  text: '#FFFFFF',
+  textSecondary: '#B0B0B0',
+  textTertiary: '#8A8A8A',
+  textMuted: '#6A6A6A',
+  textLight: '#4A4A4A',
+  textInverse: '#1A1A1A',
+  muted: '#666666',
+  
+  // Border Colors (dark mode)
+  border: '#3D3D3D',
+  borderLight: '#353535',
+  borderLighter: '#2A2A2A',
+
+  // Semantic Colors (dark mode adjusted)
+  success: '#4CAF50',
+  successLight: '#1B5E20',
+  warning: '#FFB300',
+  warningLight: '#332A1A',
+  error: '#EF5350',
+  destructive: '#EF5350',
+  errorLight: '#3B1A1A',
+  pending: '#42A5F5',
+  pendingLight: '#1A2A3B',
+
+  // Interactive States (dark mode)
+  overlay: 'rgba(0,0,0,0.7)',
+  overlayLight: 'rgba(0,0,0,0.4)',
+  overlayExtraLight: 'rgba(255,255,255,0.08)',
+
+  // Gradient anchors
+  gradientStart: '#4CAF50',
+  gradientEnd: '#2E7D32',
+};
+
 /**
- * Shadow System for elevation and depth
+ * Shadow System for elevation and depth (works for both themes)
  */
 export const shadows = {
-  // Subtle shadow for minimal elevation
   xs: {
     shadowColor: '#000',
     shadowOpacity: 0.04,
@@ -71,7 +128,6 @@ export const shadows = {
     shadowOffset: { width: 0, height: 1 },
     elevation: 1,
   },
-  // Small shadow for cards
   sm: {
     shadowColor: '#000',
     shadowOpacity: 0.06,
@@ -79,7 +135,6 @@ export const shadows = {
     shadowOffset: { width: 0, height: 2 },
     elevation: 2,
   },
-  // Medium shadow for lifted components
   md: {
     shadowColor: '#000',
     shadowOpacity: 0.08,
@@ -87,7 +142,6 @@ export const shadows = {
     shadowOffset: { width: 0, height: 4 },
     elevation: 3,
   },
-  // Large shadow for prominent elements
   lg: {
     shadowColor: '#000',
     shadowOpacity: 0.12,
@@ -95,7 +149,6 @@ export const shadows = {
     shadowOffset: { width: 0, height: 6 },
     elevation: 4,
   },
-  // Extra large shadow for modals/overlays
   xl: {
     shadowColor: '#000',
     shadowOpacity: 0.16,
@@ -103,9 +156,8 @@ export const shadows = {
     shadowOffset: { width: 0, height: 8 },
     elevation: 5,
   },
-  // Soft shadow (used in UI patterns)
   soft: {
-    shadowColor: '#1A1A1A',
+    shadowColor: '#000',
     shadowOpacity: 0.08,
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 4 },
@@ -113,11 +165,5 @@ export const shadows = {
   },
 };
 
-/**
- * Light mode theme (system default)
- */
-export const lightTheme = {
-  colors,
-  shadows,
-};
-
+// Default export for backward compatibility
+export const colors = lightColors;

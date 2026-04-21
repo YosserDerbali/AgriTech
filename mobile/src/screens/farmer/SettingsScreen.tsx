@@ -1,113 +1,134 @@
-import React, { useState } from 'react';
-import { View, Text, Switch, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity } from 'react-native';
+import React, { useEffect } from 'react';
+import { ScrollView, StyleSheet, Text, View, SafeAreaView, TouchableOpacity, Switch, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { FarmerStackParamList } from '../../navigation/types';
-import { colors } from '../../theme/colors';
 import { Card } from '../../components/ui/Card';
+import { useTheme } from '../../theme/ThemeContext';
 import { Feather } from '@expo/vector-icons';
+import { useSettingsStore } from '../../stores/settingsStore';
 
 export default function SettingsScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<FarmerStackParamList>>();
-  const [pushNotifications, setPushNotifications] = useState(true);
-  const [emailUpdates, setEmailUpdates] = useState(true);
-  const [darkMode, setDarkMode] = useState(false);
-  const [offlineMode, setOfflineMode] = useState(false);
+  const { colors, mode, setTheme } = useTheme();
+  
+  const {
+    pushNotifications,
+    emailUpdates,
+    offlineMode,
+    isLoading,
+    loadSettings,
+    setPushNotifications,
+    setEmailUpdates,
+    setOfflineMode,
+  } = useSettingsStore();
+
+  useEffect(() => {
+    loadSettings();
+  }, []);
+
+  const handleDarkModeToggle = (value: boolean) => {
+    setTheme(value ? 'dark' : 'light');
+  };
+
+  if (isLoading) {
+    return (
+      <View style={[styles.loadingContainer, { backgroundColor: colors.background }]}>
+        <ActivityIndicator size="large" color={colors.primary} />
+      </View>
+    );
+  }
+
+  const settingGroups = [
+    {
+      title: 'PREFERENCES',
+      items: [
+        {
+          id: 'notifications',
+          label: 'Push Notifications',
+          value: pushNotifications,
+          onToggle: setPushNotifications,
+          icon: 'bell',
+        },
+        {
+          id: 'email',
+          label: 'Email Updates',
+          value: emailUpdates,
+          onToggle: setEmailUpdates,
+          icon: 'mail',
+        },
+      ],
+    },
+    {
+      title: 'DISPLAY',
+      items: [
+        {
+          id: 'dark',
+          label: 'Dark Mode',
+          value: mode === 'dark',
+          onToggle: handleDarkModeToggle,
+          icon: 'moon',
+        },
+      ],
+    },
+    {
+      title: 'OFFLINE',
+      items: [
+        {
+          id: 'offline',
+          label: 'Offline Mode',
+          value: offlineMode,
+          onToggle: setOfflineMode,
+          icon: 'wifi-off',
+        },
+      ],
+    },
+  ];
 
   return (
-    <SafeAreaView style={styles.safeContainer}>
+    <SafeAreaView style={[styles.safeContainer, { backgroundColor: colors.background }]}>
       <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-        <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Feather name="arrow-left" size={24} color={colors.text} />
+        <Card style={[styles.editProfileCard, { backgroundColor: colors.surface }]}>
+          <TouchableOpacity
+            style={styles.editProfileButton}
+            onPress={() => navigation.navigate('EditProfile')}
+          >
+            <Feather name="edit-3" size={20} color={colors.primary} />
+            <View style={styles.editProfileContent}>
+              <Text style={[styles.editProfileTitle, { color: colors.text }]}>Edit Profile</Text>
+              <Text style={[styles.editProfileSubtitle, { color: colors.textSecondary }]}>Update your personal information</Text>
+            </View>
+            <Feather name="chevron-right" size={20} color={colors.border} />
           </TouchableOpacity>
-          <Text style={styles.title}>Settings</Text>
-          <View style={{ width: 24 }} />
-        </View>
-
-        {/* Edit Profile Row */}
-        <TouchableOpacity 
-          style={styles.editProfileRow}
-          onPress={() => navigation.navigate('EditProfile' as any)}
-        >
-          <View style={styles.editProfileIcon}>
-            <Feather name="user" size={24} color={colors.primary} />
-          </View>
-          <View style={styles.editProfileContent}>
-            <Text style={styles.editProfileTitle}>Edit Profile</Text>
-            <Text style={styles.editProfileSubtitle}>Update your personal information</Text>
-          </View>
-          <Feather name="chevron-right" size={20} color={colors.border} />
-        </TouchableOpacity>
-
-        {/* Preferences Section */}
-        <Card style={styles.card}>
-          <Text style={styles.sectionTitle}>PREFERENCES</Text>
-          
-          <View style={styles.settingItem}>
-            <View style={styles.settingLeft}>
-              <Feather name="bell" size={20} color={colors.primary} />
-              <Text style={styles.settingLabel}>Push Notifications</Text>
-            </View>
-            <Switch 
-              value={pushNotifications} 
-              onValueChange={setPushNotifications}
-              trackColor={{ false: colors.border, true: colors.primary }}
-              thumbColor={colors.surface}
-            />
-          </View>
-
-          <View style={styles.divider} />
-
-          <View style={styles.settingItem}>
-            <View style={styles.settingLeft}>
-              <Feather name="mail" size={20} color={colors.primary} />
-              <Text style={styles.settingLabel}>Email Updates</Text>
-            </View>
-            <Switch 
-              value={emailUpdates} 
-              onValueChange={setEmailUpdates}
-              trackColor={{ false: colors.border, true: colors.primary }}
-              thumbColor={colors.surface}
-            />
-          </View>
         </Card>
 
-        {/* Display Section */}
-        <Card style={styles.card}>
-          <Text style={styles.sectionTitle}>DISPLAY</Text>
-          
-          <View style={styles.settingItem}>
-            <View style={styles.settingLeft}>
-              <Feather name="moon" size={20} color={colors.primary} />
-              <Text style={styles.settingLabel}>Dark Mode</Text>
-            </View>
-            <Switch 
-              value={darkMode} 
-              onValueChange={setDarkMode}
-              trackColor={{ false: colors.border, true: colors.primary }}
-              thumbColor={colors.surface}
-            />
+        {settingGroups.map((group) => (
+          <View key={group.title} style={styles.settingGroup}>
+            <Text style={[styles.groupTitle, { color: colors.textSecondary }]}>{group.title}</Text>
+            <Card style={{ backgroundColor: colors.surface }}>
+              {group.items.map((item, index) => (
+                <View
+                  key={item.id}
+                  style={[
+                    styles.settingItem,
+                    index < group.items.length - 1 && [styles.settingItemBorder, { borderBottomColor: colors.border }],
+                  ]}
+                >
+                  <View style={styles.settingContent}>
+                    <Feather name={item.icon as any} size={20} color={colors.primary} />
+                    <Text style={[styles.settingLabel, { color: colors.text }]}>{item.label}</Text>
+                  </View>
+                  <Switch
+                    value={item.value}
+                    onValueChange={item.onToggle}
+                    trackColor={{ false: '#ccc', true: colors.primary + '40' }}
+                    thumbColor={item.value ? colors.primary : '#999'}
+                  />
+                </View>
+              ))}
+            </Card>
           </View>
-        </Card>
-
-        {/* Offline Section */}
-        <Card style={styles.card}>
-          <Text style={styles.sectionTitle}>OFFLINE</Text>
-          
-          <View style={styles.settingItem}>
-            <View style={styles.settingLeft}>
-              <Feather name="download-cloud" size={20} color={colors.primary} />
-              <Text style={styles.settingLabel}>Offline Mode</Text>
-            </View>
-            <Switch 
-              value={offlineMode} 
-              onValueChange={setOfflineMode}
-              trackColor={{ false: colors.border, true: colors.primary }}
-              thumbColor={colors.surface}
-            />
-          </View>
-        </Card>
+        ))}
       </ScrollView>
     </SafeAreaView>
   );
@@ -116,7 +137,6 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   safeContainer: {
     flex: 1,
-    backgroundColor: '#f9f9f9',
   },
   container: {
     flex: 1,
@@ -125,35 +145,50 @@ const styles = StyleSheet.create({
     padding: 16,
     paddingBottom: 30,
   },
-  header: {
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  settingGroup: {
+    marginBottom: 24,
+  },
+  groupTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    marginBottom: 12,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  settingItem: {
+    flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 20,
+    paddingVertical: 16,
+    paddingHorizontal: 12,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: colors.text,
+  settingItemBorder: {
+    borderBottomWidth: 1,
   },
-  editProfileRow: {
+  settingContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.surface,
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 20,
-    borderWidth: 1,
-    borderColor: colors.border,
+    gap: 12,
   },
-  editProfileIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: `${colors.primary}10`,
-    justifyContent: 'center',
+  settingLabel: {
+    fontSize: 16,
+    fontWeight: '500',
+  },
+  editProfileCard: {
+    marginBottom: 20,
+  },
+  editProfileButton: {
+    flexDirection: 'row',
     alignItems: 'center',
-    marginRight: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 12,
+    gap: 12,
   },
   editProfileContent: {
     flex: 1,
@@ -161,41 +196,9 @@ const styles = StyleSheet.create({
   editProfileTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: colors.text,
-    marginBottom: 4,
+    marginBottom: 2,
   },
   editProfileSubtitle: {
-    fontSize: 13,
-    color: colors.textSecondary || '#999',
-  },
-  card: {
-    marginBottom: 16,
-  },
-  sectionTitle: {
     fontSize: 12,
-    fontWeight: '600',
-    color: colors.textSecondary || '#999',
-    marginBottom: 12,
-    letterSpacing: 0.5,
-  },
-  settingItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 12,
-  },
-  settingLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  settingLabel: {
-    fontSize: 15,
-    color: colors.text,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: colors.border,
-    marginVertical: 4,
   },
 });

@@ -18,6 +18,9 @@ export type FarmerStackParamList = {
   Settings: undefined;
   Privacy: undefined;
   Help: undefined;
+  Notifications: undefined;
+  EditProfile: undefined;
+  ChangePassword: undefined;
 };
 
 export type AgronomistTabsParamList = {
@@ -36,3 +39,4 @@ export type AgronomistStackParamList = {
   EditProfile: undefined;
   HelpAndSupport: undefined;
 };
+

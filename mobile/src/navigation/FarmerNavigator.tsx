@@ -7,6 +7,9 @@ import ArticleDetailScreen from '../screens/farmer/ArticleDetailScreen';
 import SettingsScreen from '../screens/farmer/SettingsScreen';
 import PrivacyScreen from '../screens/farmer/PrivacyScreen';
 import HelpAndSupportScreen from '../screens/farmer/HelpAndSupportScreen';
+import NotificationsScreen from '../screens/farmer/NotificationsScreen';
+import EditProfileScreen from '../screens/farmer/EditProfileScreen';
+import ChangePasswordScreen from '../screens/farmer/ChangePasswordScreen';
 
 const Stack = createNativeStackNavigator<FarmerStackParamList>();
 
@@ -50,6 +53,21 @@ export default function FarmerNavigator() {
         name="Help"
         component={HelpAndSupportScreen}
         options={{ title: 'Help & Support' }}
+      />
+      <Stack.Screen
+        name="Notifications"
+        component={NotificationsScreen}
+        options={{ title: 'Notifications' }}
+      />
+      <Stack.Screen
+        name="EditProfile"
+        component={EditProfileScreen}
+        options={{ title: 'Edit Profile' }}
+      />
+      <Stack.Screen
+        name="ChangePassword"
+        component={ChangePasswordScreen}
+        options={{ title: 'Change Password' }}
       />
     </Stack.Navigator>
   );

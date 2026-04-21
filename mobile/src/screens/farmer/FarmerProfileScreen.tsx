@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Alert, ScrollView, StyleSheet, Text, View, SafeAreaView, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { FarmerStackParamList } from '../../navigation/types';
 import { useDiagnosisStore } from '../../stores/diagnosisStore';
 import { useAppStore } from '../../stores/appStore';
+import { useNotificationStore } from '../../stores/notificationStore';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { colors } from '../../theme/colors';
@@ -14,11 +15,17 @@ export default function FarmerProfileScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<FarmerStackParamList>>();
   const { diagnoses } = useDiagnosisStore();
   const { user, logout } = useAppStore();
+  const { unreadCount, fetchUnreadCount } = useNotificationStore();
 
   // Calculate farmer stats
   const totalScans = diagnoses?.length || 0;
   const treatedCount = diagnoses?.filter(d => d.status === 'APPROVED').length || 0;
   const accuracy = totalScans > 0 ? Math.round((treatedCount / totalScans) * 100) : 92;
+
+  // Fetch unread notification count when screen loads
+  useEffect(() => {
+    fetchUnreadCount();
+  }, []);
 
   const menuItems = [
     { id: 'notifications', label: 'Notifications', icon: 'bell', screen: 'Notifications' as any },
@@ -49,15 +56,10 @@ export default function FarmerProfileScreen() {
       <ScrollView style={styles.container} contentContainerStyle={styles.content}>
         <Text style={styles.title}>Profile</Text>
 
-        {/* Profile Card */}
+        {/* Profile Card - REMOVED the Edit Profile badge */}
         <Card style={styles.profileCard}>
           <Text style={styles.name}>{user?.name || 'John Farmer'}</Text>
           <Text style={styles.email}>{user?.email || 'john@farm.com'}</Text>
-          <View style={styles.badgesRow}>
-            <TouchableOpacity onPress={() => navigation.navigate('EditProfile' as any)}>
-              <Text style={styles.editBadge}>Edit Profile</Text>
-            </TouchableOpacity>
-          </View>
         </Card>
 
         {/* Stats Row */}
@@ -86,6 +88,11 @@ export default function FarmerProfileScreen() {
             >
               <Feather name={item.icon as any} size={20} color={colors.primary} />
               <Text style={styles.menuItemText}>{item.label}</Text>
+              {item.id === 'notifications' && unreadCount > 0 && (
+                <View style={styles.badge}>
+                  <Text style={styles.badgeText}>{unreadCount > 9 ? '9+' : unreadCount}</Text>
+                </View>
+              )}
               <Feather name="chevron-right" size={20} color={colors.border} />
             </TouchableOpacity>
           ))}
@@ -131,19 +138,6 @@ const styles = StyleSheet.create({
     color: colors.textSecondary || '#999',
     marginBottom: 10,
   },
-  badgesRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
-  editBadge: {
-    backgroundColor: '#E0F2FE',
-    color: colors.primary,
-    paddingVertical: 4,
-    paddingHorizontal: 12,
-    borderRadius: 999,
-    fontSize: 12,
-    fontWeight: '500',
-  },
   statsRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -188,6 +182,20 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '500',
     color: colors.text,
+  },
+  badge: {
+    backgroundColor: colors.primary,
+    borderRadius: 12,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    minWidth: 20,
+    alignItems: 'center',
+    marginRight: 8,
+  },
+  badgeText: {
+    color: 'white',
+    fontSize: 10,
+    fontWeight: 'bold',
   },
   footer: {
     textAlign: 'center',

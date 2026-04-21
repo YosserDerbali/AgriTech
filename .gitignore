@@ -34,3 +34,4 @@ backend/.env
 
 # Claude Code
 CLAUDE.md
+package-lock.json
