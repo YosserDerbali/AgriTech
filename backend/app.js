@@ -11,6 +11,7 @@ const adminRoutes = require("./routes/admin.js");
 const authRoutes = require("./routes/auth.js");
 const farmerRoutes = require("./routes/farmer.js");
 const agronomistRoutes = require("./routes/agronomist.js");
+const notificationRoutes = require("./routes/notifications.js"); // ← ADD THIS LINE
 
 
 const isPrivateNetworkHost = (hostname) => {
@@ -62,10 +63,11 @@ app.use(
 );
 app.use(express.json());
 
-app.use("/auth", authRoutes);  // ADD THIS LINE
+app.use("/auth", authRoutes);
 app.use("/admin", adminRoutes);
 app.use("/farmer", farmerRoutes);
 app.use("/agronomist", agronomistRoutes);
+app.use("/api/notifications", notificationRoutes); // ← ADD THIS LINE
 
 (async () => {
   try {
@@ -109,10 +111,6 @@ app.post("/create-admin-test", async (req, res) => {
 
   res.json(user);
 });
-
-
-
-
 
 app.listen(3000, "0.0.0.0", () => {
   console.log('Server is running on port 3000');

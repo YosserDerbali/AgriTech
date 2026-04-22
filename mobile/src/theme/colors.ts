@@ -4,23 +4,20 @@
  */
 
 // ============================================================================
-// FARMER - LIGHT MODE (Green Primary)
+// FARMER - LIGHT MODE
 // ============================================================================
 export const farmerLightColors = {
-  // Primary Brand Colors - Green
   primary: '#1B5E20',
   primaryLight: '#2E7D32',
   primaryDark: '#0D3B12',
   primarySoft: '#E8F5E9',
   primaryExtraLight: '#F1F8F4',
 
-  // Accent Colors - Gold/Amber
   accent: '#F9A825',
   accentLight: '#FDD835',
   accentDark: '#F57C00',
   accentSoft: '#FFF8E1',
 
-  // Neutral Colors - Professional Grays
   background: '#F5F5F0',
   surfaceBackground: '#FAFAF7',
   surface: '#FFFFFF',
@@ -28,7 +25,6 @@ export const farmerLightColors = {
   surfaceElevated: '#FAFAF7',
   surfaceAlt: '#F9F9F6',
 
-  // Text Colors - Semantic
   text: '#1A1A1A',
   textSecondary: '#5C6B5E',
   textTertiary: '#8E9A8F',
@@ -36,13 +32,11 @@ export const farmerLightColors = {
   textLight: '#D0D8D2',
   textInverse: '#FFFFFF',
   muted: '#9CA3AF',
-  
-  // Border Colors
+
   border: '#E0E4DE',
   borderLight: '#EDEFE9',
   borderLighter: '#F5F5F5',
 
-  // Semantic Colors
   success: '#2E7D32',
   successLight: '#E8F5E9',
   warning: '#F57F17',
@@ -53,34 +47,29 @@ export const farmerLightColors = {
   pending: '#1565C0',
   pendingLight: '#E3F2FD',
 
-  // Interactive States
   overlay: 'rgba(0,0,0,0.5)',
   overlayLight: 'rgba(0,0,0,0.2)',
   overlayExtraLight: 'rgba(0,0,0,0.08)',
 
-  // Gradient anchors
   gradientStart: '#1B5E20',
   gradientEnd: '#2E7D32',
 };
 
 // ============================================================================
-// FARMER - DARK MODE (Green Primary)
+// FARMER - DARK MODE
 // ============================================================================
 export const farmerDarkColors = {
-  // Primary Brand Colors - Green (lighter for contrast)
   primary: '#66BB6A',
   primaryLight: '#81C784',
   primaryDark: '#2E7D32',
   primarySoft: '#1B5E20',
   primaryExtraLight: '#0D3B12',
 
-  // Accent Colors - Gold/Amber
   accent: '#FFB74D',
   accentLight: '#FFCA28',
   accentDark: '#FFA000',
   accentSoft: '#F57F17',
 
-  // Neutral Colors - Dark grays
   background: '#000000',
   surfaceBackground: '#1A1F26',
   surface: '#212529',
@@ -88,7 +77,6 @@ export const farmerDarkColors = {
   surfaceElevated: '#2A3035',
   surfaceAlt: '#1E2329',
 
-  // Text Colors - Semantic
   text: '#F5F5F5',
   textSecondary: '#BDBDBD',
   textTertiary: '#9E9E9E',
@@ -97,12 +85,10 @@ export const farmerDarkColors = {
   textInverse: '#0F1419',
   muted: '#9E9E9E',
 
-  // Border Colors
   border: '#37474F',
   borderLight: '#455A64',
   borderLighter: '#546E7A',
 
-  // Semantic Colors
   success: '#66BB6A',
   successLight: '#2E7D32',
   warning: '#FFB74D',
@@ -112,166 +98,138 @@ export const farmerDarkColors = {
   pending: '#42A5F5',
   pendingLight: '#1565C0',
 
-  // Interactive States
   overlay: 'rgba(0,0,0,0.8)',
   overlayLight: 'rgba(0,0,0,0.5)',
   overlayExtraLight: 'rgba(255,255,255,0.1)',
 
-  // Gradient anchors
   gradientStart: '#66BB6A',
   gradientEnd: '#81C784',
 };
 
 // ============================================================================
-// AGRONOMIST - LIGHT MODE (Orange Primary - Modern & Sophisticated)
+// AGRONOMIST - LIGHT MODE
 // ============================================================================
 export const agronomistLightColors = {
-  // Primary Brand Colors - Refined Orange Palette
-  primary: '#D97706',          // Deep, rich orange
-  primaryLight: '#F59E0B',     // Medium warm orange
-  primaryDark: '#B45309',      // Dark chocolate-orange
-  primarySoft: '#FEF3C7',      // Soft warm cream
-  primaryExtraLight: '#FEF9E7', // Extra light cream
+  primary: '#D97706',
+  primaryLight: '#F59E0B',
+  primaryDark: '#B45309',
+  primarySoft: '#FEF3C7',
+  primaryExtraLight: '#FEF9E7',
 
-  // Accent Colors - Sophisticated Orange Tones
-  accent: '#EA580C',           // Vibrant accent orange
-  accentLight: '#FB923C',      // Light accent
-  accentDark: '#7C2D12',       // Deep accent
-  accentSoft: '#FED7AA',       // Soft accent background
+  accent: '#EA580C',
+  accentLight: '#FB923C',
+  accentDark: '#7C2D12',
+  accentSoft: '#FED7AA',
 
-  // Neutral Colors - Warm Professional
-  background: '#FAFAF8',       // Clean warm white
-  surfaceBackground: '#F9F7F4', // Subtle warm tone
-  surface: '#FFFFFF',          // Pure white
+  background: '#FAFAF8',
+  surfaceBackground: '#F9F7F4',
+  surface: '#FFFFFF',
   card: '#FFFFFF',
-  surfaceElevated: '#FFFBF5',  // Elevated warm surface
-  surfaceAlt: '#F7F5F2',       // Alternate surface
+  surfaceElevated: '#FFFBF5',
+  surfaceAlt: '#F7F5F2',
 
-  // Text Colors - Warm Neutral Hierarchy
-  text: '#09090B',             // Deep charcoal
-  textSecondary: '#44403C',    // Warm medium gray
-  textTertiary: '#78716C',     // Warm light gray
-  textMuted: '#A8A29E',        // Muted warm gray
-  textLight: '#D6D3D1',        // Light warm gray
-  textInverse: '#FFFFFF',      // White on dark
-  muted: '#92908B',            // Muted neutral
+  text: '#09090B',
+  textSecondary: '#44403C',
+  textTertiary: '#78716C',
+  textMuted: '#A8A29E',
+  textLight: '#D6D3D1',
+  textInverse: '#FFFFFF',
+  muted: '#92908B',
 
-  // Border Colors - Sophisticated
-  border: '#E7E5E4',           // Warm border
-  borderLight: '#F5F3F0',      // Light warm border
-  borderLighter: '#FAF9F7',    // Extra light border
+  border: '#E7E5E4',
+  borderLight: '#F5F3F0',
+  borderLighter: '#FAF9F7',
 
-  // Semantic Colors
-  success: '#D97706',          // Use primary for consistency
+  success: '#D97706',
   successLight: '#FEF3C7',
-  warning: '#EA580C',          // Vibrant warning
+  warning: '#EA580C',
   warningLight: '#FED7AA',
-  error: '#B42318',            // Deep red
+  error: '#B42318',
   errorLight: '#FECACA',
-  pending: '#0284C7',          // Blue pending
+  pending: '#0284C7',
   pendingLight: '#E0F2FE',
 
-  // Interactive States
   overlay: 'rgba(0,0,0,0.5)',
   overlayLight: 'rgba(0,0,0,0.15)',
   overlayExtraLight: 'rgba(0,0,0,0.06)',
 
-  // Gradient anchors
   gradientStart: '#D97706',
   gradientEnd: '#EA580C',
 };
 
 // ============================================================================
-// AGRONOMIST - DARK MODE (Orange Primary - Modern & Sophisticated)
+// AGRONOMIST - DARK MODE
 // ============================================================================
 export const agronomistDarkColors = {
-  // Primary Brand Colors - Refined for Dark Mode
-  primary: '#F59E0B',          // Warm orange for dark mode
-  primaryLight: '#FCD34D',     // Light warm tone
-  primaryDark: '#D97706',      // Deep orange reference
-  primarySoft: '#78350F',      // Deep brown-orange
-  primaryExtraLight: '#92400E', // Dark orange tone
+  primary: '#F59E0B',
+  primaryLight: '#FCD34D',
+  primaryDark: '#D97706',
+  primarySoft: '#78350F',
+  primaryExtraLight: '#92400E',
 
-  // Accent Colors - Sophisticated Orange
-  accent: '#FB923C',           // Light accent for contrast
-  accentLight: '#FED7AA',      // Extra light accent
-  accentDark: '#EA580C',       // Dark accent
-  accentSoft: '#7C2D12',       // Soft deep accent
+  accent: '#FB923C',
+  accentLight: '#FED7AA',
+  accentDark: '#EA580C',
+  accentSoft: '#7C2D12',
 
-  // Neutral Colors - Modern Dark
-  background: '#101010',       // True black
-  surfaceBackground: '#1F1F1F', // Dark surface
-  surface: '#2D2D2D',          // Dark card
+  background: '#101010',
+  surfaceBackground: '#1F1F1F',
+  surface: '#2D2D2D',
   card: '#2D2D2D',
-  surfaceElevated: '#3A3A3A',  // Elevated dark
-  surfaceAlt: '#242424',       // Alternate dark
+  surfaceElevated: '#3A3A3A',
+  surfaceAlt: '#242424',
 
-  // Text Colors - Warm Neutral for Dark
-  text: '#EEEBE6',             // Warm light text
-  textSecondary: '#D1CCC7',    // Warm secondary
-  textTertiary: '#A8A29E',     // Warm tertiary
-  textMuted: '#78716C',        // Muted warm
-  textLight: '#57534E',        // Light warm
-  textInverse: '#09090B',      // Dark on light
-  muted: '#9CA3AF',            // Neutral muted
+  text: '#EEEBE6',
+  textSecondary: '#D1CCC7',
+  textTertiary: '#A8A29E',
+  textMuted: '#78716C',
+  textLight: '#57534E',
+  textInverse: '#09090B',
+  muted: '#9CA3AF',
 
-  // Border Colors - Dark Mode
-  border: '#404040',           // Medium dark border
-  borderLight: '#525252',      // Light dark border
-  borderLighter: '#717171',    // Lighter dark border
+  border: '#404040',
+  borderLight: '#525252',
+  borderLighter: '#717171',
 
-  // Semantic Colors
-  success: '#F59E0B',          // Primary warm orange
+  success: '#F59E0B',
   successLight: '#78350F',
-  warning: '#FB923C',          // Light accent
+  warning: '#FB923C',
   warningLight: '#7C2D12',
-  error: '#EF4444',            // Bright red
+  error: '#EF4444',
   errorLight: '#7C2D2D',
-  pending: '#60A5FA',          // Bright blue
+  pending: '#60A5FA',
   pendingLight: '#1E40AF',
 
-  // Interactive States
   overlay: 'rgba(0,0,0,0.7)',
   overlayLight: 'rgba(0,0,0,0.4)',
   overlayExtraLight: 'rgba(255,255,255,0.08)',
 
-  // Gradient anchors
   gradientStart: '#F59E0B',
   gradientEnd: '#FB923C',
 };
 
 // ============================================================================
-// HELPER FUNCTION - Get palette by role and theme
+// TYPES
 // ============================================================================
 export type UserRole = 'farmer' | 'agronomist';
 export type ThemeMode = 'light' | 'dark';
 
+// ============================================================================
+// COLOR SELECTOR
+// ============================================================================
 export const getColors = (role: UserRole, theme: ThemeMode) => {
   if (role === 'farmer' && theme === 'light') return farmerLightColors;
   if (role === 'farmer' && theme === 'dark') return farmerDarkColors;
   if (role === 'agronomist' && theme === 'light') return agronomistLightColors;
   if (role === 'agronomist' && theme === 'dark') return agronomistDarkColors;
-  return farmerLightColors; // Default fallback
+
+  return farmerLightColors;
 };
 
 // ============================================================================
-// BACKWARDS COMPATIBILITY - Default to Farmer Light
+// SHADOWS
 // ============================================================================
-export const colors = farmerLightColors;
-
-/**
- * Shadow System for elevation and depth
- */
 export const shadows = {
-  // Subtle shadow for minimal elevation
-  xs: {
-    shadowColor: '#000',
-    shadowOpacity: 0.04,
-    shadowRadius: 2,
-    shadowOffset: { width: 0, height: 1 },
-    elevation: 1,
-  },
-  // Small shadow for cards
   sm: {
     shadowColor: '#000',
     shadowOpacity: 0.06,
@@ -279,7 +237,6 @@ export const shadows = {
     shadowOffset: { width: 0, height: 2 },
     elevation: 2,
   },
-  // Medium shadow for lifted components
   md: {
     shadowColor: '#000',
     shadowOpacity: 0.08,
@@ -287,34 +244,10 @@ export const shadows = {
     shadowOffset: { width: 0, height: 4 },
     elevation: 3,
   },
-  // Large shadow for prominent elements
-  lg: {
-    shadowColor: '#000',
-    shadowOpacity: 0.12,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 6 },
-    elevation: 4,
-  },
-  // Extra large shadow for modals/overlays
-  xl: {
-    shadowColor: '#000',
-    shadowOpacity: 0.16,
-    shadowRadius: 16,
-    shadowOffset: { width: 0, height: 8 },
-    elevation: 5,
-  },
-  // Soft shadow (used in UI patterns)
-  soft: {
-    shadowColor: '#1A1A1A',
-    shadowOpacity: 0.08,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 2,
-  },
 };
 
 // ============================================================================
-// THEME CREATION - Combines colors + shadows
+// THEME BUILDER
 // ============================================================================
 export const getTheme = (role: UserRole, theme: ThemeMode) => ({
   colors: getColors(role, theme),
@@ -322,11 +255,5 @@ export const getTheme = (role: UserRole, theme: ThemeMode) => ({
   isDark: theme === 'dark',
 });
 
-// ============================================================================
-// BACKWARDS COMPATIBILITY - Default theme
-// ============================================================================
-export const lightTheme = {
-  colors: farmerLightColors,
-  shadows,
-};
-
+// Default fallback
+export const colors = farmerLightColors;
