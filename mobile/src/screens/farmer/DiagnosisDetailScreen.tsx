@@ -109,6 +109,10 @@ export default function DiagnosisDetailScreen() {
     rejected: {
       borderColor: colors.errorLight,
     },
+    reviewStatusCard: {
+      backgroundColor: colors.pendingLight,
+      borderColor: colors.pending,
+    },
     title: {
       fontSize: 18,
       fontWeight: '700',

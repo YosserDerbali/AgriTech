@@ -219,7 +219,7 @@ export default function AgronomistDashboardScreen() {
             <AgronomistStatCard 
               title="Rejected" 
               value={rejectedCount}
-              icon="x-circle"
+              icon="activity"
             />
           </View>
           <View style={staticStyles.statItem}>
@@ -227,7 +227,7 @@ export default function AgronomistDashboardScreen() {
               title="Articles" 
               value={myArticles.length} 
               variant="accent"
-              icon="file-text"
+              icon="globe"
             />
           </View>
         </View>
@@ -282,5 +282,3 @@ export default function AgronomistDashboardScreen() {
     </SafeAreaView>
   );
 }
-
-

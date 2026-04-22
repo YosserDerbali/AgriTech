@@ -99,6 +99,24 @@ export function Input({
   const variantStyle = variantStyles[variant];
   const sizeStyle = sizePresets[size];
 
+  // Avoid extra wrapper width inside horizontal input rows (auth screens).
+  if (!label && !error) {
+    return (
+      <TextInput
+        style={[
+          dynamicStyles.input,
+          variantStyle,
+          sizeStyle,
+          hasIconPadding && dynamicStyles.inputWithIcon,
+          error && dynamicStyles.inputError,
+          style,
+        ]}
+        placeholderTextColor={colors.textTertiary}
+        {...props}
+      />
+    );
+  }
+
   return (
     <View style={dynamicStyles.container}>
       {label && <Text style={dynamicStyles.label}>{label}</Text>}

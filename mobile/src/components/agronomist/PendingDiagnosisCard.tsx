@@ -114,10 +114,10 @@ export function PendingDiagnosisCard({ diagnosis, onPress }: PendingDiagnosisCar
     >
       <View style={styles.imageWrapper}>
         {diagnosis.imageUrl ? (
-          <Image source={{ uri: diagnosis.imageUrl }} style={styles.image} />
+          <Image source={{ uri: diagnosis.imageUrl }} style={styles.image} resizeMode="cover" />
         ) : (
           <View style={styles.imagePlaceholder}>
-            <Feather name="leaf" size={32} color={colors.textMuted} />
+            <Feather name="image" size={32} color={colors.textMuted} />
           </View>
         )}
       </View>
@@ -130,7 +130,7 @@ export function PendingDiagnosisCard({ diagnosis, onPress }: PendingDiagnosisCar
           <View style={styles.confidenceRow}>
             <View style={styles.confidenceBadge}>
               <Text style={[styles.confidenceIcon, { color: isLowConfidence ? colors.warning : colors.success }]}>
-                {isLowConfidence ? '⚠' : '✓'}
+                {isLowConfidence ? '!' : 'OK'}
               </Text>
               <Text style={styles.confidenceText}>
                 {diagnosis.confidence !== null

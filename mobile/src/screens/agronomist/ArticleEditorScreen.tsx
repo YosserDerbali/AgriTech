@@ -5,10 +5,10 @@ import {
   StyleSheet,
   Text,
   View,
-  SafeAreaView,
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AgronomistStackParamList } from '../../navigation/types';
@@ -132,6 +132,9 @@ export default function ArticleEditorScreen() {
     input: {
       marginBottom: 8,
     },
+    coverSection: {
+      marginBottom: 10,
+    },
     textarea: {
       minHeight: 80,
       marginBottom: 8,
@@ -158,7 +161,7 @@ export default function ArticleEditorScreen() {
   });
 
   return (
-    <SafeAreaView style={styles.safeContainer}>
+    <SafeAreaView edges={['left', 'right', 'bottom']} style={styles.safeContainer}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardAvoid}
@@ -167,6 +170,7 @@ export default function ArticleEditorScreen() {
         <ScrollView
           style={styles.container}
           contentContainerStyle={styles.content}
+          contentInsetAdjustmentBehavior="never"
           scrollEnabled={true}
           keyboardShouldPersistTaps="handled"
         >

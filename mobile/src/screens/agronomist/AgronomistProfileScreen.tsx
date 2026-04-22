@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
-import { Alert, ScrollView, StyleSheet, Text, View, SafeAreaView, TouchableOpacity } from 'react-native';
+import { Alert, ScrollView, StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Feather } from '@expo/vector-icons';
@@ -280,5 +281,3 @@ export default function AgronomistProfileScreen() {
     </SafeAreaView>
   );
 }
-
-

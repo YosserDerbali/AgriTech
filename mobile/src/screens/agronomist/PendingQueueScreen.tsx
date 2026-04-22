@@ -183,7 +183,7 @@ export default function PendingQueueScreen() {
             activeOpacity={0.7}
           >
             <Text style={[dynamicStyles.filterChip, showLowConfidenceOnly && dynamicStyles.filterChipActive]}>
-              ⚠ Low Confidence ({lowConfidenceCount})
+              Low Confidence ({lowConfidenceCount})
             </Text>
           </TouchableOpacity>
         </View>
@@ -200,7 +200,7 @@ export default function PendingQueueScreen() {
                 <Text
                   style={[dynamicStyles.sortChip, sortBy === option && dynamicStyles.sortChipActive]}
                 >
-                  {option === 'newest' ? '🕐 Newest' : option === 'oldest' ? '📅 Oldest' : '📊 Confidence'}
+                  {option === 'newest' ? 'Newest' : option === 'oldest' ? 'Oldest' : 'Confidence'}
                 </Text>
               </TouchableOpacity>
             ))}

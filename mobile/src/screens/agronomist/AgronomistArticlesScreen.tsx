@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
-import { ScrollView, StyleSheet, Text, View, SafeAreaView } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AgronomistStackParamList } from '../../navigation/types';
@@ -64,7 +65,11 @@ export default function AgronomistArticlesScreen() {
 
   return (
     <SafeAreaView style={styles.safeContainer}>
-      <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={styles.content}
+        contentInsetAdjustmentBehavior="never"
+      >
         <View style={styles.headerRow}>
           <Text style={styles.title}>My Articles</Text>
           <Button title="New" onPress={() => navigation.navigate('ArticleEditor', {})} />

@@ -84,6 +84,7 @@ export const farmerDarkColors = {
   background: '#000000',
   surfaceBackground: '#1A1F26',
   surface: '#212529',
+  card: '#212529',
   surfaceElevated: '#2A3035',
   surfaceAlt: '#1E2329',
 
@@ -142,6 +143,7 @@ export const agronomistLightColors = {
   background: '#FAFAF8',       // Clean warm white
   surfaceBackground: '#F9F7F4', // Subtle warm tone
   surface: '#FFFFFF',          // Pure white
+  card: '#FFFFFF',
   surfaceElevated: '#FFFBF5',  // Elevated warm surface
   surfaceAlt: '#F7F5F2',       // Alternate surface
 
@@ -200,6 +202,7 @@ export const agronomistDarkColors = {
   background: '#101010',       // True black
   surfaceBackground: '#1F1F1F', // Dark surface
   surface: '#2D2D2D',          // Dark card
+  card: '#2D2D2D',
   surfaceElevated: '#3A3A3A',  // Elevated dark
   surfaceAlt: '#242424',       // Alternate dark
 

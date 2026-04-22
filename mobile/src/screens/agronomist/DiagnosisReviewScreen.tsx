@@ -22,6 +22,7 @@ import { Textarea } from '../../components/ui/Textarea';
 import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
 import { useTheme } from '../../hooks/useTheme';
+import { spacing } from '../../theme/spacing';
 
 export default function DiagnosisReviewScreen() {
   const { colors } = useTheme();
@@ -38,6 +39,7 @@ export default function DiagnosisReviewScreen() {
   const [notes, setNotes] = useState(diagnosis?.agronomistNotes || '');
   const [rejectionReason, setRejectionReason] = useState('');
   const [showRejectForm, setShowRejectForm] = useState(false);
+  const styles = createStyles(colors);
 
   useEffect(() => {
     if (!diagnosis && isAuthenticated) {
@@ -145,8 +147,6 @@ export default function DiagnosisReviewScreen() {
     },
   });
 
-  const styles = createStyles(colors);
-
   return (
     <SafeAreaView style={dynamicStyles.safeContainer}>
       <KeyboardAvoidingView
@@ -187,7 +187,7 @@ export default function DiagnosisReviewScreen() {
           </View>
         ) : (
           <View style={styles.row}>
-            <Text style={styles.value}>{diagnosis.diseaseName || 'Unknown'}</Text>
+            <Text style={styles.diseaseValue} numberOfLines={2}>{diagnosis.diseaseName || 'Unknown'}</Text>
             {diagnosis.status === 'PENDING' ? (
               <Button title="Edit" variant="outline" onPress={() => setIsEditing(true)} />
             ) : null}
@@ -329,7 +329,13 @@ const createStyles = (colors: any) => StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
     marginBottom: 6,
+  },
+  diseaseValue: {
+    flex: 1,
+    fontSize: 14,
+    marginRight: spacing.md,
   },
   flex: {
     flex: 1,

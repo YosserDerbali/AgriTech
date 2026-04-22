@@ -111,7 +111,8 @@ export const useDiagnosisStore = create<DiagnosisStore>((set, get) => ({
     try {
       set({ isLoading: true });
 
-      const data = await createDiagnosis(imageUrl, plantName, context);
+      const normalizedPlantName = plantName?.trim() || 'Unknown Plant';
+      const data = await createDiagnosis(imageUrl, normalizedPlantName, context);
       const newDiagnosis = mapDiagnosis(data.diagnosis);
 
       set((state) => ({

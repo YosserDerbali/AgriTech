@@ -44,7 +44,7 @@ export function DiagnosisCard({ diagnosis, onPress }: DiagnosisCardProps) {
   return (
     <Pressable onPress={onPress} style={dynamicStyles.card}>
       <View style={styles.imageWrapper}>
-        <Image source={{ uri: diagnosis.imageUrl }} style={styles.image} />
+        <Image source={{ uri: diagnosis.imageUrl }} style={styles.image} resizeMode="cover" />
       </View>
       <View style={styles.content}>
         <Text style={dynamicStyles.title}>{diagnosis.plantName}</Text>
@@ -66,6 +66,8 @@ const styles = StyleSheet.create({
   imageWrapper: {
     width: 90,
     height: 90,
+    flexShrink: 0,
+    backgroundColor: '#EDEFE9',
   },
   image: {
     width: '100%',

@@ -25,6 +25,13 @@ export default function ArticleDetailScreen() {
       padding: 16,
       paddingBottom: 30,
     },
+    heroImage: {
+      width: '100%',
+      height: 220,
+      borderRadius: 12,
+      marginBottom: 14,
+      backgroundColor: colors.borderLight,
+    },
     centered: {
       flex: 1,
       alignItems: 'center',

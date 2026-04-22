@@ -1,8 +1,9 @@
 import axios from "axios";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getApiBaseUrl } from './apiConfig';
 
 const API = axios.create({
-  baseURL: process.env.EXPO_PUBLIC_API_URL || "http://192.168.100.66:3000",
+  baseURL: getApiBaseUrl(),
 });
 
 export interface LoginRequest {
