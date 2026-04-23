@@ -4,7 +4,7 @@ const { AiModel } = require("../models/AiModel");
 const { supabase } = require("../config/supabaseClient");
 const { v4: uuidv4 } = require("uuid");
 const { detectDiseaseWithAIService } = require("./diseaseDetection");
-
+const {Notification} = require('./notification')
 const updateAiModelUsage = async (aiResult) => {
   const modelName = (aiResult?.model_name || "").trim();
   const modelVersion = (aiResult?.model_version || "").trim();
@@ -195,6 +195,19 @@ const createDiagnosis = async ({ userId, file, context, plantName }) => {
       validated: false,
       validated_by: null,
     });
+     const { User } = require("../models/User");
+  const agronomists = await User.findAll({
+    where: { role: "AGRONOMIST" },
+  });
+
+
+  for (const agronomist of agronomists) {
+    await Notification.create({
+      user_id: agronomist.id,
+      message: `New diagnosis submitted for ${aiResult.plant_name}. Review in queue.`,
+      read: false,
+    });
+  }
 
     await Promise.allSettled([updateAiModelUsage(aiResult)]);
 

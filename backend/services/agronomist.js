@@ -3,6 +3,7 @@ const { Diagnoses } = require("../models/Diagnoses");
 const { Article } = require("../models/Article");
 const { supabase } = require("../config/supabaseClient");
 const { v4: uuidv4 } = require("uuid");
+const {Notification} = require('./notification')
 const normalizeCatalogName = (value) => (value || "").trim().replace(/\s+/g, " ");
 const ARTICLE_COVER_BUCKET = "plant-images";
 
@@ -122,12 +123,63 @@ const updateDiagnosisReview = async ({ diagnosisId, reviewerId, status, treatmen
   });
 };
 
-const approveDiagnosis = async (diagnosisId, treatment, agronomistNotes) =>
-  updateDiagnosisReview({ diagnosisId, status: "APPROVED", treatment, agronomistNotes });
+const approveDiagnosis = async (id, treatment, agronomistNotes) => {
+  const diagnosis = await Diagnoses.findByPk(id);
 
-const rejectDiagnosis = async (diagnosisId, agronomistNotes) =>
-  updateDiagnosisReview({ diagnosisId, status: "REJECTED", agronomistNotes });
 
+  if (!diagnosis) {
+    throw new Error("Diagnosis not found");
+  }
+
+
+  diagnosis.status = "APPROVED";
+  diagnosis.treatment = treatment;
+  diagnosis.agronomist_notes = agronomistNotes || null;
+  diagnosis.updated_at = new Date();
+
+
+  await diagnosis.save();
+
+
+  // Send notification to farmer
+  await Notification.create({
+    user_id: diagnosis.user_id,
+    message: `Your diagnosis for ${diagnosis.plant_name} has been approved. Treatment: ${treatment}`,
+    read: false,
+  });
+
+
+  return diagnosis;
+};
+
+
+const rejectDiagnosis = async (id, agronomistNotes) => {
+  const diagnosis = await Diagnoses.findByPk(id);
+
+
+  if (!diagnosis) {
+    throw new Error("Diagnosis not found");
+  }
+
+
+  diagnosis.status = "REJECTED";
+  diagnosis.agronomist_notes = agronomistNotes;
+  diagnosis.updated_at = new Date();
+
+
+  await diagnosis.save();
+
+
+  // Send notification to farmer
+  await Notification.create({
+    user_id: diagnosis.user_id,
+    message: `Your diagnosis for ${diagnosis.plant_name} was rejected. Notes: ${agronomistNotes}`,
+    read: false,
+  });
+
+
+  return diagnosis;
+};
 const getMyArticles = async (authorId) =>
   Article.findAll({ where: { author_id: authorId }, order: [["created_at", "DESC"]] });
 

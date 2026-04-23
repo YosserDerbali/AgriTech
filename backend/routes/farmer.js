@@ -21,4 +21,13 @@ router.patch("/profile", authenticate, requireFarmer, farmerController.updatePro
 
 router.post("/change-password", authenticate, requireFarmer, farmerController.changePassword);
 
+router.get("/notifications", authenticate, requireFarmer, farmerController.getNotifications);
+
+
+// Delete a notification
+router.delete("/notifications/:id", authenticate, requireFarmer, farmerController.deleteNotification);
+
+
+// Mark notification as read
+router.put("/notifications/:id/read", authenticate, requireFarmer, farmerController.markNotificationAsRead);
 module.exports = router;
