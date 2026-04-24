@@ -19,4 +19,8 @@ router.post("/articles", upload.single("coverImage"), agronomistController.creat
 router.patch("/articles/:id", upload.single("coverImage"), agronomistController.updateArticle);
 router.delete("/articles/:id", agronomistController.deleteArticle);
 
+router.get("/notifications", agronomistController.getNotifications);
+router.delete("/notifications/:id", agronomistController.deleteNotification);
+router.put("/notifications/:id/read", agronomistController.markNotificationAsRead);
+
 module.exports = router;

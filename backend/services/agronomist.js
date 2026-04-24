@@ -3,7 +3,7 @@ const { Diagnoses } = require("../models/Diagnoses");
 const { Article } = require("../models/Article");
 const { supabase } = require("../config/supabaseClient");
 const { v4: uuidv4 } = require("uuid");
-const {Notification} = require('./notification')
+const {Notification} = require('../models/Notification');
 const normalizeCatalogName = (value) => (value || "").trim().replace(/\s+/g, " ");
 const ARTICLE_COVER_BUCKET = "plant-images";
 
@@ -136,14 +136,14 @@ const approveDiagnosis = async (id, treatment, agronomistNotes) => {
   diagnosis.treatment = treatment;
   diagnosis.agronomist_notes = agronomistNotes || null;
   diagnosis.updated_at = new Date();
-
+  const userID = diagnosis.user_id;
 
   await diagnosis.save();
 
 
   // Send notification to farmer
-  await Notification.create({
-    user_id: diagnosis.user_id,
+ const notification = await Notification.create({
+    user_id: userID,
     message: `Your diagnosis for ${diagnosis.plant_name} has been approved. Treatment: ${treatment}`,
     read: false,
   });
@@ -156,7 +156,7 @@ const approveDiagnosis = async (id, treatment, agronomistNotes) => {
 const rejectDiagnosis = async (id, agronomistNotes) => {
   const diagnosis = await Diagnoses.findByPk(id);
 
-
+  console.log(`Rejecting diagnosis ID ${id} with notes: ${agronomistNotes}`);
   if (!diagnosis) {
     throw new Error("Diagnosis not found");
   }
@@ -165,14 +165,14 @@ const rejectDiagnosis = async (id, agronomistNotes) => {
   diagnosis.status = "REJECTED";
   diagnosis.agronomist_notes = agronomistNotes;
   diagnosis.updated_at = new Date();
-
+  const userID = diagnosis.user_id;
 
   await diagnosis.save();
 
 
   // Send notification to farmer
-  await Notification.create({
-    user_id: diagnosis.user_id,
+  const notification = await Notification.create({
+    user_id: userID,
     message: `Your diagnosis for ${diagnosis.plant_name} was rejected. Notes: ${agronomistNotes}`,
     read: false,
   });

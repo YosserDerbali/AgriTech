@@ -67,7 +67,7 @@ app.use("/auth", authRoutes);
 app.use("/admin", adminRoutes);
 app.use("/farmer", farmerRoutes);
 app.use("/agronomist", agronomistRoutes);
-app.use("/api/notifications", notificationRoutes); // ← ADD THIS LINE
+// app.use("/api/notifications", notificationRoutes); // ← ADD THIS LINE
 
 (async () => {
   try {

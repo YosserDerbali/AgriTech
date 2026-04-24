@@ -1,5 +1,6 @@
 const agronomistService = require("../services/agronomist");
-
+const notificationService = require("../services/notification");
+const { Notification } = require("../models/Notification");
 const parseTags = (rawTags) => {
   if (rawTags === undefined) {
     return undefined;
@@ -84,8 +85,49 @@ const updateDiagnosis = async (req, res) => {
 
 const getPendingDiagnoses = getDiagnoses;
 const getDiagnosisById = getDiagnosis;
-const approveDiagnosis = updateDiagnosis;
-const rejectDiagnosis = updateDiagnosis;
+const approveDiagnosis = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { treatment, agronomistNotes } = req.body;
+
+    const result = await agronomistService.approveDiagnosis(id, treatment, agronomistNotes);
+
+    return res.status(200).json({
+      message: "Diagnosis approved successfully",
+      data: result,
+    });
+
+  } catch (error) {
+    console.error("Approve diagnosis error:", error);
+    return res.status(500).json({
+      message: error.message || "Server error",
+    });
+  }
+};
+
+
+// =========================
+// REJECT DIAGNOSIS CONTROLLER
+// =========================
+const rejectDiagnosis = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { agronomistNotes } = req.body;
+
+    const result = await agronomistService.rejectDiagnosis(id, agronomistNotes);
+
+    return res.status(200).json({
+      message: "Diagnosis rejected successfully",
+      data: result,
+    });
+
+  } catch (error) {
+    console.error("Reject diagnosis error:", error);
+    return res.status(500).json({
+      message: error.message || "Server error",
+    });
+  }
+};
 
 const getMyArticles = async (req, res) => {
   try {
@@ -158,7 +200,50 @@ const deleteArticle = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
+const getNotifications = async (req, res) => {
+  console.log("[agronomist.getNotifications] Incoming request", )
+  try {
+    const userId = req.user.id;
+    const notifications = await Notification.findAll({
+    where: {
+      user_id: userId,
+      deleted_at: null, // <-- exclude soft-deleted notifications
+    },
+    order: [["created_at", "DESC"]],
+  });
+  
+  res.status(200).json(notifications);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 
+
+const deleteNotification = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { id } = req.params;
+    await Notification.update(
+      { deleted_at: new Date() },
+      { where: { id: notificationId } }
+    );
+    res.status(200).json({ message: "Notification deleted successfully" });
+  } catch (error) {
+    res.status(404).json({ error: error.message });
+  }
+};
+
+
+const markNotificationAsRead = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { id } = req.params;
+    const notification = await agronomistService.markNotificationAsRead(id, userId);
+    res.status(200).json(notification);
+  } catch (error) {
+    res.status(404).json({ error: error.message });
+  }
+};
 module.exports = {
   getDiagnoses,
   getDiagnosis,
@@ -171,4 +256,7 @@ module.exports = {
   createArticle,
   updateArticle,
   deleteArticle,
+  getNotifications,
+  deleteNotification,
+  markNotificationAsRead,
 };

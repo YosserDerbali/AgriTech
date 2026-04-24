@@ -1,46 +1,59 @@
-import axiosInstance from './axiosInstance';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
+import { getApiBaseUrl } from "./apiConfig";
 
-export interface Notification {
-  id: string;
-  user_id: string;
-  title: string;
-  message: string;
-  type: string;
-  metadata: Record<string, any>;
-  isRead: boolean;
-  created_at: string;
-}
+const API = axios.create({
+  baseURL: getApiBaseUrl(),
+  withCredentials: true,
+});
 
-export interface NotificationsResponse {
-  success: boolean;
-  data: {
-    total: number;
-    unreadCount: number;
-    notifications: Notification[];
-  };
-}
+API.interceptors.request.use(async (config) => {
+  const token = await AsyncStorage.getItem("authToken");
+  console.log('Attaching token to request:', token);
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  
+  return config;
+}, (error) => {
+  return Promise.reject(error);
+});
 
-export const getNotifications = async (limit = 50, offset = 0) => {
-  const response = await axiosInstance.get(`/api/notifications?limit=${limit}&offset=${offset}`);
+API.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    if (error.response?.status === 401) {
+      console.log('401 Unauthorized - Clearing token');
+      await AsyncStorage.removeItem('authToken');
+    }
+    return Promise.reject(error);
+  }
+);
+
+/* =========================
+   NOTIFICATIONS
+========================= */
+
+
+// Get user notifications
+export const getNotifications = async () => {
+  const response = await API.get("/farmer/notifications");
   return response.data;
 };
 
-export const getUnreadCount = async () => {
-  const response = await axiosInstance.get('/api/notifications/unread/count');
+export const getAgronomistNotifications = async () => {
+  const response = await API.get("/agronomist/notifications");
   return response.data;
 };
-
-export const markAsRead = async (notificationId: string) => {
-  const response = await axiosInstance.patch(`/api/notifications/${notificationId}/read`);
-  return response.data;
-};
-
-export const markAllAsRead = async () => {
-  const response = await axiosInstance.post('/api/notifications/mark-all-read');
-  return response.data;
-};
-
+// Delete a notification
 export const deleteNotification = async (notificationId: string) => {
-  const response = await axiosInstance.delete(`/api/notifications/${notificationId}`);
+  const response = await API.delete(`/farmer/notifications/${notificationId}`);
+  return response.data;
+};
+
+
+// Mark notification as read
+export const markNotificationAsRead = async (notificationId: string) => {
+  const response = await API.put(`/farmer/notifications/${notificationId}/read`);
   return response.data;
 };

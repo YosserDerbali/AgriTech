@@ -1,6 +1,7 @@
 const farmerService = require('../services/farmer');
 const { transcribeWithAIService } = require('../services/speechRecognition');
-
+const notificationService = require('../services/notification');
+const {Notification} = require('../models/Notification');
 const getArticles = async (req, res) => {
   try {
     const articles = await farmerService.getPublishedArticles();
@@ -161,6 +162,50 @@ const changePassword = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+const getNotifications = async (req, res) => {
+  console.log('Fetching notifications for user', req.user.id);
+  try {
+    const userId = req.user.id;
+    const notifications = await Notification.findAll({
+    where: {
+      user_id: userId,
+     
+    },
+    order: [["created_at", "DESC"]],
+  });
+    console.log(`Fetched ${notifications.length} notifications for user ${userId}`);
+    res.status(200).json(notifications);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
+const deleteNotification = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { id } = req.params;
+     await Notification.update(
+    { deleted_at: new Date() },
+    { where: { id: notificationId } }
+  );
+    res.status(200).json({ message: "Notification deleted successfully" });
+  } catch (error) {
+    res.status(404).json({ error: error.message });
+  }
+};
+
+
+const markNotificationAsRead = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { id } = req.params;
+    const notification = await farmerService.markNotificationAsRead(id, userId);
+    res.status(200).json(notification);
+  } catch (error) {
+    res.status(404).json({ error: error.message });
+  }
+};
 
 module.exports = {
   getArticles,
@@ -171,4 +216,7 @@ module.exports = {
   transcribeVoiceNote,
   updateProfile,
   changePassword,
+  getNotifications,
+  deleteNotification,
+  markNotificationAsRead,
 };
