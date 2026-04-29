@@ -11,16 +11,15 @@ import GoogleSignInButton from '../../components/ui/GoogleSignInButton';
 import { useAppStore } from '../../stores/appStore';
 import { authAPI } from '../../services/authAPI';
 import { useTheme } from '../../hooks/useTheme';
-import { signInWithGoogle, useGoogleAuth } from '../../services/googleAuthService';
+import { useGoogleAuth } from '../../services/auth/googleAuth';
+import { isClerkConfigured } from '../../services/auth/clerkConfig';
 import { spacing, radius } from '../../theme/spacing';
 
 export default function AgronomistAuthScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<AuthStackParamList>>();
-  const { setRole, setUser, setIsAuthenticated, setToken, restoreToken, isAuthenticated } = useAppStore();
+  const { setRole, setUser, setIsAuthenticated, setToken } = useAppStore();
   const { colors, shadows } = useTheme();
 
-  // Initialize Google Auth hook
-  const [request, response, promptAsync] = useGoogleAuth();
 
   const [isSignUp, setIsSignUp] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -40,52 +39,37 @@ export default function AgronomistAuthScreen() {
     setRole('agronomist');
   }, [setRole]);
 
-  const handleGoogleSignIn = async () => {
-    try {
-      setIsGoogleLoading(true);
-      
-      if (!promptAsync) {
-        Alert.alert('Error', 'Google Sign-In not initialized');
-        return;
+  function ClerkGoogleSignInButton() {
+    const { signInWithGoogle } = useGoogleAuth();
+
+    const handlePress = async () => {
+      try {
+        setIsGoogleLoading(true);
+        await signInWithGoogle();
+        Alert.alert('Welcome', 'Google sign-in completed successfully.');
+      } catch (error) {
+        Alert.alert('Error', error instanceof Error ? error.message : 'Google sign-in failed');
+      } finally {
+        setIsGoogleLoading(false);
       }
+    };
 
-      const result = await promptAsync();
-
-      if (result?.type !== 'success') {
-        throw new Error('Google sign-in was cancelled');
-      }
-
-      const { id_token, access_token } = result.params || {};
-
-      if (!id_token) {
-        throw new Error('No authentication token received');
-      }
-
-      const googleResult = await signInWithGoogle(id_token, access_token, 'AGRONOMIST');
-      
-      await setToken(googleResult.token);
-      setUser({
-        id: googleResult.user.id,
-        name: googleResult.user.name,
-        email: googleResult.user.email,
-        role: 'agronomist',
-      });
-      setRole('agronomist');
-      setIsAuthenticated(true);
-      Alert.alert('Welcome', `Signed in as ${googleResult.user.name}`);
-    } catch (error) {
-      Alert.alert('Error', error instanceof Error ? error.message : 'Google sign-in failed');
-    } finally {
-      setIsGoogleLoading(false);
-    }
-  };
+    return (
+      <GoogleSignInButton
+        onPress={handlePress}
+        loading={isGoogleLoading}
+        disabled={isLoading || isGoogleLoading}
+        size="medium"
+      />
+    );
+  }
 
   const handleSubmit = async () => {
     Keyboard.dismiss();
     setIsLoading(true);
 
     try {
-      
+
       if (isSignUp) {
         // Register
         if (!formData.name || !formData.email || !formData.password) {
@@ -301,12 +285,16 @@ export default function AgronomistAuthScreen() {
 
         {/* Google Sign-In Button */}
         <View style={styles.googleButtonContainer}>
-          <GoogleSignInButton
-            onPress={handleGoogleSignIn}
-            loading={isGoogleLoading}
-            disabled={isLoading || isGoogleLoading}
-            size="medium"
-          />
+          {isClerkConfigured ? (
+            <ClerkGoogleSignInButton />
+          ) : (
+            <GoogleSignInButton
+              onPress={() => Alert.alert('Google Sign-In', 'Configure Clerk to enable Google sign-in.')}
+              loading={false}
+              disabled={true}
+              size="medium"
+            />
+          )}
         </View>
 
         {/* Divider */}
