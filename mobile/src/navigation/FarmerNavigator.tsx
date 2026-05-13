@@ -49,22 +49,22 @@ export default function FarmerNavigator() {
       <Stack.Screen
         name="Settings"
         component={SettingsScreen}
-        options={{ title: 'Settings' }}
+        options={{ headerShown: false }}
       />
       <Stack.Screen
         name="Privacy"
         component={PrivacyScreen}
-        options={{ title: 'Privacy & Security' }}
+        options={{ headerShown: false }}
       />
       <Stack.Screen
         name="Help"
         component={HelpAndSupportScreen}
-        options={{ title: 'Help & Support' }}
+        options={{ headerShown: false }}
       />
       <Stack.Screen
         name="Notifications"
         component={NotificationsScreen}
-        options={{ title: 'Notifications' }}
+        options={{ headerShown: false }}
       />
       <Stack.Screen
         name="EditProfile"

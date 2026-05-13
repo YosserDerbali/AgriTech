@@ -1,4 +1,7 @@
 const { User } = require("../models/User");
+const { Diagnosis } = require("../models/Diagnoses");
+const { Article } = require("../models/Article");
+const { AiModel } = require("../models/AiModel");
 const bcrypt = require("bcrypt");
 
 // 🔹 Get all users
@@ -10,11 +13,17 @@ exports.getAllUsers = async () => {
 };
 
 // 🔹 Create a new user
-exports.createUser = async ({ name, email, role, isActive = true, password="password123" }) => {
+exports.createUser = async ({
+  name,
+  email,
+  role,
+  isActive = true,
+  password = "password123",
+}) => {
   if (!["FARMER", "AGRONOMIST", "ADMIN"].includes(role)) {
     throw new Error("Invalid role");
   }
-   // Check if email already exists
+
   const existing = await User.findOne({ where: { email } });
   if (existing) throw new Error("Email already in use");
 
@@ -31,7 +40,7 @@ exports.createUser = async ({ name, email, role, isActive = true, password="pass
   return user;
 };
 
-// 🔹 Update a user's details (name, email, role, isActive, password)
+// 🔹 Update user details
 exports.updateUserDetails = async (userId, data) => {
   const user = await User.findByPk(userId);
   if (!user) throw new Error("User not found");
@@ -60,7 +69,7 @@ exports.updateUserDetails = async (userId, data) => {
   return user;
 };
 
-// 🔹 Update a user's role
+// 🔹 Update user role
 exports.updateUserRole = async (userId, newRole) => {
   if (!["FARMER", "AGRONOMIST", "ADMIN"].includes(newRole)) {
     throw new Error("Invalid role");
@@ -74,7 +83,7 @@ exports.updateUserRole = async (userId, newRole) => {
   return user;
 };
 
-// 🔹 Update a user's status (active/inactive)
+// 🔹 Update user status (toggle)
 exports.updateUserStatus = async (userId) => {
   const user = await User.findByPk(userId);
   if (!user) throw new Error("User not found");
@@ -84,12 +93,40 @@ exports.updateUserStatus = async (userId) => {
   return user;
 };
 
-// 🔹 Delete a user (hard delete)
+// 🔹 Delete user (hard delete)
 exports.deleteUser = async (userId) => {
   const user = await User.findByPk(userId);
-
   if (!user) throw new Error("User not found");
 
   await user.destroy();
   return user;
+};
+
+//
+// ===============================
+// 🔹 ADMIN: DIAGNOSES
+// ===============================
+//
+
+exports.getAllDiagnoses = async () => {
+  return await Diagnosis.findAll({
+    order: [["created_at", "DESC"]],
+  });
+};
+
+//
+// ===============================
+// 🔹 ADMIN: AI MODELS
+// ===============================
+//
+
+exports.getAllAiModels = async () => {
+  return await AiModel.findAll({
+    order: [["created_at", "DESC"]],
+  });
+};
+exports.getAllArticles = async () => {
+  return await Article.findAll({
+    order: [["created_at", "DESC"]],
+  });
 };

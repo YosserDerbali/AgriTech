@@ -20,6 +20,7 @@ import {
   ChartTooltipContent 
 } from '@/components/ui/chart';
 import { AreaChart, Area, XAxis, YAxis, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { useEffect } from 'react';
 
 // Mock chart data
 const diagnosisData = [
@@ -39,14 +40,17 @@ const statusData = [
 ];
 
 export default function AdminDashboardPage() {
-  const getSystemStats = useAdminStore((state) => state.getSystemStats);
+
   const diagnoses = useDiagnosisStore((state) => state.diagnoses);
   const articles = useArticleStore((state) => state.articles);
-
+ const { users, addUser, loadUsers, loadSystemData,getSystemStats  } = useAdminStore();
   const stats = getSystemStats();
   const pendingCount = diagnoses.filter((d) => d.status === 'PENDING').length;
   const approvedCount = diagnoses.filter((d) => d.status === 'APPROVED').length;
-
+useEffect(() => {
+    loadSystemData();
+    console.log('System data loaded');
+}, []);
   return (
     <div className="min-h-screen bg-background">
       <AdminSidebar />

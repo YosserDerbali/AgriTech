@@ -32,6 +32,7 @@ export default function AgronomistProfileScreen() {
   const menuItems = [
     { id: 'notifications', label: 'Notifications', icon: 'bell', onPress: () => navigation.navigate('Notifications') },
     { id: 'settings', label: 'Settings', icon: 'settings', onPress: () => navigation.navigate('Settings') },
+    { id: 'privacy', label: 'Privacy & Security', icon: 'shield', onPress: () => navigation.navigate('Privacy' as any) },
     { id: 'help', label: 'Help & Support', icon: 'life-buoy', onPress: () => navigation.navigate('HelpAndSupport') },
   ];
 

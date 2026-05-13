@@ -22,6 +22,29 @@ router.post("/rss-configurations/validate-feed", authenticate, requireAdmin, adm
 router.post("/rss-configurations/preview-sync", authenticate, requireAdmin, adminController.previewRssSync);
 router.post("/rss-configurations/trigger-sync", authenticate, requireAdmin, adminController.triggerRssSync);
 router.get("/rss-configurations/schedule-info", authenticate, requireAdmin, adminController.getRssScheduleInfo);
+// ── Diagnoses Management ───────────────────────────────────────────────
 
+// 🔹 Get all diagnoses
+router.get(
+  "/diagnoses",
+  authenticate,
+  requireAdmin,
+  adminController.getAllDiagnoses
+);
+
+// ── AI Models Management ───────────────────────────────────────────────
+
+// 🔹 Get all AI models
+router.get(
+  "/ai-models",
+  authenticate,
+  requireAdmin,
+  adminController.getAllAiModels
+);
+router.get(
+  "/articles",
+  authenticate,requireAdmin,
+  adminController.getAllArticles
+);
 
 module.exports = router;

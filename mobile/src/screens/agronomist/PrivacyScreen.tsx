@@ -2,7 +2,7 @@ import React from 'react';
 import { ScrollView, StyleSheet, Text, View, SafeAreaView, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { FarmerStackParamList } from '../../navigation/types';
+import { AgronomistStackParamList } from '../../navigation/types';
 import { Card } from '../../components/ui/Card';
 import { useTheme } from '../../hooks/useTheme';
 import { Feather } from '@expo/vector-icons';
@@ -11,7 +11,7 @@ import { useAppStore } from '../../stores/appStore';
 
 export default function PrivacyScreen() {
   const { colors } = useTheme();
-  const navigation = useNavigation<NativeStackNavigationProp<FarmerStackParamList>>();
+  const navigation = useNavigation<NativeStackNavigationProp<AgronomistStackParamList>>();
   const { logout } = useAppStore();
 
   const handleChangePassword = () => {

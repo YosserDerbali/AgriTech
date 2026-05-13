@@ -302,3 +302,52 @@ exports.getRssScheduleInfo = async (req, res) => {
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
+// ── Diagnoses Endpoints ───────────────────────────────────────────────
+
+// 🔹 Get all diagnoses
+exports.getAllDiagnoses = async (req, res) => {
+  try {
+    const diagnoses = await adminService.getAllDiagnoses();
+
+    res.json({
+      success: true,
+      data: diagnoses,
+    });
+  } catch (err) {
+    console.error("Get all diagnoses error:", err);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+// ── AI Models Endpoints ───────────────────────────────────────────────
+
+// 🔹 Get all AI models
+exports.getAllAiModels = async (req, res) => {
+  try {
+    const models = await adminService.getAllAiModels();
+
+    res.json({
+      success: true,
+      data: models,
+    });
+  } catch (err) {
+    console.error("Get all AI models error:", err);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+exports.getAllArticles = async (req, res) => {
+  try {
+    const articles = await adminService.getAllArticles();
+
+    res.json({
+      success: true,
+      data: articles,
+    });
+  } catch (err) {
+    console.error("Get all articles error:", err);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};

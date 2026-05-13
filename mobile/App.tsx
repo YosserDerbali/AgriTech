@@ -68,7 +68,11 @@ function ClerkStateSync() {
 }
 
 function AppContent() {
-  const { isDark } = useTheme();
+  const { isDark, restoreTheme } = useTheme();
+
+  useEffect(() => {
+    restoreTheme();
+  }, [restoreTheme]);
 
   return (
     <>
