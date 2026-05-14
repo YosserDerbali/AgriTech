@@ -335,6 +335,69 @@ exports.getAllAiModels = async (req, res) => {
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
+// 🔹 Create AI model
+exports.createAiModel = async (req, res) => {
+  try {
+    const { name, version, type, accuracy, isEnabled = true } = req.body;
+    if (!name || !version || !type || accuracy === undefined) {
+      return res.status(400).json({ success: false, message: 'Missing required fields' });
+    }
+
+    const { AiModel } = require('../models');
+
+    const model = await AiModel.create({
+      name,
+      version,
+      type,
+      accuracy,
+      isEnabled,
+      totalPredictions: 0,
+      lastUpdated: new Date(),
+    });
+
+    res.status(201).json({ success: true, data: model });
+  } catch (err) {
+    console.error('Create AI model error:', err);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
+// 🔹 Toggle AI model enabled/disabled
+exports.toggleAiModel = async (req, res) => {
+  try {
+    const { modelId } = req.params;
+    const { AiModel } = require('../models');
+
+    const model = await AiModel.findByPk(modelId);
+    if (!model) return res.status(404).json({ success: false, message: 'Model not found' });
+
+    model.isEnabled = !model.isEnabled;
+    model.lastUpdated = new Date();
+    await model.save();
+
+    res.json({ success: true, data: model });
+  } catch (err) {
+    console.error('Toggle AI model error:', err);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
+// 🔹 Delete AI model
+exports.deleteAiModel = async (req, res) => {
+  try {
+    const { modelId } = req.params;
+    const { AiModel } = require('../models');
+
+    const model = await AiModel.findByPk(modelId);
+    if (!model) return res.status(404).json({ success: false, message: 'Model not found' });
+
+    await model.destroy();
+    res.json({ success: true, message: 'Model deleted' });
+  } catch (err) {
+    console.error('Delete AI model error:', err);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
 exports.getAllArticles = async (req, res) => {
   try {
     const articles = await adminService.getAllArticles();
@@ -351,3 +414,96 @@ exports.getAllArticles = async (req, res) => {
     });
   }
 };
+
+// 🔹 Get system settings
+exports.getSystemSettings = async (req, res) => {
+  try {
+    const { SystemSettings } = require('../models');
+
+    let settings = await SystemSettings.findOne();
+
+    // If no settings exist, create default ones
+    if (!settings) {
+      settings = await SystemSettings.create({
+        maintenanceMode: false,
+        maxImageSizeMB: 10,
+        confidenceThreshold: 0.8,
+        notificationsEnabled: true,
+        externalBlogSyncEnabled: false,
+        externalBlogSyncIntervalHours: 6,
+      });
+    }
+
+    res.json({
+      success: true,
+      data: settings,
+    });
+  } catch (err) {
+    console.error("Get system settings error:", err);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+// 🔹 Update system settings
+exports.updateSystemSettings = async (req, res) => {
+  try {
+    const {
+      maintenanceMode,
+      maxImageSizeMB,
+      confidenceThreshold,
+      notificationsEnabled,
+      externalBlogSyncEnabled,
+      externalBlogSyncIntervalHours,
+    } = req.body;
+
+    const { SystemSettings } = require('../models');
+
+    const settings = await SystemSettings.findOne();
+    if (!settings) {
+      return res.status(404).json({ success: false, message: 'Settings not found' });
+    }
+
+    // Validation
+    if (maxImageSizeMB !== undefined) {
+      if (maxImageSizeMB < 1 || maxImageSizeMB > 50) {
+        return res.status(400).json({
+          success: false,
+          message: 'maxImageSizeMB must be between 1 and 50',
+        });
+      }
+      settings.maxImageSizeMB = maxImageSizeMB;
+    }
+
+    if (confidenceThreshold !== undefined) {
+      if (confidenceThreshold < 0.5 || confidenceThreshold > 0.95) {
+        return res.status(400).json({
+          success: false,
+          message: 'confidenceThreshold must be between 0.5 and 0.95',
+        });
+      }
+      settings.confidenceThreshold = confidenceThreshold;
+    }
+
+    if (externalBlogSyncIntervalHours !== undefined) {
+      if (externalBlogSyncIntervalHours < 1 || externalBlogSyncIntervalHours > 24) {
+        return res.status(400).json({
+          success: false,
+          message: 'externalBlogSyncIntervalHours must be between 1 and 24',
+        });
+      }
+      settings.externalBlogSyncIntervalHours = externalBlogSyncIntervalHours;
+    }
+
+    if (maintenanceMode !== undefined) settings.maintenanceMode = maintenanceMode;
+    if (notificationsEnabled !== undefined) settings.notificationsEnabled = notificationsEnabled;
+    if (externalBlogSyncEnabled !== undefined) settings.externalBlogSyncEnabled = externalBlogSyncEnabled;
+
+    await settings.save();
+
+    res.json({ success: true, data: settings });
+  } catch (err) {
+    console.error('Update system settings error:', err);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
