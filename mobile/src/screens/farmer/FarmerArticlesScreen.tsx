@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View, SafeAreaView, Linking } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import React, { useState, useEffect, useRef } from 'react';
+import { Pressable, ScrollView, StyleSheet, Text, View, SafeAreaView, Linking, Animated } from 'react-native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { formatDistanceToNow } from 'date-fns';
 import { FarmerStackParamList } from '../../navigation/types';
@@ -16,6 +16,11 @@ export default function FarmerArticlesScreen() {
   const { articles, isLoading, getAllArticles } = useArticleStore(); // Changed to getAllArticles
   const { colors, shadows } = useTheme();
   const [tab, setTab] = useState<FilterTab>('all');
+
+  // Animation refs
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(20)).current;
+  const scaleAnim = useRef(new Animated.Value(0.95)).current;
 
   // Dynamic styles based on theme
   const dynamicStyles = StyleSheet.create({
@@ -138,6 +143,39 @@ export default function FarmerArticlesScreen() {
     getAllArticles(); // Changed to getAllArticles
   }, []);
 
+  // Mount animation
+  useFocusEffect(
+    React.useCallback(() => {
+      // Reset animations
+      fadeAnim.setValue(0);
+      slideAnim.setValue(20);
+      scaleAnim.setValue(0.95);
+
+      // Start entrance animation
+      Animated.parallel([
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 600,
+          useNativeDriver: true,
+        }),
+        Animated.timing(slideAnim, {
+          toValue: 0,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+        Animated.timing(scaleAnim, {
+          toValue: 1,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+      ]).start();
+
+      return () => {
+        // Cleanup when screen loses focus
+      };
+    }, [fadeAnim, slideAnim, scaleAnim])
+  );
+
   if (isLoading) {
     return (
       <SafeAreaView style={dynamicStyles.safeContainer}>
@@ -150,7 +188,19 @@ export default function FarmerArticlesScreen() {
 
   return (
     <SafeAreaView style={dynamicStyles.safeContainer}>
-      <ScrollView style={dynamicStyles.container} contentContainerStyle={dynamicStyles.content}>
+      <Animated.View
+        style={[
+          { flex: 1 },
+          {
+            opacity: fadeAnim,
+            transform: [
+              { translateY: slideAnim },
+              { scale: scaleAnim },
+            ],
+          },
+        ]}
+      >
+        <ScrollView style={dynamicStyles.container} contentContainerStyle={dynamicStyles.content}>
         <Text style={dynamicStyles.title}>Articles</Text>
         <Text style={dynamicStyles.subtitle}>Learn from experts and trusted sources</Text>
 
@@ -197,6 +247,7 @@ export default function FarmerArticlesScreen() {
           )}
         </View>
       </ScrollView>
+      </Animated.View>
     </SafeAreaView>
   );
 }

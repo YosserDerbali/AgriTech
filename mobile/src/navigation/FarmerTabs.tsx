@@ -1,5 +1,6 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { Animated, Easing } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { FarmerTabsParamList } from './types';
 import HomeScreen from '../screens/farmer/HomeScreen';
@@ -14,16 +15,45 @@ const Tab = createBottomTabNavigator<FarmerTabsParamList>();
 export default function FarmerTabs() {
   const { colors } = useTheme();
 
+  // Custom transition animation
+  const transitionSpec = {
+    animation: 'timing',
+    config: {
+      duration: 300,
+      easing: Easing.out(Easing.poly(4)),
+    },
+  };
+
+  const screenOptions = {
+    transitionSpec,
+    cardStyleInterpolator: ({ current, next, layouts }: any) => {
+      const translateX = Animated.interpolate(current.progress, {
+        inputRange: [0, 1],
+        outputRange: [layouts.screen.width, 0],
+      });
+
+      const opacity = Animated.interpolate(current.progress, {
+        inputRange: [0, 0.5, 1],
+        outputRange: [0, 0.5, 1],
+      });
+
+      return {
+        cardStyle: {
+          transform: [{ translateX }],
+          opacity,
+        },
+      };
+    },
+  };
+
   return (
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: colors.textMuted,
-        tabBarStyle: { 
-          backgroundColor: colors.surface,
-          borderTopColor: colors.border 
-        },
+        tabBarInactiveTintColor: colors.muted,
+        tabBarStyle: { backgroundColor: colors.surface, borderTopColor: colors.border },
+        ...screenOptions,
       }}
     >
       <Tab.Screen

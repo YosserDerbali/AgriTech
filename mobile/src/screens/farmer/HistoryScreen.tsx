@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Animated, ScrollView, StyleSheet, Text, View, SafeAreaView, TouchableOpacity } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { FarmerStackParamList } from '../../navigation/types';
 import { PendingDiagnosisCard } from '../../components/agronomist/PendingDiagnosisCard';
@@ -25,21 +25,49 @@ export default function HistoryScreen() {
   const { fetchDiagnoses } = useDiagnosisStore();
   const { isAuthenticated } = useAppStore();
   const [filter, setFilter] = useState<FilterType>('ALL');
-  const mountAnimation = useRef(new Animated.Value(0)).current;
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(20)).current;
+  const scaleAnim = useRef(new Animated.Value(0.95)).current;
   const filterAnimation = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
     if (isAuthenticated) {
       fetchDiagnoses().catch(() => null);
     }
+  }, [fetchDiagnoses, isAuthenticated]);
 
-    Animated.timing(mountAnimation, {
-      toValue: 1,
-      duration: 500,
-      delay: 120,
-      useNativeDriver: true,
-    }).start();
-  }, [fetchDiagnoses, isAuthenticated, mountAnimation]);
+  // Mount animation
+  useFocusEffect(
+    React.useCallback(() => {
+      // Reset animations
+      fadeAnim.setValue(0);
+      slideAnim.setValue(20);
+      scaleAnim.setValue(0.95);
+
+      // Start entrance animation
+      Animated.parallel([
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 600,
+          useNativeDriver: true,
+        }),
+        Animated.timing(slideAnim, {
+          toValue: 0,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+        Animated.timing(scaleAnim, {
+          toValue: 1,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+      ]).start();
+
+      return () => {
+        // Cleanup when screen loses focus
+      };
+    }, [fadeAnim, slideAnim, scaleAnim])
+  );
 
   useEffect(() => {
     filterAnimation.setValue(0);
@@ -120,13 +148,13 @@ export default function HistoryScreen() {
       color: colors.textMuted,
     },
     contentWrapper: {
-      opacity: mountAnimation,
+      opacity: fadeAnim,
       transform: [
         {
-          translateY: mountAnimation.interpolate({
-            inputRange: [0, 1],
-            outputRange: [18, 0],
-          }),
+          translateY: slideAnim,
+        },
+        {
+          scale: scaleAnim,
         },
       ],
     },
@@ -137,8 +165,20 @@ export default function HistoryScreen() {
 
   return (
     <SafeAreaView style={styles.safeContainer}>
-      <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-        <Animated.View style={styles.contentWrapper}>
+      <Animated.View
+        style={[
+          { flex: 1 },
+          {
+            opacity: fadeAnim,
+            transform: [
+              { translateY: slideAnim },
+              { scale: scaleAnim },
+            ],
+          },
+        ]}
+      >
+        <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+          <Animated.View style={styles.contentWrapper}>
           <Text style={styles.title}>Diagnosis History</Text>
           <View style={styles.filtersRow}>
             {filters.map(({ label, value }) => (
@@ -195,6 +235,7 @@ export default function HistoryScreen() {
           </Animated.View>
         </Animated.View>
       </ScrollView>
+      </Animated.View>
     </SafeAreaView>
   );
 }

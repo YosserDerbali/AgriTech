@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import {
   Alert,
   ScrollView,
@@ -6,10 +6,11 @@ import {
   Text,
   View,
   SafeAreaView,
-  TouchableOpacity
+  TouchableOpacity,
+  Animated
 } from 'react-native';
 
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import { FarmerStackParamList } from '../../navigation/types';
@@ -28,6 +29,11 @@ import { spacing, radius } from '../../theme/spacing';
 export default function FarmerProfileScreen() {
 
   const { colors, shadows } = useTheme();
+
+  // Animation refs
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(20)).current;
+  const scaleAnim = useRef(new Animated.Value(0.95)).current;
   const dynamicStyles = StyleSheet.create({
     safeContainer: {
       flex: 1,
@@ -198,6 +204,39 @@ export default function FarmerProfileScreen() {
   const accuracy =
     totalScans > 0 ? Math.round((treatedCount / totalScans) * 100) : 92;
 
+  // Mount animation
+  useFocusEffect(
+    React.useCallback(() => {
+      // Reset animations
+      fadeAnim.setValue(0);
+      slideAnim.setValue(20);
+      scaleAnim.setValue(0.95);
+
+      // Start entrance animation
+      Animated.parallel([
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 600,
+          useNativeDriver: true,
+        }),
+        Animated.timing(slideAnim, {
+          toValue: 0,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+        Animated.timing(scaleAnim, {
+          toValue: 1,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+      ]).start();
+
+      return () => {
+        // Cleanup when screen loses focus
+      };
+    }, [fadeAnim, slideAnim, scaleAnim])
+  );
+
   const menuItems = [
     { id: 'notifications', label: 'Notifications', icon: 'bell', onPress: () => navigation.navigate('Notifications') },
     { id: 'settings', label: 'Settings', icon: 'settings', onPress: () => navigation.navigate('Settings') },
@@ -213,7 +252,19 @@ export default function FarmerProfileScreen() {
 
   return (
     <SafeAreaView style={dynamicStyles.safeContainer}>
-      <ScrollView style={dynamicStyles.container} contentContainerStyle={dynamicStyles.content}>
+      <Animated.View
+        style={[
+          { flex: 1 },
+          {
+            opacity: fadeAnim,
+            transform: [
+              { translateY: slideAnim },
+              { scale: scaleAnim },
+            ],
+          },
+        ]}
+      >
+        <ScrollView style={dynamicStyles.container} contentContainerStyle={dynamicStyles.content}>
         <Text style={dynamicStyles.title}>Profile</Text>
 
         <Card style={staticStyles.profileCard}>
@@ -285,6 +336,7 @@ export default function FarmerProfileScreen() {
           <Button title="Log Out" variant="outline" onPress={handleLogout} />
         </View>
       </ScrollView>
+      </Animated.View>
     </SafeAreaView>
   );
 }

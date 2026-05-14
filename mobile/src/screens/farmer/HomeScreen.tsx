@@ -1,11 +1,12 @@
-import React, { useEffect } from 'react';
-import { ScrollView, StyleSheet, Text, View, SafeAreaView, Platform, Pressable } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { ScrollView, StyleSheet, Text, View, SafeAreaView, Platform, Pressable, Animated } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Feather, Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useFocusEffect } from '@react-navigation/native';
 import { FarmerStackParamList } from '../../navigation/types';
 import { useDiagnosisStore } from '../../stores/diagnosisStore';
 import { DiagnosisCard } from '../../components/diagnosis/DiagnosisCard';
@@ -21,6 +22,11 @@ export default function HomeScreen() {
   const { colors, shadows } = useTheme();
   const recentDiagnoses = diagnoses.slice(0, 3);
 
+  // Animation refs
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(20)).current;
+  const scaleAnim = useRef(new Animated.Value(0.95)).current;
+
   const handleHaptics = () => {
     if (Platform.OS !== 'web') {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -29,6 +35,39 @@ export default function HomeScreen() {
 
   const pendingCount = diagnoses.filter((d) => d.status === 'PENDING').length;
   const approvedCount = diagnoses.filter((d) => d.status === 'APPROVED').length;
+
+  // Mount animation
+  useFocusEffect(
+    React.useCallback(() => {
+      // Reset animations
+      fadeAnim.setValue(0);
+      slideAnim.setValue(20);
+      scaleAnim.setValue(0.95);
+
+      // Start entrance animation
+      Animated.parallel([
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 600,
+          useNativeDriver: true,
+        }),
+        Animated.timing(slideAnim, {
+          toValue: 0,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+        Animated.timing(scaleAnim, {
+          toValue: 1,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+      ]).start();
+
+      return () => {
+        // Cleanup when screen loses focus
+      };
+    }, [fadeAnim, slideAnim, scaleAnim])
+  );
 
   // Dynamic styles based on theme
   const dynamicStyles = StyleSheet.create({
@@ -137,11 +176,23 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={dynamicStyles.safeContainer}>
-      <ScrollView
-        style={dynamicStyles.container}
-        contentContainerStyle={styles.content}
-        showsVerticalScrollIndicator={false}
+      <Animated.View
+        style={[
+          { flex: 1 },
+          {
+            opacity: fadeAnim,
+            transform: [
+              { translateY: slideAnim },
+              { scale: scaleAnim },
+            ],
+          },
+        ]}
       >
+        <ScrollView
+          style={dynamicStyles.container}
+          contentContainerStyle={styles.content}
+          showsVerticalScrollIndicator={false}
+        >
         {/* Hero Section with Gradient */}
         <LinearGradient
           colors={[colors.primary, colors.primaryLight]}
@@ -312,6 +363,7 @@ export default function HomeScreen() {
           </View>
         </View>
       </ScrollView>
+      </Animated.View>
     </SafeAreaView>
   );
 }

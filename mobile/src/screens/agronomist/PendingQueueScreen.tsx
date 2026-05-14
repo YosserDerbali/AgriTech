@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View, SafeAreaView, TouchableOpacity } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import React, { useEffect, useState, useRef } from 'react';
+import { ScrollView, StyleSheet, Text, View, SafeAreaView, TouchableOpacity, Animated } from 'react-native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Feather } from '@expo/vector-icons';
 import { AgronomistStackParamList } from '../../navigation/types';
@@ -17,6 +17,12 @@ export default function PendingQueueScreen() {
   const { colors, shadows } = useTheme();
   const [sortBy, setSortBy] = useState<SortOption>('newest');
   const [showLowConfidenceOnly, setShowLowConfidenceOnly] = useState(false);
+
+  // Animation refs
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(20)).current;
+  const scaleAnim = useRef(new Animated.Value(0.95)).current;
+  const filterAnim = useRef(new Animated.Value(1)).current;
 
   const dynamicStyles = StyleSheet.create({
     safeContainer: {
@@ -147,6 +153,49 @@ export default function PendingQueueScreen() {
     fetchReviewQueue().catch(() => null);
   }, [fetchReviewQueue]);
 
+  // Mount animation
+  useFocusEffect(
+    React.useCallback(() => {
+      // Reset animations
+      fadeAnim.setValue(0);
+      slideAnim.setValue(20);
+      scaleAnim.setValue(0.95);
+
+      // Start entrance animation
+      Animated.parallel([
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 600,
+          useNativeDriver: true,
+        }),
+        Animated.timing(slideAnim, {
+          toValue: 0,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+        Animated.timing(scaleAnim, {
+          toValue: 1,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+      ]).start();
+
+      return () => {
+        // Cleanup when screen loses focus
+      };
+    }, [fadeAnim, slideAnim, scaleAnim])
+  );
+
+  // Filter/sort change animations
+  useEffect(() => {
+    filterAnim.setValue(0);
+    Animated.timing(filterAnim, {
+      toValue: 1,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  }, [sortBy, showLowConfidenceOnly, filterAnim]);
+
   const pendingDiagnoses = getPendingDiagnoses();
   const filteredDiagnoses = pendingDiagnoses
     .filter((d) => !showLowConfidenceOnly || (d.confidence !== null && d.confidence < 0.7))
@@ -168,7 +217,19 @@ export default function PendingQueueScreen() {
 
   return (
     <SafeAreaView style={dynamicStyles.safeContainer}>
-      <ScrollView style={dynamicStyles.container} contentContainerStyle={dynamicStyles.content}>
+      <Animated.View
+        style={[
+          { flex: 1 },
+          {
+            opacity: fadeAnim,
+            transform: [
+              { translateY: slideAnim },
+              { scale: scaleAnim },
+            ],
+          },
+        ]}
+      >
+        <ScrollView style={dynamicStyles.container} contentContainerStyle={dynamicStyles.content}>
         <View style={dynamicStyles.header}>
           <Text style={dynamicStyles.title}>Pending Queue</Text>
           <Text style={dynamicStyles.subtitle}>
@@ -226,7 +287,22 @@ export default function PendingQueueScreen() {
             </Text>
           </View>
         ) : (
-          <View style={dynamicStyles.listContainer}>
+          <Animated.View
+            style={[
+              dynamicStyles.listContainer,
+              {
+                opacity: filterAnim,
+                transform: [
+                  {
+                    translateY: filterAnim.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [10, 0],
+                    }),
+                  },
+                ],
+              },
+            ]}
+          >
             {filteredDiagnoses.map((diagnosis) => (
               <PendingDiagnosisCard
                 key={diagnosis.id}
@@ -234,9 +310,10 @@ export default function PendingQueueScreen() {
                 onPress={() => navigation.navigate('DiagnosisReview', { id: diagnosis.id })}
               />
             ))}
-          </View>
+          </Animated.View>
         )}
       </ScrollView>
+      </Animated.View>
     </SafeAreaView>
   );
 }

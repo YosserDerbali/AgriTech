@@ -44,6 +44,7 @@ export default function DiagnoseScreen() {
   const [currentStep, setCurrentStep] = useState(0);
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const slideAnim = useRef(new Animated.Value(0)).current;
+  const scaleAnim = useRef(new Animated.Value(1)).current;
 
   const steps = [
     { id: 0, title: 'Upload Image', icon: 'camera', required: true },
@@ -64,7 +65,30 @@ export default function DiagnoseScreen() {
   useFocusEffect(
     React.useCallback(() => {
       resetDiagnosisForm();
-    }, [])
+
+      // Mount animations
+      fadeAnim.setValue(0);
+      slideAnim.setValue(20);
+      scaleAnim.setValue(0.95);
+
+      Animated.parallel([
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 600,
+          useNativeDriver: true,
+        }),
+        Animated.timing(slideAnim, {
+          toValue: 0,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+        Animated.timing(scaleAnim, {
+          toValue: 1,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    }, [fadeAnim, slideAnim, scaleAnim])
   );
 
   const appendTranscript = (transcript: string) => {
@@ -701,11 +725,23 @@ export default function DiagnoseScreen() {
 
   return (
     <SafeAreaView style={styles.safeContainer}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.keyboardAvoid}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+      <Animated.View
+        style={[
+          { flex: 1 },
+          {
+            opacity: fadeAnim,
+            transform: [
+              { translateY: slideAnim },
+              { scale: scaleAnim },
+            ],
+          },
+        ]}
       >
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.keyboardAvoid}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+        >
         <ScrollView
           style={styles.container}
           contentContainerStyle={styles.content}
@@ -721,6 +757,7 @@ export default function DiagnoseScreen() {
           {renderNavigationButtons()}
         </ScrollView>
       </KeyboardAvoidingView>
+      </Animated.View>
     </SafeAreaView>
   );
 }
