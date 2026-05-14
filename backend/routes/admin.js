@@ -14,6 +14,16 @@ router.patch("/users/:userId/role", authenticate,requireAdmin,adminController.up
 router.patch("/users/:userId/status", authenticate,requireAdmin,adminController.updateUserStatus);
 router.delete("/users/:userId",authenticate,requireAdmin, adminController.deleteUser);
 
+// AI Models management
+router.get("/ai-models", authenticate, requireAdmin, adminController.getAllAiModels);
+router.post("/ai-models", authenticate, requireAdmin, adminController.createAiModel);
+router.patch("/ai-models/:modelId", authenticate, requireAdmin, adminController.toggleAiModel);
+router.delete("/ai-models/:modelId", authenticate, requireAdmin, adminController.deleteAiModel);
+
+// System Settings management
+router.get("/settings", authenticate, requireAdmin, adminController.getSystemSettings);
+router.put("/settings", authenticate, requireAdmin, adminController.updateSystemSettings);
+
 // RSS Configuration management
 router.get("/rss-configurations", authenticate, requireAdmin, adminController.getAllRssConfigurations);
 router.get("/rss-configurations/category/:category", authenticate, requireAdmin, adminController.getRssConfigurationsByCategory);

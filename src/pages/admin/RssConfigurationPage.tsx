@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo, memo } from 'react';
 import { AdminSidebar } from '@/components/layout/AdminSidebar';
 import { useAdminStore } from '@/stores/adminStore';
 import { Button } from '@/components/ui/button';
@@ -17,7 +17,7 @@ import { Loader2, Plus, Trash2, Edit2, CheckCircle, XCircle, RefreshCw, Play, Cl
 type ScheduleConfigValue = boolean | number;
 type PreviewArticle = RssPreviewResult['articles'][number];
 
-export default function RssConfigurationPage() {
+function RssConfigurationPageComponent() {
   const {
     rssConfig,
     loadRssConfigurations,
@@ -54,7 +54,8 @@ export default function RssConfigurationPage() {
 
   useEffect(() => {
     loadRssConfigurations();
-  }, [loadRssConfigurations]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleAddFeed = async () => {
     if (!newFeedUrl.trim() || !newFeedAuthor.trim()) {
@@ -940,3 +941,5 @@ export default function RssConfigurationPage() {
     </div>
   );
 }
+
+export default memo(RssConfigurationPageComponent);

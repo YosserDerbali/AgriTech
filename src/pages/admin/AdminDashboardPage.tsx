@@ -3,7 +3,8 @@ import { StatsCard } from '@/components/admin/StatsCard';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAdminStore } from '@/stores/adminStore';
 import { useDiagnosisStore } from '@/stores/diagnosisStore';
-import { useArticleStore } from '@/stores/articleStore';
+import { useEffect } from 'react';
+import type { Diagnosis } from '@/types/diagnosis';
 import { 
   Users, 
   FileCheck, 
@@ -21,31 +22,44 @@ import {
 } from '@/components/ui/chart';
 import { AreaChart, Area, XAxis, YAxis, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
-// Mock chart data
-const diagnosisData = [
-  { name: 'Mon', diagnoses: 12 },
-  { name: 'Tue', diagnoses: 19 },
-  { name: 'Wed', diagnoses: 15 },
-  { name: 'Thu', diagnoses: 22 },
-  { name: 'Fri', diagnoses: 18 },
-  { name: 'Sat', diagnoses: 8 },
-  { name: 'Sun', diagnoses: 5 },
-];
-
-const statusData = [
-  { name: 'Approved', value: 132, fill: 'hsl(var(--status-approved))' },
-  { name: 'Pending', value: 12, fill: 'hsl(var(--status-pending))' },
-  { name: 'Rejected', value: 12, fill: 'hsl(var(--status-rejected))' },
-];
+// Generate weekly diagnosis data from backend diagnoses
+const generateWeeklyData = (diagnoses: Diagnosis[]) => {
+  const today = new Date();
+  const weekData = Array.from({ length: 7 }, (_, i) => {
+    const date = new Date(today);
+    date.setDate(date.getDate() - (6 - i));
+    const dayCount = diagnoses.filter((d) => {
+      const dDate = new Date(d.createdAt);
+      return dDate.toDateString() === date.toDateString();
+    }).length;
+    return {
+      name: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][date.getDay()],
+      diagnoses: dayCount,
+    };
+  });
+  return weekData;
+};
 
 export default function AdminDashboardPage() {
-  const getSystemStats = useAdminStore((state) => state.getSystemStats);
-  const diagnoses = useDiagnosisStore((state) => state.diagnoses);
-  const articles = useArticleStore((state) => state.articles);
+  const { getSystemStats, loadUsers } = useAdminStore();
+  const { diagnoses } = useDiagnosisStore();
 
   const stats = getSystemStats();
   const pendingCount = diagnoses.filter((d) => d.status === 'PENDING').length;
   const approvedCount = diagnoses.filter((d) => d.status === 'APPROVED').length;
+
+  // Generate data from backend diagnoses
+  const diagnosisData = generateWeeklyData(diagnoses);
+  const statusData = [
+    { name: 'Approved', value: approvedCount, fill: 'hsl(var(--status-approved))' },
+    { name: 'Pending', value: pendingCount, fill: 'hsl(var(--status-pending))' },
+    { name: 'Rejected', value: diagnoses.filter((d) => d.status === 'REJECTED').length, fill: 'hsl(var(--status-rejected))' },
+  ];
+
+  // Fetch data on mount
+  useEffect(() => {
+    loadUsers();
+  }, [loadUsers]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -69,7 +83,7 @@ export default function AdminDashboardPage() {
             />
             <StatsCard
               title="Total Diagnoses"
-              value={diagnoses.length}
+              value={stats.totalDiagnoses}
               icon={FileCheck}
               variant="success"
               trend={{ value: 8, isPositive: true }}
@@ -202,12 +216,12 @@ export default function AdminDashboardPage() {
             <Card>
               <CardContent className="p-4">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-secondary">
-                    <FileText className="w-5 h-5 text-secondary-foreground" />
+                  <div className="p-2 rounded-lg bg-success/10">
+                    <FileText className="w-5 h-5 text-success" />
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Articles</p>
-                    <p className="text-lg font-semibold">{articles.length}</p>
+                    <p className="text-lg font-semibold">{stats.totalArticles}</p>
                   </div>
                 </div>
               </CardContent>

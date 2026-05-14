@@ -6,9 +6,18 @@ import { Brain, TrendingUp, Zap, Activity } from 'lucide-react';
 import { toast } from 'sonner';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
+import { useEffect, useState } from 'react';
 
 export default function AIModelsPage() {
-  const { aiModels, toggleAIModel } = useAdminStore();
+  const { aiModels, toggleAIModel, loadAIModels } = useAdminStore();
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    setIsLoading(true);
+    loadAIModels()
+      .catch(err => console.error('Failed to load AI models:', err))
+      .finally(() => setIsLoading(false));
+  }, [loadAIModels]);
 
   const handleToggle = (modelId: string) => {
     const model = aiModels.find((m) => m.id === modelId);
@@ -92,14 +101,16 @@ export default function AIModelsPage() {
 
           {/* AI Models Grid */}
           <h2 className="text-lg font-semibold mb-4">Manage Models</h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {aiModels.map((model) => (
-              <AIModelCard
-                key={model.id}
-                model={model}
-                onToggle={handleToggle}
-              />
-            ))}
+          <div className="flex justify-center">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-2xl">
+              {aiModels.map((model) => (
+                <AIModelCard
+                  key={model.id}
+                  model={model}
+                  onToggle={handleToggle}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </main>

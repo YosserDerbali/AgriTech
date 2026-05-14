@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { User, AIModel, SystemStats, SystemConfig, UserRole, RssConfiguration, RssFeed, RssFeedValidation, RssPreviewResult, RssConfigState } from '@/types/admin';
-import { fetchUsers, createUser, updateUserDetails, updateUserRole, updateUserStatus, deleteUser, fetchRssConfigurations, updateRssConfiguration, validateRssFeed, previewRssSync, triggerRssSync, fetchRssScheduleInfo } from '@/services/adminAPIs';
+import { fetchUsers, createUser, updateUserDetails, updateUserRole, updateUserStatus, deleteUser, fetchRssConfigurations, updateRssConfiguration, validateRssFeed, previewRssSync, triggerRssSync, fetchRssScheduleInfo, fetchAiModels, toggleAiModel, fetchSystemSettings, updateSystemSettings } from '@/services/adminAPIs';
 // Mock users data
 const mockUsers: User[] = [
   {
@@ -54,7 +54,7 @@ const mockUsers: User[] = [
 const mockAIModels: AIModel[] = [
   {
     id: '1',
-    name: 'Plant Disease Classifier',
+    name: 'Plant Disease Detection Model',
     version: 'v2.1.0',
     type: 'DISEASE_DETECTION',
     isEnabled: true,
@@ -69,18 +69,8 @@ const mockAIModels: AIModel[] = [
     type: 'SPEECH_RECOGNITION',
     isEnabled: true,
     accuracy: 95.2,
-    totalPredictions: 342,
+    totalPredictions: 456,
     lastUpdated: new Date(Date.now() - 86400000 * 14),
-  },
-  {
-    id: '3',
-    name: 'Agronomist Recommender',
-    version: 'v1.2.0',
-    type: 'RECOMMENDATION',
-    isEnabled: true,
-    accuracy: 88.3,
-    totalPredictions: 156,
-    lastUpdated: new Date(Date.now() - 86400000 * 3),
   },
 ];
 
@@ -112,11 +102,13 @@ interface AdminStore {
   deleteUser: (userId: string) => Promise<void>;
 
   // AI Model management
+  loadAIModels: () => Promise<void>;
   getAIModels: () => AIModel[];
   toggleAIModel: (modelId: string) => void;
 
   // System config
-  updateSystemConfig: (config: Partial<SystemConfig>) => void;
+  loadSystemSettings: () => Promise<void>;
+  updateSystemConfig: (config: Partial<SystemConfig>) => Promise<void>;
 
   // RSS Configuration management
   loadRssConfigurations: () => Promise<void>;
@@ -229,18 +221,50 @@ export const useAdminStore = create<AdminStore>((set, get) => ({
   
   getAIModels: () => get().aiModels,
   
+  loadAIModels: async () => {
+    set({ isLoading: true });
+    try {
+      const models = await fetchAiModels();
+      set({ aiModels: models, isLoading: false });
+    } catch (error) {
+      console.error('Failed to load AI models:', error);
+      set({ isLoading: false });
+      throw error;
+    }
+  },
+  
   toggleAIModel: (modelId) => {
     set((state) => ({
       aiModels: state.aiModels.map((m) =>
         m.id === modelId ? { ...m, isEnabled: !m.isEnabled } : m
       ),
     }));
+    // Also update on backend
+    toggleAiModel(modelId).catch(err => console.error('Failed to toggle AI model:', err));
   },
   
-  updateSystemConfig: (config) => {
-    set((state) => ({
-      systemConfig: { ...state.systemConfig, ...config },
-    }));
+  updateSystemConfig: async (config) => {
+    try {
+      const updated = await updateSystemSettings(config);
+      set((state) => ({
+        systemConfig: updated,
+      }));
+    } catch (error) {
+      console.error('Failed to update system config:', error);
+      throw error;
+    }
+  },
+
+  loadSystemSettings: async () => {
+    set({ isLoading: true });
+    try {
+      const settings = await fetchSystemSettings();
+      set({ systemConfig: settings, isLoading: false });
+    } catch (error) {
+      console.error('Failed to load settings:', error);
+      set({ isLoading: false });
+      throw error;
+    }
   },
   
   getSystemStats: () => {

@@ -114,3 +114,74 @@ export const fetchRssScheduleInfo = async () => {
   const res = await API.get("/rss-configurations/schedule-info");
   return res.data.data;
 };
+
+// ============================
+// 🔹 AI MODELS
+// ============================
+
+export interface AIModel {
+  id: string;
+  name: string;
+  version: string;
+  type: string;
+  accuracy: number;
+  totalPredictions: number;
+  isEnabled: boolean;
+  lastUpdated: Date;
+}
+
+// Get all AI models
+export const fetchAiModels = async (): Promise<AIModel[]> => {
+  const res = await API.get("/ai-models");
+  return res.data.data;
+};
+
+// Create new AI model
+export const createAiModel = async (
+  data: Omit<AIModel, "id" | "lastUpdated">
+): Promise<AIModel> => {
+  const res = await API.post("/ai-models", data);
+  return res.data.data;
+};
+
+// Toggle AI model status (enable/disable)
+export const toggleAiModel = async (modelId: string): Promise<AIModel> => {
+  const res = await API.patch(`/ai-models/${modelId}`);
+  return res.data.data;
+};
+
+// Delete AI model
+export const deleteAiModel = async (modelId: string): Promise<void> => {
+  const res = await API.delete(`/ai-models/${modelId}`);
+  return res.data.data;
+};
+
+// ============================
+// 🔹 SYSTEM SETTINGS
+// ============================
+
+export interface SystemConfig {
+  id: string;
+  maintenanceMode: boolean;
+  maxImageSizeMB: number;
+  confidenceThreshold: number;
+  notificationsEnabled: boolean;
+  externalBlogSyncEnabled: boolean;
+  externalBlogSyncIntervalHours: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// Get system settings
+export const fetchSystemSettings = async (): Promise<SystemConfig> => {
+  const res = await API.get("/settings");
+  return res.data.data;
+};
+
+// Update system settings
+export const updateSystemSettings = async (
+  data: Partial<Omit<SystemConfig, "id" | "createdAt" | "updatedAt">>
+): Promise<SystemConfig> => {
+  const res = await API.put("/settings", data);
+  return res.data.data;
+};

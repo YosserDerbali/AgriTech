@@ -8,15 +8,35 @@ import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Settings, Bell, Image, Brain, RefreshCw, AlertTriangle, Save } from 'lucide-react';
 import { toast } from 'sonner';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function SettingsPage() {
-  const { systemConfig, updateSystemConfig } = useAdminStore();
+  const { systemConfig, updateSystemConfig, loadSystemSettings } = useAdminStore();
   const [localConfig, setLocalConfig] = useState(systemConfig);
+  const [isSaving, setIsSaving] = useState(false);
 
-  const handleSave = () => {
-    updateSystemConfig(localConfig);
-    toast.success('Settings saved successfully');
+  useEffect(() => {
+    // Load settings from backend on mount
+    loadSystemSettings().catch(err => {
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    setLocalConfig(systemConfig);
+  }, [systemConfig]);
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      await updateSystemConfig(localConfig);
+      toast.success('Settings saved successfully');
+    } catch (error) {
+      toast.error('Failed to save settings');
+      console.error('Save error:', error);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -206,9 +226,13 @@ export default function SettingsPage() {
             </Card>
 
             {/* Save Button */}
-            <Button onClick={handleSave} className="w-full">
+            <Button 
+              onClick={handleSave} 
+              className="w-full"
+              disabled={isSaving}
+            >
               <Save className="w-4 h-4 mr-2" />
-              Save Settings
+              {isSaving ? 'Saving...' : 'Save Settings'}
             </Button>
           </div>
         </div>
