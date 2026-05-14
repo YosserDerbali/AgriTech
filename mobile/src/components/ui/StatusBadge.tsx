@@ -12,19 +12,25 @@ type StatusBadgeProps = {
 };
 
 export function StatusBadge({ status }: StatusBadgeProps) {
-  const { colors } = useTheme();
+  const { colors, isDark } = useTheme();
+
+  const statusBackgrounds = {
+    PENDING: isDark ? 'rgba(66,165,245,0.16)' : colors.pendingLight,
+    APPROVED: isDark ? 'rgba(102,187,106,0.18)' : colors.successLight,
+    REJECTED: isDark ? 'rgba(239,83,80,0.18)' : colors.errorLight,
+  };
 
   const statusStyles: Record<Status, { container: Record<string, any>; text: { color: string } }> = {
     PENDING: {
-      container: { backgroundColor: colors.pendingLight },
+      container: { backgroundColor: statusBackgrounds.PENDING },
       text: { color: colors.pending },
     },
     APPROVED: {
-      container: { backgroundColor: colors.successLight },
+      container: { backgroundColor: statusBackgrounds.APPROVED },
       text: { color: colors.success },
     },
     REJECTED: {
-      container: { backgroundColor: colors.errorLight },
+      container: { backgroundColor: statusBackgrounds.REJECTED },
       text: { color: colors.error },
     },
   };

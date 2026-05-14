@@ -24,6 +24,12 @@ export function DiagnosisCard({ diagnosis, onPress }: DiagnosisCardProps) {
       marginBottom: 12,
       ...shadows.soft,
     },
+    imageWrapper: {
+      width: 90,
+      height: 90,
+      flexShrink: 0,
+      backgroundColor: colors.surfaceAlt,
+    },
     title: {
       fontSize: 14,
       fontWeight: '600',
@@ -43,7 +49,7 @@ export function DiagnosisCard({ diagnosis, onPress }: DiagnosisCardProps) {
 
   return (
     <Pressable onPress={onPress} style={dynamicStyles.card}>
-      <View style={styles.imageWrapper}>
+      <View style={dynamicStyles.imageWrapper}>
         <Image source={{ uri: diagnosis.imageUrl }} style={styles.image} resizeMode="cover" />
       </View>
       <View style={styles.content}>

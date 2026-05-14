@@ -15,7 +15,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Feather } from '@expo/vector-icons';
 
 import { AgronomistStackParamList } from '../../navigation/types';
-import { Card } from '../../components/ui/Card';
+import { NotificationCard } from '../../components/ui/NotificationCard';
 import { useTheme } from '../../hooks/useTheme';
 import { spacing, radius } from '../../theme/spacing';
 
@@ -294,50 +294,6 @@ export default function NotificationsScreen() {
       width: 40,
     },
 
-    notificationCard: {
-      marginBottom: spacing.lg,
-    },
-
-    notificationContent: {
-      flexDirection: 'row',
-      alignItems: 'flex-start',
-      gap: spacing.lg,
-    },
-
-    iconContainer: {
-      width: 52,
-      height: 52,
-      borderRadius: radius.lg,
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: colors.primaryLight,
-      borderWidth: 1.5,
-      borderColor: colors.primary,
-    },
-
-    textContent: {
-      flex: 1,
-    },
-
-    notificationMessage: {
-      fontSize: 15,
-      color: colors.text,
-      marginBottom: spacing.xs,
-    },
-
-    timestamp: {
-      fontSize: 12,
-      color: colors.textMuted,
-      fontWeight: '500',
-    },
-
-    unreadDot: {
-      width: 8,
-      height: 8,
-      borderRadius: 4,
-      backgroundColor: colors.primary,
-      marginLeft: 6
-    },
 
     emptyContainer: {
       justifyContent: 'center',
@@ -393,48 +349,13 @@ export default function NotificationsScreen() {
         {notifications.length > 0 ? (
 
           notifications.map((notification) => (
-
-            <TouchableOpacity
+            <NotificationCard
               key={notification.id}
-              activeOpacity={0.7}
+              notification={notification}
+              timeLabel={getRelativeTime(notification.created_at)}
               onPress={() => handleNotificationPress(notification)}
               onLongPress={() => handleLongPress(notification)}
-            >
-
-              <Card style={[styles.notificationCard, shadows.sm]}>
-
-                <View style={styles.notificationContent}>
-
-                  <View style={styles.iconContainer}>
-                    <Feather name="bell" size={24} color={colors.primary} />
-                  </View>
-
-                  <View style={styles.textContent}>
-
-                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-
-                      <Text style={styles.notificationMessage}>
-                        {notification.message}
-                      </Text>
-
-                      {!notification.read && (
-                        <View style={styles.unreadDot} />
-                      )}
-
-                    </View>
-
-                    <Text style={styles.timestamp}>
-                      {getRelativeTime(notification.created_at)}
-                    </Text>
-
-                  </View>
-
-                </View>
-
-              </Card>
-
-            </TouchableOpacity>
-
+            />
           ))
 
         ) : (

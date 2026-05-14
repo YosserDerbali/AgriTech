@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import {
   Alert,
   ScrollView,
@@ -6,10 +6,11 @@ import {
   Text,
   View,
   SafeAreaView,
-  TouchableOpacity
+  TouchableOpacity,
+  Animated
 } from 'react-native';
 
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import { FarmerStackParamList } from '../../navigation/types';
@@ -21,23 +22,172 @@ import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { useTheme } from '../../hooks/useTheme';
 import { Feather } from '@expo/vector-icons';
+import { spacing, radius } from '../../theme/spacing';
 
 
 
 export default function FarmerProfileScreen() {
 
-  const { colors } = useTheme();
-  const styles = createStyles(colors);
+  const { colors, shadows } = useTheme();
+
+  // Animation refs
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(20)).current;
+  const scaleAnim = useRef(new Animated.Value(0.95)).current;
+  const dynamicStyles = StyleSheet.create({
+    safeContainer: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    content: {
+      padding: spacing.lg,
+      paddingBottom: spacing['3xl'],
+    },
+    title: {
+      fontSize: 28,
+      fontWeight: '800',
+      letterSpacing: 0.5,
+      color: colors.text,
+      marginBottom: spacing.xl,
+    },
+    name: {
+      fontSize: 22,
+      fontWeight: '800',
+      lineHeight: 28,
+      color: colors.text,
+      marginBottom: spacing.sm,
+    },
+    email: {
+      fontSize: 14,
+      lineHeight: 21,
+      color: colors.textSecondary,
+      marginBottom: spacing.lg,
+    },
+    badgeContainer: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: spacing.sm,
+    },
+    badge: {
+      backgroundColor: colors.primary,
+      color: colors.textInverse,
+      paddingVertical: spacing.sm,
+      paddingHorizontal: spacing.md,
+      borderRadius: radius.full,
+      fontSize: 12,
+      fontWeight: '700',
+      lineHeight: 16,
+    },
+    badgeMuted: {
+      backgroundColor: colors.borderLight,
+      color: colors.text,
+      paddingVertical: spacing.sm,
+      paddingHorizontal: spacing.md,
+      borderRadius: radius.full,
+      fontSize: 12,
+      fontWeight: '600',
+      lineHeight: 16,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    sectionTitle: {
+      fontSize: 16,
+      fontWeight: '700',
+      letterSpacing: 0.3,
+      color: colors.text,
+      marginBottom: spacing.md,
+      marginTop: spacing.lg,
+    },
+    statsRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      gap: spacing.md,
+      marginVertical: spacing.lg,
+    },
+    statBox: {
+      flex: 1,
+      backgroundColor: colors.surface,
+      borderRadius: radius['2xl'],
+      padding: spacing.md,
+      borderWidth: 1.5,
+      borderColor: colors.border,
+      alignItems: 'center',
+      justifyContent: 'center',
+      ...shadows.sm,
+    },
+    statValue: {
+      fontSize: 24,
+      fontWeight: '800',
+      lineHeight: 30,
+      color: colors.primary,
+      marginBottom: spacing.xs,
+    },
+    statLabel: {
+      fontSize: 12,
+      lineHeight: 16,
+      color: colors.textSecondary,
+      fontWeight: '600',
+      textAlign: 'center',
+    },
+    aboutText: {
+      fontSize: 14,
+      lineHeight: 21,
+      color: colors.textSecondary,
+    },
+    menuItem: {
+      paddingVertical: spacing.md,
+      paddingHorizontal: spacing.md,
+      fontSize: 14,
+      color: colors.text,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.borderLight,
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing.lg,
+    },
+    menuItemText: {
+      flex: 1,
+      fontSize: 15,
+      fontWeight: '600',
+      lineHeight: 21,
+      color: colors.text,
+    },
+    menuItemIcon: {
+      width: 40,
+      height: 40,
+      borderRadius: radius.lg,
+      backgroundColor: colors.primarySoft,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+  });
+
+  const staticStyles = StyleSheet.create({
+    profileCard: {
+      marginBottom: spacing.lg,
+    },
+    card: {
+      marginBottom: spacing.lg,
+    },
+    menuItemLast: {
+      borderBottomWidth: 0,
+    },
+    signOutButton: {
+      marginTop: spacing.lg,
+    },
+  });
 
   const navigation =
     useNavigation<NativeStackNavigationProp<FarmerStackParamList>>();
 
   const { diagnoses } = useDiagnosisStore();
-  const { user, logout } = useAppStore();
+  const { user, logout, isAuthenticated } = useAppStore();
 
   const { notifications } = useNotificationStore();
-
-
 
   /* UNREAD COUNT (DERIVED STATE) */
 
@@ -45,8 +195,6 @@ export default function FarmerProfileScreen() {
     () => notifications.filter(n => !n.read).length,
     [notifications]
   );
-
-
 
   const totalScans = diagnoses?.length || 0;
 
@@ -56,265 +204,139 @@ export default function FarmerProfileScreen() {
   const accuracy =
     totalScans > 0 ? Math.round((treatedCount / totalScans) * 100) : 92;
 
+  // Mount animation
+  useFocusEffect(
+    React.useCallback(() => {
+      // Reset animations
+      fadeAnim.setValue(0);
+      slideAnim.setValue(20);
+      scaleAnim.setValue(0.95);
 
+      // Start entrance animation
+      Animated.parallel([
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 600,
+          useNativeDriver: true,
+        }),
+        Animated.timing(slideAnim, {
+          toValue: 0,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+        Animated.timing(scaleAnim, {
+          toValue: 1,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+      ]).start();
+
+      return () => {
+        // Cleanup when screen loses focus
+      };
+    }, [fadeAnim, slideAnim, scaleAnim])
+  );
 
   const menuItems = [
-    { id: 'notifications', label: 'Notifications', icon: 'bell', screen: 'Notifications' as any },
-    { id: 'settings', label: 'Settings', icon: 'settings', screen: 'Settings' as any },
-    { id: 'privacy', label: 'Privacy & Security', icon: 'shield', screen: 'Privacy' as any },
-    { id: 'help', label: 'Help & Support', icon: 'life-buoy', screen: 'Help' as any },
+    { id: 'notifications', label: 'Notifications', icon: 'bell', onPress: () => navigation.navigate('Notifications') },
+    { id: 'settings', label: 'Settings', icon: 'settings', onPress: () => navigation.navigate('Settings') },
+    { id: 'privacy', label: 'Privacy & Security', icon: 'shield', onPress: () => navigation.navigate('Privacy' as any) },
+    { id: 'help', label: 'Help & Support', icon: 'life-buoy', onPress: () => navigation.navigate('Help' as any) },
   ];
 
-
-
-  const handleMenuPress = (item: any) => {
-
-    try {
-      navigation.navigate(item.screen);
-    } catch {
-      Alert.alert('Coming Soon', `${item.label} will be available soon.`);
-    }
-
-  };
-
-
-
   const handleLogout = () => {
-
     logout();
-
-    Alert.alert('Logged out', 'Logged out successfully.');
-
-    navigation.reset({
-      index: 0,
-      routes: [{ name: 'FarmerTabs' }],
-    });
-
+    Alert.alert('Signed out', 'Logged out successfully.');
+    navigation.navigate('FarmerTabs', { screen: 'FarmerDashboard' } as never);
   };
-
-
 
   return (
+    <SafeAreaView style={dynamicStyles.safeContainer}>
+      <Animated.View
+        style={[
+          { flex: 1 },
+          {
+            opacity: fadeAnim,
+            transform: [
+              { translateY: slideAnim },
+              { scale: scaleAnim },
+            ],
+          },
+        ]}
+      >
+        <ScrollView style={dynamicStyles.container} contentContainerStyle={dynamicStyles.content}>
+        <Text style={dynamicStyles.title}>Profile</Text>
 
-    <SafeAreaView style={styles.safeContainer}>
-
-      <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-
-        <Text style={styles.title}>Profile</Text>
-
-
-
-        <Card style={styles.profileCard}>
-
-          <Text style={styles.name}>
+        <Card style={staticStyles.profileCard}>
+          <Text style={dynamicStyles.name}>
             {user?.name || 'John Farmer'}
           </Text>
-
-          <Text style={styles.email}>
+          <Text style={dynamicStyles.email}>
             {user?.email || 'john@farm.com'}
           </Text>
-
+          <View style={dynamicStyles.badgeContainer}>
+            <Text style={dynamicStyles.badge}>Active Farmer</Text>
+            <Text style={dynamicStyles.badgeMuted}>Verified</Text>
+          </View>
         </Card>
 
-
-
-        <View style={styles.statsRow}>
-
-          <View style={styles.statBox}>
-            <Text style={styles.statValue}>{totalScans}</Text>
-            <Text style={styles.statLabel}>Total Scans</Text>
+        <View style={dynamicStyles.statsRow}>
+          <View style={dynamicStyles.statBox}>
+            <Feather name="activity" size={24} color={colors.primary} style={{ marginBottom: spacing.xs }} />
+            <Text style={dynamicStyles.statValue}>{totalScans}</Text>
+            <Text style={dynamicStyles.statLabel}>Total Scans</Text>
           </View>
 
-          <View style={styles.statBox}>
-            <Text style={styles.statValue}>{treatedCount}</Text>
-            <Text style={styles.statLabel}>Treated</Text>
+          <View style={dynamicStyles.statBox}>
+            <Feather name="check-circle" size={24} color={colors.primary} style={{ marginBottom: spacing.xs }} />
+            <Text style={dynamicStyles.statValue}>{treatedCount}</Text>
+            <Text style={dynamicStyles.statLabel}>Treated</Text>
           </View>
 
-          <View style={styles.statBox}>
-            <Text style={styles.statValue}>{accuracy}%</Text>
-            <Text style={styles.statLabel}>Accuracy</Text>
+          <View style={dynamicStyles.statBox}>
+            <Feather name="trending-up" size={24} color={colors.primary} style={{ marginBottom: spacing.xs }} />
+            <Text style={dynamicStyles.statValue}>{accuracy}%</Text>
+            <Text style={dynamicStyles.statLabel}>Accuracy</Text>
           </View>
-
         </View>
 
+        <Card style={staticStyles.card}>
+          <Text style={dynamicStyles.sectionTitle}>About</Text>
+          <Text style={dynamicStyles.aboutText}>
+            Dedicated to providing the best care for your crops. Using AgriScan to monitor plant health
+            and prevent diseases before they spread.
+          </Text>
+        </Card>
 
-
-        <Card style={styles.card}>
-
+        <Card style={staticStyles.card}>
           {menuItems.map((item, index) => (
-
             <TouchableOpacity
               key={item.id}
-              style={[
-                styles.menuItem,
-                index === menuItems.length - 1 && styles.menuItemLast
-              ]}
-              onPress={() => handleMenuPress(item)}
+              style={[dynamicStyles.menuItem, index === menuItems.length - 1 && staticStyles.menuItemLast]}
+              onPress={item.onPress}
+              activeOpacity={0.6}
             >
-
-              <Feather name={item.icon as any} size={20} color={colors.primary} />
-
-              <Text style={styles.menuItemText}>
-                {item.label}
-              </Text>
-
-
-
+              <View style={dynamicStyles.menuItemIcon}>
+                <Feather name={item.icon as any} size={18} color={colors.primary} />
+              </View>
+              <Text style={dynamicStyles.menuItemText}>{item.label}</Text>
               {item.id === 'notifications' && unreadCount > 0 && (
-                <View style={styles.badge}>
-                  <Text style={styles.badgeText}>
+                <View style={dynamicStyles.badge}>
+                  <Text style={{ color: colors.textInverse, fontSize: 10, fontWeight: 'bold' }}>
                     {unreadCount > 9 ? '9+' : unreadCount}
                   </Text>
                 </View>
               )}
-
-
-
-              <Feather name="chevron-right" size={20} color={colors.border} />
-
+              <Feather name="chevron-right" size={20} color={colors.borderLight} />
             </TouchableOpacity>
-
           ))}
-
         </Card>
 
-
-
-        <Button title="Log Out" variant="outline" onPress={handleLogout} />
-
-
-
-        <Text style={styles.footer}>
-          AgriScan v1.0.0 · Made with 🌱 for farmers
-        </Text>
-
+        <View style={staticStyles.signOutButton}>
+          <Button title="Log Out" variant="outline" onPress={handleLogout} />
+        </View>
       </ScrollView>
-
+      </Animated.View>
     </SafeAreaView>
-
   );
-
 }
-
-
-
-/* STYLES */
-
-const createStyles = (colors: any) =>
-  StyleSheet.create({
-
-    safeContainer: {
-      flex: 1,
-      backgroundColor: colors.background,
-    },
-
-    container: {
-      flex: 1,
-    },
-
-    content: {
-      padding: 16,
-      paddingBottom: 30,
-    },
-
-    title: {
-      fontSize: 22,
-      fontWeight: '700',
-      color: colors.text,
-      marginBottom: 12,
-    },
-
-    profileCard: {
-      marginBottom: 12,
-    },
-
-    name: {
-      fontSize: 18,
-      fontWeight: '700',
-      color: colors.text,
-      marginBottom: 6,
-    },
-
-    email: {
-      fontSize: 13,
-      color: colors.textSecondary,
-      marginBottom: 10,
-    },
-
-    statsRow: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      marginBottom: 12,
-    },
-
-    statBox: {
-      flex: 1,
-      backgroundColor: colors.surface,
-      borderRadius: 12,
-      padding: 12,
-      marginHorizontal: 4,
-      alignItems: 'center',
-      borderWidth: 1,
-      borderColor: colors.border,
-    },
-
-    statValue: {
-      fontSize: 18,
-      fontWeight: '700',
-      color: colors.primary,
-    },
-
-    statLabel: {
-      fontSize: 11,
-      color: colors.textSecondary,
-    },
-
-    card: {
-      marginBottom: 12,
-    },
-
-    menuItem: {
-      paddingVertical: 14,
-      paddingHorizontal: 12,
-      borderBottomWidth: 1,
-      borderBottomColor: colors.border,
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 12,
-    },
-
-    menuItemLast: {
-      borderBottomWidth: 0,
-    },
-
-    menuItemText: {
-      flex: 1,
-      fontSize: 14,
-      fontWeight: '500',
-      color: colors.text,
-    },
-
-    badge: {
-      backgroundColor: colors.primary,
-      borderRadius: 12,
-      paddingHorizontal: 6,
-      paddingVertical: 2,
-      minWidth: 20,
-      alignItems: 'center',
-      marginRight: 8,
-    },
-
-    badgeText: {
-      color: '#fff',
-      fontSize: 10,
-      fontWeight: 'bold',
-    },
-
-    footer: {
-      textAlign: 'center',
-      color: colors.textSecondary,
-      fontSize: 12,
-      marginTop: 16,
-    },
-
-  });

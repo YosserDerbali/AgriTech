@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react';
-import { Alert, ScrollView, StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { Alert, ScrollView, StyleSheet, Text, View, TouchableOpacity, Animated } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Feather } from '@expo/vector-icons';
 import { AgronomistStackParamList } from '../../navigation/types';
@@ -20,11 +20,49 @@ export default function AgronomistProfileScreen() {
   const { getMyArticles } = useArticleStore();
   const { user, logout, isAuthenticated } = useAppStore();
 
+  // Animation refs
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(20)).current;
+  const scaleAnim = useRef(new Animated.Value(0.95)).current;
+
   useEffect(() => {
     if (isAuthenticated) {
       fetchReviewQueue().catch(() => null);
     }
   }, [fetchReviewQueue, isAuthenticated]);
+
+  // Mount animation
+  useFocusEffect(
+    React.useCallback(() => {
+      // Reset animations
+      fadeAnim.setValue(0);
+      slideAnim.setValue(20);
+      scaleAnim.setValue(0.95);
+
+      // Start entrance animation
+      Animated.parallel([
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 600,
+          useNativeDriver: true,
+        }),
+        Animated.timing(slideAnim, {
+          toValue: 0,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+        Animated.timing(scaleAnim, {
+          toValue: 1,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+      ]).start();
+
+      return () => {
+        // Cleanup when screen loses focus
+      };
+    }, [fadeAnim, slideAnim, scaleAnim])
+  );
 
   const approvedByMe = diagnoses.filter((d) => d.status === 'APPROVED').length;
   const myArticles = getMyArticles();
@@ -32,6 +70,7 @@ export default function AgronomistProfileScreen() {
   const menuItems = [
     { id: 'notifications', label: 'Notifications', icon: 'bell', onPress: () => navigation.navigate('Notifications') },
     { id: 'settings', label: 'Settings', icon: 'settings', onPress: () => navigation.navigate('Settings') },
+    { id: 'privacy', label: 'Privacy & Security', icon: 'shield', onPress: () => navigation.navigate('Privacy' as any) },
     { id: 'help', label: 'Help & Support', icon: 'life-buoy', onPress: () => navigation.navigate('HelpAndSupport') },
   ];
 
@@ -207,7 +246,19 @@ export default function AgronomistProfileScreen() {
 
   return (
     <SafeAreaView style={dynamicStyles.safeContainer}>
-      <ScrollView style={dynamicStyles.container} contentContainerStyle={dynamicStyles.content}>
+      <Animated.View
+        style={[
+          { flex: 1 },
+          {
+            opacity: fadeAnim,
+            transform: [
+              { translateY: slideAnim },
+              { scale: scaleAnim },
+            ],
+          },
+        ]}
+      >
+        <ScrollView style={dynamicStyles.container} contentContainerStyle={dynamicStyles.content}>
         <Text style={dynamicStyles.title}>Profile</Text>
 
         <Card style={staticStyles.profileCard}>
@@ -278,6 +329,7 @@ export default function AgronomistProfileScreen() {
           <Button title="Sign Out" variant="outline" onPress={handleLogout} />
         </View>
       </ScrollView>
+      </Animated.View>
     </SafeAreaView>
   );
 }

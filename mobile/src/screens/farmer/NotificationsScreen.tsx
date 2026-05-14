@@ -15,8 +15,9 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Feather } from '@expo/vector-icons';
 
 import { FarmerStackParamList } from '../../navigation/types';
-import { Card } from '../../components/ui/Card';
-import { colors } from '../../theme/colors';
+import { NotificationCard } from '../../components/ui/NotificationCard';
+import { useTheme } from '../../hooks/useTheme';
+import { spacing, radius } from '../../theme/spacing';
 
 import {
   getNotifications,
@@ -53,7 +54,10 @@ const getRelativeTime = (date: Date): string => {
 
 export default function NotificationsScreen() {
 
-  const navigation = useNavigation<NativeStackNavigationProp<FarmerStackParamList>>();
+  const { colors, shadows } = useTheme();
+
+  const navigation =
+    useNavigation<NativeStackNavigationProp<FarmerStackParamList>>();
 
   const {
     notifications,
@@ -66,11 +70,9 @@ export default function NotificationsScreen() {
 
   const [refreshing, setRefreshing] = useState(false);
 
-
+  /* CALCULATE UNREAD */
 
   const unreadCount = notifications.filter(n => !n.read).length;
-
-
 
   /* LOAD NOTIFICATIONS */
 
@@ -79,7 +81,9 @@ export default function NotificationsScreen() {
     try {
 
       setIsLoading(true);
+
       const data = await getNotifications();
+      console.log('Fetched notifications', data);
       setNotifications(data);
 
     } catch (error) {
@@ -94,8 +98,6 @@ export default function NotificationsScreen() {
 
   }, []);
 
-
-
   /* REFRESH */
 
   const onRefresh = async () => {
@@ -108,8 +110,6 @@ export default function NotificationsScreen() {
 
   };
 
-
-
   /* LOAD ON SCREEN FOCUS */
 
   useFocusEffect(
@@ -117,8 +117,6 @@ export default function NotificationsScreen() {
       loadNotifications();
     }, [])
   );
-
-
 
   /* MARK ALL AS READ */
 
@@ -154,8 +152,6 @@ export default function NotificationsScreen() {
 
   };
 
-
-
   /* HEADER BUTTON */
 
   useEffect(() => {
@@ -168,11 +164,7 @@ export default function NotificationsScreen() {
             onPress={handleMarkAllRead}
             style={{ marginRight: 16 }}
           >
-            <Text style={{
-              color: colors.primary,
-              fontSize: 14,
-              fontWeight: '600'
-            }}>
+            <Text style={{ color: colors.primary, fontWeight: '600' }}>
               Mark all
             </Text>
           </TouchableOpacity>
@@ -182,9 +174,7 @@ export default function NotificationsScreen() {
 
   }, [unreadCount]);
 
-
-
-  /* OPEN NOTIFICATION */
+  /* CLICK NOTIFICATION */
 
   const handleNotificationPress = async (notification: Notification) => {
 
@@ -206,15 +196,13 @@ export default function NotificationsScreen() {
 
   };
 
-
-
   /* DELETE */
 
-  const handleDelete = (notification: Notification) => {
+  const handleLongPress = (notification: Notification) => {
 
     Alert.alert(
       'Delete Notification',
-      'Are you sure you want to delete this notification?',
+      'Delete this notification?',
       [
         { text: 'Cancel', style: 'cancel' },
         {
@@ -241,7 +229,73 @@ export default function NotificationsScreen() {
 
   };
 
+  const styles = StyleSheet.create({
 
+    safeContainer: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+
+    container: {
+      flex: 1,
+    },
+
+    content: {
+      padding: spacing.lg,
+      paddingBottom: spacing['3xl'],
+    },
+
+    header: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: spacing.xl,
+      gap: spacing.lg,
+    },
+
+    backButton: {
+      width: 40,
+      height: 40,
+      borderRadius: radius.lg,
+      backgroundColor: colors.surface,
+      borderWidth: 1,
+      borderColor: colors.border,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+
+    title: {
+      fontSize: 28,
+      fontWeight: '800',
+      letterSpacing: 0.5,
+      color: colors.text,
+      flex: 1,
+    },
+
+    spacer: {
+      width: 40,
+    },
+
+
+    emptyContainer: {
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingVertical: spacing['5xl'],
+    },
+
+    emptyText: {
+      fontSize: 18,
+      fontWeight: '600',
+      color: colors.textSecondary,
+    },
+
+    emptySubtext: {
+      fontSize: 14,
+      color: colors.textMuted,
+      marginTop: spacing.sm,
+      textAlign: 'center',
+    },
+  });
 
   return (
 
@@ -255,88 +309,41 @@ export default function NotificationsScreen() {
         }
       >
 
+        <View style={styles.header}>
+
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}
+          >
+            <Feather name="arrow-left" size={24} color={colors.text} />
+          </TouchableOpacity>
+
+          <Text style={styles.title}>Notifications</Text>
+
+          <View style={styles.spacer} />
+
+        </View>
+
         {notifications.length > 0 ? (
 
-          <>
-            {unreadCount > 0 && (
-              <View style={styles.unreadBadgeContainer}>
-                <Text style={styles.unreadBadgeText}>
-                  {unreadCount} unread
-                </Text>
-              </View>
-            )}
-
-            {notifications.map((notification) => (
-
-              <TouchableOpacity
-                key={notification.id}
-                activeOpacity={0.7}
-                onPress={() => handleNotificationPress(notification)}
-                onLongPress={() => handleDelete(notification)}
-              >
-
-                <Card
-                  style={[
-                    styles.notificationCard,
-                    !notification.read && styles.unreadCard
-                  ]}
-                >
-
-                  <View style={styles.notificationContent}>
-
-                    <View style={styles.iconContainer}>
-                      <Feather name="bell" size={22} color={colors.primary} />
-                    </View>
-
-                    <View style={styles.textContent}>
-
-                      <View style={styles.titleRow}>
-
-                        <Text
-                          style={[
-                            styles.notificationMessage,
-                            !notification.read && styles.unreadTitle
-                          ]}
-                        >
-                          {notification.message}
-                        </Text>
-
-                        {!notification.read && (
-                          <View style={styles.unreadDot} />
-                        )}
-
-                      </View>
-
-                      <Text style={styles.timestamp}>
-                        {getRelativeTime(notification.created_at)}
-                      </Text>
-
-                    </View>
-
-                  </View>
-
-                </Card>
-
-              </TouchableOpacity>
-
-            ))}
-
-          </>
+          notifications.map((notification) => (
+            <NotificationCard
+              key={notification.id}
+              notification={notification}
+              timeLabel={getRelativeTime(notification.created_at)}
+              onPress={() => handleNotificationPress(notification)}
+              onLongPress={() => handleLongPress(notification)}
+            />
+          ))
 
         ) : (
 
           <View style={styles.emptyContainer}>
-
-            <Feather name="bell-off" size={48} color={colors.border} />
-
-            <Text style={styles.emptyText}>
-              No notifications
-            </Text>
-
+            <Feather name="inbox" size={56} color={colors.border} />
+            <Text style={styles.emptyText}>No notifications yet</Text>
             <Text style={styles.emptySubtext}>
-              When you receive notifications, they'll appear here
+              Your notifications will appear here
             </Text>
-
           </View>
 
         )}
@@ -348,116 +355,3 @@ export default function NotificationsScreen() {
   );
 
 }
-
-
-
-const styles = StyleSheet.create({
-
-  safeContainer: {
-    flex: 1,
-    backgroundColor: '#f9f9f9'
-  },
-
-  container: {
-    flex: 1
-  },
-
-  content: {
-    padding: 16,
-    paddingBottom: 30
-  },
-
-  unreadBadgeContainer: {
-    backgroundColor: colors.primary,
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 20,
-    alignSelf: 'flex-start',
-    marginBottom: 12
-  },
-
-  unreadBadgeText: {
-    color: 'white',
-    fontSize: 12,
-    fontWeight: '500'
-  },
-
-  notificationCard: {
-    marginBottom: 12
-  },
-
-  unreadCard: {
-    backgroundColor: '#F0F9FF',
-    borderLeftWidth: 3,
-    borderLeftColor: colors.primary
-  },
-
-  notificationContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 12
-  },
-
-  iconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-    backgroundColor: '#EEF4FF'
-  },
-
-  textContent: {
-    flex: 1
-  },
-
-  titleRow: {
-    flexDirection: 'row',
-    alignItems: 'center'
-  },
-
-  notificationMessage: {
-    fontSize: 15,
-    color: colors.text,
-    flex: 1
-  },
-
-  unreadTitle: {
-    fontWeight: '700'
-  },
-
-  unreadDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: colors.primary,
-    marginLeft: 8
-  },
-
-  timestamp: {
-    fontSize: 12,
-    color: '#999',
-    marginTop: 4
-  },
-
-  emptyContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: 80
-  },
-
-  emptyText: {
-    fontSize: 16,
-    color: '#999',
-    marginTop: 12
-  },
-
-  emptySubtext: {
-    fontSize: 13,
-    color: '#bbb',
-    marginTop: 4,
-    textAlign: 'center'
-  }
-
-});

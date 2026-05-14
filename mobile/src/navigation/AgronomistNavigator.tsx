@@ -7,6 +7,7 @@ import DiagnosisReviewScreen from '../screens/agronomist/DiagnosisReviewScreen';
 import ArticleEditorScreen from '../screens/agronomist/ArticleEditorScreen';
 import NotificationsScreen from '../screens/agronomist/NotificationsScreen';
 import SettingsScreen from '../screens/agronomist/SettingsScreen';
+import PrivacyScreen from '../screens/agronomist/PrivacyScreen';
 import EditProfileScreen from '../screens/agronomist/EditProfileScreen';
 import HelpAndSupportScreen from '../screens/agronomist/HelpAndSupportScreen';
 import { useTheme } from '../hooks/useTheme';
@@ -43,6 +44,7 @@ export default function AgronomistNavigator() {
       <Stack.Screen name="ArticleEditor" component={ArticleEditorScreen} options={{ title: 'Write Article' }} />
       <Stack.Screen name="Notifications" component={NotificationsScreen} options={{ headerShown: false }} />
       <Stack.Screen name="Settings" component={SettingsScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="Privacy" component={PrivacyScreen} options={{ headerShown: false }} />
       <Stack.Screen name="EditProfile" component={EditProfileScreen} options={{ headerShown: false }} />
       <Stack.Screen name="HelpAndSupport" component={HelpAndSupportScreen} options={{ headerShown: false }} />
     </Stack.Navigator>

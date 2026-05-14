@@ -4,8 +4,8 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { FarmerStackParamList } from '../../navigation/types';
 import { Card } from '../../components/ui/Card';
-import { colors } from '../../theme/colors';
 import { Feather } from '@expo/vector-icons';
+import { useTheme } from '../../hooks/useTheme';
 import { useAppStore } from '../../stores/appStore';
 import axiosInstance from '../../services/axiosInstance';
 import * as ImagePicker from 'expo-image-picker';
@@ -13,6 +13,7 @@ import * as ImagePicker from 'expo-image-picker';
 export default function EditProfileScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<FarmerStackParamList>>();
   const { user, setUser } = useAppStore();
+  const { colors } = useTheme();
 
   const [name, setName] = useState(user?.name || '');
   const [email] = useState(user?.email || '');
@@ -95,6 +96,8 @@ export default function EditProfileScreen() {
     }
   };
 
+  const styles = getStyles(colors);
+
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       {/* Profile Photo Section */}
@@ -116,8 +119,8 @@ export default function EditProfileScreen() {
             </TouchableOpacity>
             {profileImage && (
               <TouchableOpacity style={[styles.photoButton, styles.removeButton]} onPress={handleRemovePhoto}>
-                <Feather name="trash-2" size={16} color="#999" />
-                <Text style={[styles.photoButtonText, { color: '#999' }]}>Remove</Text>
+<Feather name="trash-2" size={16} color={colors.textSecondary} />
+              <Text style={[styles.photoButtonText, { color: colors.textSecondary }]}>Remove</Text>
               </TouchableOpacity>
             )}
           </View>
@@ -132,7 +135,7 @@ export default function EditProfileScreen() {
           placeholder="Enter your full name"
           value={name}
           onChangeText={setName}
-          placeholderTextColor="#ccc"
+          placeholderTextColor={colors.textSecondary}
         />
       </Card>
 
@@ -143,7 +146,7 @@ export default function EditProfileScreen() {
           style={[styles.input, styles.readonlyInput]}
           value={email}
           editable={false}
-          placeholderTextColor="#ccc"
+          placeholderTextColor={colors.textSecondary}
         />
         <Text style={styles.helperText}>Email cannot be changed</Text>
       </Card>
@@ -156,7 +159,7 @@ export default function EditProfileScreen() {
           placeholder="Enter your farm name"
           value={farmName}
           onChangeText={setFarmName}
-          placeholderTextColor="#ccc"
+          placeholderTextColor={colors.textSecondary}
         />
       </Card>
 
@@ -168,7 +171,7 @@ export default function EditProfileScreen() {
           placeholder="Enter your location (City, State)"
           value={location}
           onChangeText={setLocation}
-          placeholderTextColor="#ccc"
+          placeholderTextColor={colors.textSecondary}
         />
       </Card>
 
@@ -180,7 +183,7 @@ export default function EditProfileScreen() {
           placeholder="Enter your phone number"
           value={phoneNumber}
           onChangeText={setPhoneNumber}
-          placeholderTextColor="#ccc"
+          placeholderTextColor={colors.textSecondary}
           keyboardType="phone-pad"
         />
       </Card>
@@ -209,10 +212,10 @@ export default function EditProfileScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (colors: any) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f9f9f9',
+    backgroundColor: colors.background,
   },
   content: {
     padding: 16,
@@ -221,6 +224,7 @@ const styles = StyleSheet.create({
   photoCard: {
     marginBottom: 20,
     paddingVertical: 20,
+    backgroundColor: colors.surface,
   },
   photoContainer: {
     alignItems: 'center',
@@ -242,7 +246,7 @@ const styles = StyleSheet.create({
   avatarText: {
     fontSize: 40,
     fontWeight: '700',
-    color: 'white',
+    color: colors.textInverse,
   },
   photoActions: {
     flexDirection: 'row',
@@ -254,11 +258,11 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 12,
     borderRadius: 8,
-    backgroundColor: `${colors.primary}10`,
+    backgroundColor: `${colors.primary}20`,
     gap: 6,
   },
   removeButton: {
-    backgroundColor: '#f5f5f5',
+    backgroundColor: colors.surfaceElevated,
   },
   photoButtonText: {
     fontSize: 12,
@@ -268,6 +272,7 @@ const styles = StyleSheet.create({
   section: {
     marginBottom: 16,
     padding: 16,
+    backgroundColor: colors.surface,
   },
   label: {
     fontSize: 14,
@@ -277,7 +282,7 @@ const styles = StyleSheet.create({
   },
   helperText: {
     fontSize: 12,
-    color: '#999',
+    color: colors.textSecondary,
     marginTop: 8,
   },
   input: {
@@ -288,11 +293,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     fontSize: 14,
     color: colors.text,
-    backgroundColor: '#fafafa',
+    backgroundColor: colors.surfaceElevated,
   },
   readonlyInput: {
-    backgroundColor: '#f5f5f5',
-    color: '#999',
+    backgroundColor: colors.surfaceAlt,
+    color: colors.textSecondary,
   },
   saveButton: {
     backgroundColor: colors.primary,
@@ -306,7 +311,7 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   saveButtonText: {
-    color: 'white',
+    color: colors.textInverse,
     fontSize: 16,
     fontWeight: '600',
   },
@@ -319,7 +324,7 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
   },
   cancelButtonText: {
-    color: colors.textSecondary || '#999',
+    color: colors.textSecondary,
     fontSize: 16,
     fontWeight: '500',
   },

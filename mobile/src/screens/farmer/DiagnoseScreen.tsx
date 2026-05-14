@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -12,9 +12,11 @@ import {
   Platform,
   Keyboard,
   TouchableOpacity,
+  Animated,
+  Dimensions,
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Audio } from 'expo-av';
 import { FarmerStackParamList } from '../../navigation/types';
@@ -38,6 +40,19 @@ export default function DiagnoseScreen() {
   const [recording, setRecording] = useState<Audio.Recording | null>(null);
   const [recordingDurationMs, setRecordingDurationMs] = useState(0);
 
+  // Step management
+  const [currentStep, setCurrentStep] = useState(0);
+  const fadeAnim = useRef(new Animated.Value(1)).current;
+  const slideAnim = useRef(new Animated.Value(0)).current;
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+
+  const steps = [
+    { id: 0, title: 'Upload Image', icon: 'camera', required: true },
+    { id: 1, title: 'Plant Name', icon: 'leaf', required: false },
+    { id: 2, title: 'Additional Context', icon: 'message-square', required: false },
+    { id: 3, title: 'Review & Submit', icon: 'check-circle', required: true },
+  ];
+
   useEffect(() => {
     return () => {
       if (recording) {
@@ -45,6 +60,36 @@ export default function DiagnoseScreen() {
       }
     };
   }, [recording]);
+
+  // Reset form when screen comes into focus
+  useFocusEffect(
+    React.useCallback(() => {
+      resetDiagnosisForm();
+
+      // Mount animations
+      fadeAnim.setValue(0);
+      slideAnim.setValue(20);
+      scaleAnim.setValue(0.95);
+
+      Animated.parallel([
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 600,
+          useNativeDriver: true,
+        }),
+        Animated.timing(slideAnim, {
+          toValue: 0,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+        Animated.timing(scaleAnim, {
+          toValue: 1,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    }, [fadeAnim, slideAnim, scaleAnim])
+  );
 
   const appendTranscript = (transcript: string) => {
     if (!transcript.trim()) {
@@ -55,6 +100,78 @@ export default function DiagnoseScreen() {
       const current = previous.trimEnd();
       return current.length > 0 ? `${current}\n${transcript.trim()}` : transcript.trim();
     });
+  };
+
+  // Step navigation with animations
+  const animateTransition = (direction: 'next' | 'prev') => {
+    Animated.sequence([
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 150,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnim, {
+        toValue: direction === 'next' ? -50 : 50,
+        duration: 0,
+        useNativeDriver: true,
+      }),
+      Animated.parallel([
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+        Animated.timing(slideAnim, {
+          toValue: 0,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+      ]),
+    ]).start();
+  };
+
+  const nextStep = () => {
+    if (currentStep < steps.length - 1) {
+      animateTransition('next');
+      setCurrentStep(currentStep + 1);
+    }
+  };
+
+  const prevStep = () => {
+    if (currentStep > 0) {
+      animateTransition('prev');
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
+  const canProceedToNext = () => {
+    switch (currentStep) {
+      case 0: // Image upload
+        return selectedImage !== null;
+      case 1: // Plant name
+        return true; // Optional
+      case 2: // Context
+        return true; // Optional
+      case 3: // Review
+        return selectedImage !== null;
+      default:
+        return false;
+    }
+  };
+
+  // Reset function to clear all state
+  const resetDiagnosisForm = () => {
+    setCurrentStep(0);
+    setSelectedImage(null);
+    setPlantName('');
+    setContext('');
+    setIsRecording(false);
+    setIsTranscribing(false);
+    setRecording(null);
+    setRecordingDurationMs(0);
+    // Reset animations
+    fadeAnim.setValue(1);
+    slideAnim.setValue(0);
   };
 
   const handleSubmit = async () => {
@@ -240,11 +357,76 @@ export default function DiagnoseScreen() {
       padding: 16,
       paddingBottom: 30,
     },
+    header: {
+      marginBottom: 24,
+    },
     title: {
       fontSize: 22,
       fontWeight: '700',
       color: colors.text,
       marginBottom: 16,
+      textAlign: 'center',
+    },
+    progressContainer: {
+      flexDirection: 'row',
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginBottom: 24,
+    },
+    stepIndicator: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      borderWidth: 2,
+      borderColor: colors.border,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginHorizontal: 8,
+      backgroundColor: colors.surface,
+    },
+    stepIndicatorActive: {
+      borderColor: colors.primary,
+      backgroundColor: colors.primary,
+    },
+    stepIndicatorCompleted: {
+      borderColor: colors.success,
+      backgroundColor: colors.success,
+    },
+    stepIcon: {
+      color: colors.muted,
+    },
+    stepIconActive: {
+      color: colors.textInverse,
+    },
+    stepIconCompleted: {
+      color: colors.textInverse,
+    },
+    stepLine: {
+      height: 2,
+      backgroundColor: colors.border,
+      flex: 1,
+      marginHorizontal: 8,
+    },
+    stepLineActive: {
+      backgroundColor: colors.primary,
+    },
+    stepContainer: {
+      flex: 1,
+      opacity: fadeAnim,
+      transform: [{ translateX: slideAnim }],
+    },
+    stepTitle: {
+      fontSize: 20,
+      fontWeight: '600',
+      color: colors.text,
+      marginBottom: 8,
+      textAlign: 'center',
+    },
+    stepDescription: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      textAlign: 'center',
+      marginBottom: 24,
     },
     section: {
       marginBottom: 18,
@@ -310,106 +492,272 @@ export default function DiagnoseScreen() {
     },
     infoText: {
       fontSize: 13,
-      color: colors.muted,
+      color: colors.textSecondary,
+    },
+    navigationButtons: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      marginTop: 24,
+    },
+    navButton: {
+      flex: 1,
+      marginHorizontal: 8,
     },
     submitButton: {
       marginTop: 6,
     },
+    reviewSection: {
+      marginBottom: 16,
+    },
+    reviewItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      padding: 12,
+      backgroundColor: colors.surface,
+      borderRadius: 12,
+      marginBottom: 8,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    reviewItemText: {
+      flex: 1,
+      fontSize: 14,
+      color: colors.text,
+    },
+    reviewItemIcon: {
+      marginRight: 12,
+    },
   });
+
+  const renderProgressIndicator = () => (
+    <View style={styles.progressContainer}>
+      {steps.map((step, index) => (
+        <React.Fragment key={step.id}>
+          <View
+            style={[
+              styles.stepIndicator,
+              index === currentStep && styles.stepIndicatorActive,
+              index < currentStep && styles.stepIndicatorCompleted,
+            ]}
+          >
+            <Feather
+              name={step.icon as any}
+              size={20}
+              style={[
+                styles.stepIcon,
+                index === currentStep && styles.stepIconActive,
+                index < currentStep && styles.stepIconCompleted,
+              ]}
+            />
+          </View>
+          {index < steps.length - 1 && (
+            <View
+              style={[
+                styles.stepLine,
+                index < currentStep && styles.stepLineActive,
+              ]}
+            />
+          )}
+        </React.Fragment>
+      ))}
+    </View>
+  );
+
+  const renderStepContent = () => {
+    const stepDescriptions = {
+      0: 'Upload a clear photo of your plant to get started',
+      1: 'Give your plant a name to help identify it',
+      2: 'Add any additional details about symptoms or conditions',
+      3: 'Review your information before submitting',
+    };
+
+    switch (currentStep) {
+      case 0:
+        return (
+          <Animated.View style={styles.stepContainer}>
+            <Text style={styles.stepTitle}>Upload Plant Image</Text>
+            <Text style={styles.stepDescription}>{stepDescriptions[0]}</Text>
+            <View style={styles.section}>
+              <ImageUploader
+                selectedImage={selectedImage}
+                onImageSelect={setSelectedImage}
+                onClear={() => setSelectedImage(null)}
+              />
+            </View>
+          </Animated.View>
+        );
+
+      case 1:
+        return (
+          <Animated.View style={styles.stepContainer}>
+            <Text style={styles.stepTitle}>Plant Name</Text>
+            <Text style={styles.stepDescription}>{stepDescriptions[1]}</Text>
+            <View style={styles.section}>
+              <TextInput
+                placeholder="Enter the plant name (optional)"
+                placeholderTextColor={colors.muted}
+                value={plantName}
+                onChangeText={setPlantName}
+                style={styles.plantNameInput}
+                returnKeyType="done"
+                autoFocus
+              />
+            </View>
+          </Animated.View>
+        );
+
+      case 2:
+        return (
+          <Animated.View style={styles.stepContainer}>
+            <Text style={styles.stepTitle}>Additional Context</Text>
+            <Text style={styles.stepDescription}>{stepDescriptions[2]}</Text>
+            <TouchableOpacity
+              activeOpacity={1}
+              style={styles.section}
+              onPress={Keyboard.dismiss}
+            >
+              <Textarea
+                placeholder="Describe any symptoms, growing conditions, or concerns..."
+                value={context}
+                onChangeText={setContext}
+                style={styles.textarea}
+                autoFocus
+              />
+              <Button
+                title={isRecording ? 'Stop Recording' : 'Add Voice Note'}
+                variant={isRecording ? 'destructive' : 'outline'}
+                onPress={toggleRecording}
+                style={styles.voiceButton}
+                disabled={isTranscribing}
+                icon={
+                  <Feather
+                    name={isRecording ? 'mic-off' : 'mic'}
+                    size={18}
+                    color={isRecording ? colors.textInverse : colors.primary}
+                  />
+                }
+              />
+              {isRecording ? (
+                <Text style={styles.recording}>
+                  Recording voice note... {(recordingDurationMs / 1000).toFixed(1)}s
+                </Text>
+              ) : null}
+              {isTranscribing ? (
+                <View style={styles.transcribingRow}>
+                  <ActivityIndicator size="small" color={colors.primary} />
+                  <Text style={styles.transcribingText}>Transcribing voice note...</Text>
+                </View>
+              ) : null}
+            </TouchableOpacity>
+          </Animated.View>
+        );
+
+      case 3:
+        return (
+          <Animated.View style={styles.stepContainer}>
+            <Text style={styles.stepTitle}>Review & Submit</Text>
+            <Text style={styles.stepDescription}>{stepDescriptions[3]}</Text>
+
+            <View style={styles.reviewSection}>
+              <View style={styles.reviewItem}>
+                <Feather name="camera" size={20} color={colors.primary} style={styles.reviewItemIcon} />
+                <Text style={styles.reviewItemText}>
+                  {selectedImage ? 'Image uploaded' : 'No image selected'}
+                </Text>
+              </View>
+
+              <View style={styles.reviewItem}>
+                <Feather name="leaf" size={20} color={plantName.trim() ? colors.primary : colors.muted} style={styles.reviewItemIcon} />
+                <Text style={styles.reviewItemText}>
+                  {plantName.trim() || 'No plant name provided'}
+                </Text>
+              </View>
+
+              <View style={styles.reviewItem}>
+                <Feather name="message-square" size={20} color={context.trim() ? colors.primary : colors.muted} style={styles.reviewItemIcon} />
+                <Text style={styles.reviewItemText}>
+                  {context.trim() ? 'Context provided' : 'No additional context'}
+                </Text>
+              </View>
+            </View>
+
+            <View style={styles.infoBox}>
+              <Text style={styles.infoTitle}>How it works</Text>
+              <Text style={styles.infoText}>
+                Your image will be analyzed by AI and reviewed by an agronomist for accurate diagnosis and treatment.
+              </Text>
+            </View>
+          </Animated.View>
+        );
+
+      default:
+        return null;
+    }
+  };
+
+  const renderNavigationButtons = () => (
+    <View style={styles.navigationButtons}>
+      {currentStep > 0 && (
+        <Button
+          title="Previous"
+          variant="outline"
+          onPress={prevStep}
+          style={styles.navButton}
+        />
+      )}
+      {currentStep < steps.length - 1 ? (
+        <Button
+          title="Next"
+          onPress={nextStep}
+          disabled={!canProceedToNext()}
+          style={styles.navButton}
+        />
+      ) : (
+        <Button
+          title={isLoading ? 'Analyzing...' : 'Submit for Diagnosis'}
+          onPress={handleSubmit}
+          disabled={!selectedImage || isLoading}
+          style={styles.navButton}
+        />
+      )}
+    </View>
+  );
 
   return (
     <SafeAreaView style={styles.safeContainer}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.keyboardAvoid}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+      <Animated.View
+        style={[
+          { flex: 1 },
+          {
+            opacity: fadeAnim,
+            transform: [
+              { translateY: slideAnim },
+              { scale: scaleAnim },
+            ],
+          },
+        ]}
       >
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.keyboardAvoid}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+        >
         <ScrollView
           style={styles.container}
           contentContainerStyle={styles.content}
           scrollEnabled={true}
           keyboardShouldPersistTaps="handled"
         >
-          <Text style={styles.title}>New Diagnosis</Text>
-
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Plant Image</Text>
-            <ImageUploader
-              selectedImage={selectedImage}
-              onImageSelect={setSelectedImage}
-              onClear={() => setSelectedImage(null)}
-            />
+          <View style={styles.header}>
+            <Text style={styles.title}>New Diagnosis</Text>
+            {renderProgressIndicator()}
           </View>
 
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Plant Name</Text>
-            <TextInput
-              placeholder="Enter the plant name"
-              placeholderTextColor={colors.muted}
-              value={plantName}
-              onChangeText={setPlantName}
-              style={styles.plantNameInput}
-              returnKeyType="done"
-            />
-          </View>
-
-          <TouchableOpacity
-            activeOpacity={1}
-            style={styles.section}
-            onPress={Keyboard.dismiss}
-          >
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Additional Context</Text>
-              <Text style={styles.optional}>(Optional)</Text>
-            </View>
-            <Textarea
-              placeholder="Describe any symptoms, growing conditions, or concerns..."
-              value={context}
-              onChangeText={setContext}
-              style={styles.textarea}
-            />
-            <Button
-              title={isRecording ? 'Stop Recording' : 'Add Voice Note'}
-              variant={isRecording ? 'destructive' : 'outline'}
-              onPress={toggleRecording}
-              style={styles.voiceButton}
-              disabled={isTranscribing}
-              icon={
-                <Feather
-                  name={isRecording ? 'mic-off' : 'mic'}
-                  size={18}
-                  color={isRecording ? colors.textInverse : colors.primary}
-                />
-              }
-            />
-            {isRecording ? (
-              <Text style={styles.recording}>
-                Recording voice note... {(recordingDurationMs / 1000).toFixed(1)}s
-              </Text>
-            ) : null}
-            {isTranscribing ? (
-              <View style={styles.transcribingRow}>
-                <ActivityIndicator size="small" color={colors.primary} />
-                <Text style={styles.transcribingText}>Transcribing voice note...</Text>
-              </View>
-            ) : null}
-          </TouchableOpacity>
-
-          <View style={styles.infoBox}>
-            <Text style={styles.infoTitle}>How it works</Text>
-            <Text style={styles.infoText}>
-              Your image will be analyzed by AI and reviewed by an agronomist for accurate diagnosis and treatment.
-            </Text>
-          </View>
-
-          <Button
-            title={isLoading ? 'Analyzing...' : 'Submit for Diagnosis'}
-            onPress={handleSubmit}
-            disabled={!selectedImage || isLoading}
-            style={styles.submitButton}
-          />
+          {renderStepContent()}
+          {renderNavigationButtons()}
         </ScrollView>
       </KeyboardAvoidingView>
+      </Animated.View>
     </SafeAreaView>
   );
 }

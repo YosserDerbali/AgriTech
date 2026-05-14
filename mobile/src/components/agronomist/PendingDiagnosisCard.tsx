@@ -26,6 +26,7 @@ export function PendingDiagnosisCard({ diagnosis, onPress }: PendingDiagnosisCar
       borderWidth: 1.5,
       borderColor: isLowConfidence ? colors.warning : colors.border,
       marginBottom: spacing.lg,
+      height: 160,
       ...shadows.md,
     },
     title: {
@@ -73,9 +74,10 @@ export function PendingDiagnosisCard({ diagnosis, onPress }: PendingDiagnosisCar
       marginBottom: spacing.md,
     },
     imageWrapper: {
-      width: 100,
-      height: 100,
+      width: 140,
+      height: 160,
       position: 'relative',
+      backgroundColor: colors.surfaceAlt,
     },
     image: {
       width: '100%',
@@ -90,7 +92,8 @@ export function PendingDiagnosisCard({ diagnosis, onPress }: PendingDiagnosisCar
     },
     content: {
       flex: 1,
-      padding: spacing.lg,
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.md,
       justifyContent: 'space-between',
     },
     metaRow: {

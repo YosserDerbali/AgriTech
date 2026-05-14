@@ -1,7 +1,6 @@
 const adminService = require("../services/admin");
 const rssConfigService = require("../services/rssConfigService");
 const { rescheduleRssSync, getScheduleInfo, syncArticlesFromRSS } = require("../services/cronRescheduler");
-const { AiModel, SystemSettings } = require("../models");
 
 // Helper to remove sensitive fields
 const sanitizeUser = (user) => {
@@ -303,209 +302,52 @@ exports.getRssScheduleInfo = async (req, res) => {
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
+// ── Diagnoses Endpoints ───────────────────────────────────────────────
 
-// ========================================
-// AI MODELS MANAGEMENT
-// ========================================
+// 🔹 Get all diagnoses
+exports.getAllDiagnoses = async (req, res) => {
+  try {
+    const diagnoses = await adminService.getAllDiagnoses();
+
+    res.json({
+      success: true,
+      data: diagnoses,
+    });
+  } catch (err) {
+    console.error("Get all diagnoses error:", err);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+// ── AI Models Endpoints ───────────────────────────────────────────────
 
 // 🔹 Get all AI models
 exports.getAllAiModels = async (req, res) => {
   try {
-    const aiModels = await AiModel.findAll({
-      attributes: ['id', 'name', 'version', 'type', 'accuracy', 'totalPredictions', 'isEnabled', 'lastUpdated'],
-      order: [['lastUpdated', 'DESC']],
-    });
+    const models = await adminService.getAllAiModels();
 
     res.json({
       success: true,
-      data: aiModels,
+      data: models,
     });
   } catch (err) {
     console.error("Get all AI models error:", err);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
-
-// 🔹 Toggle AI model status (enable/disable)
-exports.toggleAiModel = async (req, res) => {
+exports.getAllArticles = async (req, res) => {
   try {
-    const { modelId } = req.params;
-
-    const model = await AiModel.findByPk(modelId);
-    if (!model) {
-      return res.status(404).json({ success: false, message: "AI Model not found" });
-    }
-
-    const updatedModel = await model.update({
-      isEnabled: !model.isEnabled,
-      lastUpdated: new Date(),
-    });
+    const articles = await adminService.getAllArticles();
 
     res.json({
       success: true,
-      data: updatedModel,
+      data: articles,
     });
   } catch (err) {
-    console.error("Toggle AI model error:", err);
-    res.status(500).json({ success: false, message: "Internal server error" });
-  }
-};
-
-// 🔹 Create new AI model
-exports.createAiModel = async (req, res) => {
-  try {
-    const { name, version, type, accuracy, totalPredictions } = req.body;
-
-    if (!name || !version || !type) {
-      return res.status(400).json({
-        success: false,
-        message: "name, version, and type are required",
-      });
-    }
-
-    if (accuracy === undefined) {
-      return res.status(400).json({
-        success: false,
-        message: "accuracy is required",
-      });
-    }
-
-    const newModel = await AiModel.create({
-      name,
-      version,
-      type,
-      accuracy,
-      totalPredictions: totalPredictions || 0,
-      isEnabled: true,
-      lastUpdated: new Date(),
+    console.error("Get all articles error:", err);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
     });
-
-    res.status(201).json({
-      success: true,
-      data: newModel,
-    });
-  } catch (err) {
-    console.error("Create AI model error:", err);
-    res.status(500).json({ success: false, message: "Internal server error" });
-  }
-};
-
-// 🔹 Delete AI model
-exports.deleteAiModel = async (req, res) => {
-  try {
-    const { modelId } = req.params;
-
-    const model = await AiModel.findByPk(modelId);
-    if (!model) {
-      return res.status(404).json({ success: false, message: "AI Model not found" });
-    }
-
-    await model.destroy();
-
-    res.json({
-      success: true,
-      message: "AI Model deleted successfully",
-    });
-  } catch (err) {
-    console.error("Delete AI model error:", err);
-    res.status(500).json({ success: false, message: "Internal server error" });
-  }
-};
-
-// ========================================
-// SYSTEM SETTINGS MANAGEMENT
-// ========================================
-
-// 🔹 Get system settings
-exports.getSystemSettings = async (req, res) => {
-  try {
-    let settings = await SystemSettings.findOne();
-
-    // If no settings exist, create default ones
-    if (!settings) {
-      settings = await SystemSettings.create({
-        maintenanceMode: false,
-        maxImageSizeMB: 10,
-        confidenceThreshold: 0.8,
-        notificationsEnabled: true,
-        externalBlogSyncEnabled: false,
-        externalBlogSyncIntervalHours: 6,
-      });
-    }
-
-    res.json({
-      success: true,
-      data: settings,
-    });
-  } catch (err) {
-    console.error("Get system settings error:", err);
-    res.status(500).json({ success: false, message: "Internal server error" });
-  }
-};
-
-// 🔹 Update system settings
-exports.updateSystemSettings = async (req, res) => {
-  try {
-    const {
-      maintenanceMode,
-      maxImageSizeMB,
-      confidenceThreshold,
-      notificationsEnabled,
-      externalBlogSyncEnabled,
-      externalBlogSyncIntervalHours,
-    } = req.body;
-
-    // Validation
-    if (maxImageSizeMB !== undefined) {
-      if (maxImageSizeMB < 1 || maxImageSizeMB > 50) {
-        return res.status(400).json({
-          success: false,
-          message: "maxImageSizeMB must be between 1 and 50",
-        });
-      }
-    }
-
-    if (confidenceThreshold !== undefined) {
-      if (confidenceThreshold < 0.5 || confidenceThreshold > 0.95) {
-        return res.status(400).json({
-          success: false,
-          message: "confidenceThreshold must be between 0.5 and 0.95",
-        });
-      }
-    }
-
-    if (externalBlogSyncIntervalHours !== undefined) {
-      if (externalBlogSyncIntervalHours < 1 || externalBlogSyncIntervalHours > 24) {
-        return res.status(400).json({
-          success: false,
-          message: "externalBlogSyncIntervalHours must be between 1 and 24",
-        });
-      }
-    }
-
-    // Get or create settings
-    let settings = await SystemSettings.findOne();
-    if (!settings) {
-      settings = await SystemSettings.create({});
-    }
-
-    // Update with provided values
-    const updateData = {};
-    if (maintenanceMode !== undefined) updateData.maintenanceMode = maintenanceMode;
-    if (maxImageSizeMB !== undefined) updateData.maxImageSizeMB = maxImageSizeMB;
-    if (confidenceThreshold !== undefined) updateData.confidenceThreshold = confidenceThreshold;
-    if (notificationsEnabled !== undefined) updateData.notificationsEnabled = notificationsEnabled;
-    if (externalBlogSyncEnabled !== undefined) updateData.externalBlogSyncEnabled = externalBlogSyncEnabled;
-    if (externalBlogSyncIntervalHours !== undefined) updateData.externalBlogSyncIntervalHours = externalBlogSyncIntervalHours;
-
-    const updatedSettings = await settings.update(updateData);
-
-    res.json({
-      success: true,
-      data: updatedSettings,
-    });
-  } catch (err) {
-    console.error("Update system settings error:", err);
-    res.status(500).json({ success: false, message: "Internal server error" });
   }
 };

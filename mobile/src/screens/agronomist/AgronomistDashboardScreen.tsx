@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
-import { ScrollView, StyleSheet, Text, View, SafeAreaView, TouchableOpacity } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import React, { useEffect, useRef } from 'react';
+import { ScrollView, StyleSheet, Text, View, SafeAreaView, TouchableOpacity, Animated } from 'react-native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Feather } from '@expo/vector-icons';
 import { AgronomistStackParamList } from '../../navigation/types';
@@ -15,6 +15,11 @@ import { spacing, radius } from '../../theme/spacing';
 
 export default function AgronomistDashboardScreen() {
   const { colors, shadows } = useTheme();
+
+  // Animation refs
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(20)).current;
+  const scaleAnim = useRef(new Animated.Value(0.95)).current;
   const navigation = useNavigation<NativeStackNavigationProp<AgronomistStackParamList>>();
   const { diagnoses, getPendingDiagnoses, fetchReviewQueue } = useDiagnosisStore();
   const { getMyArticles, fetchMyArticles } = useArticleStore();
@@ -37,6 +42,39 @@ export default function AgronomistDashboardScreen() {
       fetchMyArticles().catch(() => null);
     }
   }, [fetchReviewQueue, fetchMyArticles, isAuthenticated]);
+
+  // Mount animation
+  useFocusEffect(
+    React.useCallback(() => {
+      // Reset animations
+      fadeAnim.setValue(0);
+      slideAnim.setValue(20);
+      scaleAnim.setValue(0.95);
+
+      // Start entrance animation
+      Animated.parallel([
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 600,
+          useNativeDriver: true,
+        }),
+        Animated.timing(slideAnim, {
+          toValue: 0,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+        Animated.timing(scaleAnim, {
+          toValue: 1,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+      ]).start();
+
+      return () => {
+        // Cleanup when screen loses focus
+      };
+    }, [fadeAnim, slideAnim, scaleAnim])
+  );
 
   const dynamicStyles = StyleSheet.create({
     safeContainer: {
@@ -171,7 +209,19 @@ export default function AgronomistDashboardScreen() {
 
   return (
     <SafeAreaView style={dynamicStyles.safeContainer}>
-      <ScrollView style={dynamicStyles.container} contentContainerStyle={dynamicStyles.content}>
+      <Animated.View
+        style={[
+          { flex: 1 },
+          {
+            opacity: fadeAnim,
+            transform: [
+              { translateY: slideAnim },
+              { scale: scaleAnim },
+            ],
+          },
+        ]}
+      >
+        <ScrollView style={dynamicStyles.container} contentContainerStyle={dynamicStyles.content}>
         <Text style={dynamicStyles.title}>Dashboard</Text>
 
         <View style={dynamicStyles.welcomeCard}>
@@ -279,6 +329,7 @@ export default function AgronomistDashboardScreen() {
           </View>
         </View>
       </ScrollView>
+      </Animated.View>
     </SafeAreaView>
   );
 }
